@@ -1003,6 +1003,8 @@ export interface Database {
           refund_amount_cents_usd: number | null;
           resolution_notes: string | null;
           resolved_at: string | null;
+          appealed_at: string | null;
+          appeal_reason: string | null;
           opened_at: string;
           updated_at: string;
         };
@@ -1019,6 +1021,8 @@ export interface Database {
           refund_amount_cents_usd?: number | null;
           resolution_notes?: string | null;
           resolved_at?: string | null;
+          appealed_at?: string | null;
+          appeal_reason?: string | null;
           opened_at?: string;
           updated_at?: string;
         };
@@ -1152,6 +1156,89 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["referrals"]["Insert"]>;
         Relationships: [];
       };
+
+      commission_payouts: {
+        Row: {
+          id: string;
+          seller_id: string;
+          period_month: string;
+          total_cents_usd: number;
+          method: string | null;
+          requested_at: string;
+          paid_at: string | null;
+          proof_url: string | null;
+          status: "solicitado" | "pagado" | "rechazado";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          seller_id: string;
+          period_month: string;
+          total_cents_usd: number;
+          method?: string | null;
+          requested_at?: string;
+          paid_at?: string | null;
+          proof_url?: string | null;
+          status?: "solicitado" | "pagado" | "rechazado";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["commission_payouts"]["Insert"]>;
+        Relationships: [];
+      };
+
+      support_tickets: {
+        Row: {
+          id: string;
+          user_id: string;
+          subject: string;
+          category: string | null;
+          body: string;
+          status: "abierto" | "en_proceso" | "cerrado";
+          priority: "baja" | "normal" | "alta" | "urgente";
+          assigned_to: string | null;
+          opened_at: string;
+          closed_at: string | null;
+          satisfaction_rating: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          subject: string;
+          category?: string | null;
+          body: string;
+          status?: "abierto" | "en_proceso" | "cerrado";
+          priority?: "baja" | "normal" | "alta" | "urgente";
+          assigned_to?: string | null;
+          opened_at?: string;
+          closed_at?: string | null;
+          satisfaction_rating?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["support_tickets"]["Insert"]>;
+        Relationships: [];
+      };
+
+      notification_preferences: {
+        Row: {
+          user_id: string;
+          notification_type: string;
+          channels: NotificationChannel[];
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          notification_type: string;
+          channels?: NotificationChannel[];
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["notification_preferences"]["Insert"]>;
+        Relationships: [];
+      };
     };
 
     Views: {
@@ -1169,6 +1256,33 @@ export interface Database {
           unique_reservers: number | null;
           moq_progress_pct: number | null;
           seconds_until_close: number | null;
+        };
+        Relationships: [];
+      };
+
+      user_stats_view: {
+        Row: {
+          user_id: string | null;
+          email: string | null;
+          active_reservations: number | null;
+          marketplace_orders: number | null;
+          credit_cents_usd: number | null;
+          unread_notifications: number | null;
+        };
+        Relationships: [];
+      };
+
+      seller_dashboard_view: {
+        Row: {
+          seller_id: string | null;
+          user_id: string | null;
+          display_name: string | null;
+          slug: string | null;
+          total_sales: number | null;
+          rating_avg: number | null;
+          pending_commission_cents: number | null;
+          paid_commission_cents: number | null;
+          pending_attributions: number | null;
         };
         Relationships: [];
       };
@@ -1190,6 +1304,62 @@ export interface Database {
       auto_release_marketplace_escrow: {
         Args: Record<string, never>;
         Returns: { order_id: string; result: string }[];
+      };
+      pay_campaign_balance: {
+        Args: {
+          p_reservation_id: string;
+          p_method?: PaymentMethod;
+        };
+        Returns: Json;
+      };
+      refund_failed_campaign_reservation: {
+        Args: {
+          p_reservation_id: string;
+          p_mode?: string;
+        };
+        Returns: Json;
+      };
+      extend_campaign: {
+        Args: {
+          p_campaign_id: string;
+          p_new_closes_at: string;
+        };
+        Returns: Json;
+      };
+      appeal_claim: {
+        Args: {
+          p_claim_id: string;
+          p_reason: string;
+        };
+        Returns: Json;
+      };
+      compute_seller_monthly_bonus_pct: {
+        Args: {
+          p_seller_id: string;
+          p_month_start: string;
+        };
+        Returns: number;
+      };
+      auto_close_expired_campaigns: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      process_monthly_seller_payouts: {
+        Args: { p_min_amount_cents?: number };
+        Returns: Json;
+      };
+      reservation_balance_cents: {
+        Args: { p_reservation_id: string };
+        Returns: number;
+      };
+      purchase_inventory_item: {
+        Args: {
+          p_item_id: string;
+          p_quantity: number;
+          p_shipping_address_id: string;
+          p_method?: PaymentMethod;
+        };
+        Returns: Json;
       };
     };
 

@@ -56,14 +56,20 @@ export default async function PerfilPage() {
   // no lo sabe — chequeo defensivo.
   if (!user) redirect("/login");
 
-  const [{ data: profile }, { data: roles }] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("active", true),
-  ]);
+  const [{ data: profile }, { data: roles }, { data: stats }] =
+    await Promise.all([
+      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+      supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("active", true),
+      supabase
+        .from("user_stats_view")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
 
   const fullName =
     [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
@@ -81,7 +87,46 @@ export default async function PerfilPage() {
           Acá vas a ver el estado de tus reservas, pedidos y reclamos.
         </p>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="mt-8 grid gap-3 sm:grid-cols-4">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Reservas activas
+            </p>
+            <p className="mt-2 text-2xl font-semibold">
+              {stats?.active_reservations ?? 0}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Marketplace
+            </p>
+            <p className="mt-2 text-2xl font-semibold">
+              {stats?.marketplace_orders ?? 0}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Crédito
+            </p>
+            <p className="mt-2 text-2xl font-semibold">
+              {new Intl.NumberFormat("es-UY", {
+                style: "currency",
+                currency: "USD",
+                maximumFractionDigits: 2,
+              }).format((stats?.credit_cents_usd ?? 0) / 100)}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Sin leer
+            </p>
+            <p className="mt-2 text-2xl font-semibold">
+              {stats?.unread_notifications ?? 0}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -140,6 +185,12 @@ export default async function PerfilPage() {
               description: "Avisos del estado de tus pedidos y campañas.",
             },
             {
+              href: "/pedidos",
+              icon: Package,
+              title: "Mis pedidos",
+              description: "Compras de stock disponible y entregas.",
+            },
+            {
               href: "/perfil/mis-compras",
               icon: ShoppingBag,
               title: "Mis compras marketplace",
@@ -192,6 +243,12 @@ export default async function PerfilPage() {
               icon: Phone,
               title: "Verificar teléfono",
               description: "Confirmá tu número antes del primer pago.",
+            },
+            {
+              href: "/perfil/verificacion-identidad",
+              icon: ShieldCheck,
+              title: "Verificar identidad",
+              description: "Subí tu cédula para cobrar comisiones o vender.",
             },
             {
               href: "/perfil/referidos",

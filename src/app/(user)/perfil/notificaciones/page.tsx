@@ -57,25 +57,33 @@ export default async function NotificacionesPage() {
                 : "Todas leídas. Te avisamos cuando haya novedades."}
             </p>
           </div>
-          {unreadCount > 0 ? (
-            <form
-              action={async () => {
-                "use server";
-                await markAllNotificationsReadAction();
-              }}
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/perfil/notificaciones/preferencias"
+              className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
             >
-              <button
-                type="submit"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "gap-1.5",
-                )}
+              Preferencias
+            </Link>
+            {unreadCount > 0 ? (
+              <form
+                action={async () => {
+                  "use server";
+                  await markAllNotificationsReadAction();
+                }}
               >
-                <CheckCheck className="size-3.5" aria-hidden />
-                Marcar todas como leídas
-              </button>
-            </form>
-          ) : null}
+                <button
+                  type="submit"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    "gap-1.5",
+                  )}
+                >
+                  <CheckCheck className="size-3.5" aria-hidden />
+                  Marcar todas como leídas
+                </button>
+              </form>
+            ) : null}
+          </div>
         </div>
 
         {list.length === 0 ? (

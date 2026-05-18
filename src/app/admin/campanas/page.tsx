@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
 import { CloseCampaignButton } from "@/components/admin/CloseCampaignButton";
+import { ExtendCampaignButton } from "@/components/admin/ExtendCampaignButton";
 import { buttonVariants } from "@/components/ui/button";
 import {
   formatTimeRemaining,
@@ -39,6 +40,7 @@ type CampaignRow = {
   moq: number;
   closes_at: string;
   status: Database["public"]["Enums"]["campaign_status"];
+  extended_once: boolean;
   product: { name: string } | { name: string }[] | null;
   pricing_tiers: PricingTier[];
 };
@@ -50,7 +52,7 @@ export default async function AdminCampanasPage() {
     .from("campaigns")
     .select(
       `
-      id, slug, title, moq, closes_at, status,
+      id, slug, title, moq, closes_at, status, extended_once,
       product:products(name),
       pricing_tiers:campaign_pricing_tiers(*)
       `,
@@ -180,10 +182,17 @@ export default async function AdminCampanasPage() {
                           Ver
                         </Link>
                         {c.status === "activa" ? (
-                          <CloseCampaignButton
-                            campaignId={c.id}
-                            campaignTitle={c.title}
-                          />
+                          <>
+                            <ExtendCampaignButton
+                              campaignId={c.id}
+                              currentClosesAt={c.closes_at}
+                              extendedOnce={c.extended_once}
+                            />
+                            <CloseCampaignButton
+                              campaignId={c.id}
+                              campaignTitle={c.title}
+                            />
+                          </>
                         ) : null}
                       </div>
                     </td>

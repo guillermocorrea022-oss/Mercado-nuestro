@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { ArrowRight, PackageOpen } from "lucide-react";
 
 import { CancelReservationButton } from "@/components/campanas/CancelReservationButton";
+import { PayBalanceButton } from "@/components/campanas/PayBalanceButton";
+import { RefundChoiceButtons } from "@/components/campanas/RefundChoiceButtons";
 import { Container } from "@/components/layout/Container";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -12,6 +14,7 @@ import {
 } from "@/lib/campaigns";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import type { Database } from "@/types/database";
 
 export const metadata: Metadata = {
   title: "Mis reservas",
@@ -34,6 +37,14 @@ const STATUS_LABELS = {
   },
 } as const;
 
+type CampaignJoin = {
+  slug: string;
+  title: string;
+  hero_image_url: string | null;
+  closes_at: string;
+  status: Database["public"]["Enums"]["campaign_status"];
+};
+
 type ReservationRow = {
   id: string;
   quantity: number;
@@ -41,20 +52,13 @@ type ReservationRow = {
   expected_deposit_cents_usd: number;
   status: keyof typeof STATUS_LABELS;
   reserved_at: string;
-  campaign:
-    | {
-        slug: string;
-        title: string;
-        hero_image_url: string | null;
-        closes_at: string;
-      }
-    | {
-        slug: string;
-        title: string;
-        hero_image_url: string | null;
-        closes_at: string;
-      }[]
-    | null;
+  campaign: CampaignJoin | CampaignJoin[] | null;
+};
+
+type PaymentRow = {
+  reservation_id: string | null;
+  amount_cents: number;
+  status: Database["public"]["Enums"]["payment_status"];
 };
 
 export default async function MisReservasPage() {
@@ -70,7 +74,7 @@ export default async function MisReservasPage() {
       `
       id, quantity, unit_price_at_reservation_cents_usd, expected_deposit_cents_usd,
       status, reserved_at,
-      campaign:campaigns(slug, title, hero_image_url, closes_at)
+      campaign:campaigns(slug, title, hero_image_url, closes_at, status)
       `,
     )
     .eq("user_id", user.id)
@@ -78,6 +82,26 @@ export default async function MisReservasPage() {
     .returns<ReservationRow[]>();
 
   const list = reservations ?? [];
+
+  const reservationIds = list.map((r) => r.id);
+  const { data: payments } =
+    reservationIds.length > 0
+      ? await supabase
+          .from("payments")
+          .select("reservation_id, amount_cents, status")
+          .in("reservation_id", reservationIds)
+          .eq("status", "aprobado")
+          .returns<PaymentRow[]>()
+      : { data: [] as PaymentRow[] };
+
+  const paidByReservation = new Map<string, number>();
+  for (const p of payments ?? []) {
+    if (!p.reservation_id) continue;
+    paidByReservation.set(
+      p.reservation_id,
+      (paidByReservation.get(p.reservation_id) ?? 0) + p.amount_cents,
+    );
+  }
 
   return (
     <Container className="py-10 sm:py-16">
@@ -178,6 +202,34 @@ export default async function MisReservasPage() {
                         <CancelReservationButton
                           reservationId={r.id}
                           canCancel={canCancel}
+                        />
+                      </div>
+                    ) : null}
+
+                    {campaign.status === "cerrada_exitosa" &&
+                    r.status !== "pagada_total" &&
+                    r.status !== "cancelada" ? (
+                      <div className="mt-4 border-t border-border pt-4">
+                        <PayBalanceButton
+                          reservationId={r.id}
+                          balanceCents={Math.max(
+                            0,
+                            totalCents -
+                              (paidByReservation.get(r.id) ?? 0),
+                          )}
+                        />
+                      </div>
+                    ) : null}
+
+                    {campaign.status === "cerrada_fallida" &&
+                    r.status !== "cancelada" ? (
+                      <div className="mt-4 border-t border-border pt-4">
+                        <RefundChoiceButtons
+                          reservationId={r.id}
+                          depositCents={
+                            paidByReservation.get(r.id) ??
+                            r.expected_deposit_cents_usd
+                          }
                         />
                       </div>
                     ) : null}

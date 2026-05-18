@@ -241,6 +241,34 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
   - **Tipos DB** extendidos: `phone_verification_codes`, `referrals` agregados a `Tables`; `phone_verified_at`/`referral_code` en `profiles.Row|Insert|Update`; `UserRole` extendido con los 4 sub-roles.
   - Perfil `/perfil` actualizado con cards "Verificar teléfono" y "Programa de referidos".
 
+- **Fase 4: cierre del ciclo completo del MASTER** — todo lo que faltaba para cubrir los 10 bloques (excepto el carrito multi-item, decisión registrada en docs/DECISIONS.md):
+  - **Migración** [20260518190000_phase4_full_cycle.sql](supabase/migrations/20260518190000_phase4_full_cycle.sql) con 10 RPCs nuevas:
+    - `pay_campaign_balance(reservation, method)` paga el 70% restante (regla §5.2).
+    - `refund_failed_campaign_reservation(reservation, mode)` cash o credit + 5% (regla §5.3).
+    - `extend_campaign(campaign, new_closes_at)` admin, una vez si ≥85% MOQ y <7 días (regla §5.4).
+    - `appeal_claim(claim, reason)` apelación única (regla §5.8).
+    - `compute_seller_monthly_bonus_pct(seller, month)` aplica bonus por volumen (regla §5.7).
+    - `auto_close_expired_campaigns()` cron del cierre automático.
+    - `process_monthly_seller_payouts(min_cents)` genera payouts mensuales (regla §5.7), permitido desde service role para correr por cron.
+    - `reservation_balance_cents(id)` helper.
+    - `purchase_inventory_item(item, qty, address, method)` checkout atómico de stock disponible.
+    - Vistas: `user_stats_view`, `seller_dashboard_view`.
+    - `claims` extendida con `appealed_at`, `appeal_reason`.
+  - **Pago de saldo + refund/credit al fallar MOQ** [src/app/(public)/campanas/actions.ts](src/app/(public)/campanas/actions.ts): `payCampaignBalanceAction`, `refundFailedCampaignAction`. UI en [/mis-reservas](src/app/(user)/mis-reservas/page.tsx) con [PayBalanceButton](src/components/campanas/PayBalanceButton.tsx) (cuando la campaña cerró exitosa) y [RefundChoiceButtons](src/components/campanas/RefundChoiceButtons.tsx) (cash o credit + 5%).
+  - **Checkout de stock disponible** [BuyInventoryForm](src/components/productos/BuyInventoryForm.tsx) en `/producto/[slug]` para items con stock activo. Server Action [buyInventoryItemAction](src/app/(public)/producto/[slug]/buy-actions.ts) llama a la RPC atómica.
+  - **Pedidos unificados** [/pedidos](src/app/(user)/pedidos/page.tsx) listado + [/pedidos/[id]](src/app/(user)/pedidos/[id]/page.tsx) detalle con timeline de 5 estados, items, dirección y pagos.
+  - **Verificación de identidad** [/perfil/verificacion-identidad](src/app/(user)/perfil/verificacion-identidad/page.tsx) con [VerificationForm](src/components/perfil/VerificationForm.tsx) — acepta URL externa al documento mientras esté en Fase 0-2 (decisión documentada). Admin revisa en [/admin/verificaciones](src/app/admin/verificaciones/page.tsx) con [ReviewVerificationButtons](src/components/admin/ReviewVerificationButtons.tsx).
+  - **Extensión de plazo admin** [ExtendCampaignButton](src/components/admin/ExtendCampaignButton.tsx) en `/admin/campanas` con datetime-local. Llama a [extendCampaignAction](src/app/admin/actions.ts).
+  - **Apelación de reclamos** [AppealClaimButton](src/components/perfil/AppealClaimButton.tsx) visible en `/perfil/reclamos` cuando el reclamo está cerrado o resuelto a favor del vendedor. UNA sola vez (regla §5.8).
+  - **Admin pages nuevas**: [/admin/comisiones](src/app/admin/comisiones/page.tsx) con [ProcessPayoutsButton](src/components/admin/ProcessPayoutsButton.tsx) y [MarkPayoutPaidButton](src/components/admin/MarkPayoutPaidButton.tsx); [/admin/reclamos](src/app/admin/reclamos/page.tsx) con [ResolveClaimButtons](src/components/admin/ResolveClaimButtons.tsx); [/admin/pedidos](src/app/admin/pedidos/page.tsx) listado unificado; [/admin/verificaciones](src/app/admin/verificaciones/page.tsx). Sidebar admin actualizado con 5 entradas nuevas.
+  - **Notification preferences** [/perfil/notificaciones/preferencias](src/app/(user)/perfil/notificaciones/preferencias/page.tsx) con grid de 4 tipos × 4 canales (in_app, email, sms, whatsapp). Upsert en `notification_preferences`.
+  - **Cron endpoints** en [/api/cron/](src/app/api/cron/): `close-expired-campaigns`, `release-escrow`, `process-payouts`. Protegidos con `Authorization: Bearer ${CRON_SECRET}`. Usan [createAdminClient](src/lib/supabase/admin.ts) (service role). `vercel.json` con 3 schedules (cada hora, cada hora +15min, día 1 del mes a las 10).
+  - **Dashboard agregado** en `/perfil`: 4 stats arriba (reservas activas, marketplace orders, crédito, notifs sin leer) leídos de `user_stats_view`.
+  - **Páginas legales + informativas**: [/terminos](src/app/(public)/terminos/page.tsx), [/privacidad](src/app/(public)/privacidad/page.tsx), [/devoluciones](src/app/(public)/devoluciones/page.tsx), [/envios](src/app/(public)/envios/page.tsx), [/quienes-somos](src/app/(public)/quienes-somos/page.tsx), [/contacto](src/app/(public)/contacto/page.tsx). Footer actualizado.
+  - **Docs complementarios**: `docs/DECISIONS.md`, `docs/BUSINESS.md`, `docs/ARCHITECTURE.md`, `docs/FLOWS.md`, `docs/SCHEMA.md`, `docs/PROMPTS.md`. Cierra el referencing del CLAUDE.md §6.
+  - **Tipos DB** extendidos: `commission_payouts`, `support_tickets`, `notification_preferences` agregados a Tables; `claims.appealed_at|appeal_reason`; 2 vistas nuevas; 10 RPCs en Functions.
+  - **Build verde con 57 rutas** (era 47 antes).
+
 **Pendiente en cimientos técnicos:**
 - Conectar las features clave de Supabase Auth desde el dashboard: redirect URLs (`http://localhost:3000/auth/callback` para dev), Google OAuth provider (cuando se tengan client_id/secret), confirmar email habilitado.
 - Migraciones siguientes: marketplace (listings, orders, messages), orders unificadora + order_items + payments, vendedores por catálogo (catalog_links, attributions, sales, commission_tiers, payouts), reviews/ratings, wishlists, support_tickets/claims, notifications, settings, admin_actions_log.

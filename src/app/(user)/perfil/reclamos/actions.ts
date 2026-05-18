@@ -66,3 +66,52 @@ export async function createClaimAction(
   revalidatePath("/perfil/reclamos");
   redirect("/perfil/reclamos");
 }
+
+// ----------------------------------------------------------------------------
+// appealClaimAction — apelar una resolución (UNA sola vez, regla §5.8)
+// ----------------------------------------------------------------------------
+
+export type AppealClaimResult =
+  | { status: "success"; message: string }
+  | { status: "error"; message: string };
+
+export async function appealClaimAction(
+  claimId: string,
+  reason: string,
+): Promise<AppealClaimResult> {
+  if (!claimId) {
+    return { status: "error", message: "Reclamo inválido." };
+  }
+  if (!reason || reason.trim().length < 10) {
+    return {
+      status: "error",
+      message: "Contanos al menos 10 caracteres por qué apelás.",
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { status: "error", message: "Iniciá sesión." };
+  }
+
+  const { error } = await supabase.rpc("appeal_claim", {
+    p_claim_id: claimId,
+    p_reason: reason.trim(),
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message || "No pudimos registrar la apelación.",
+    };
+  }
+
+  revalidatePath("/perfil/reclamos");
+  return {
+    status: "success",
+    message: "Recibimos tu apelación. Vamos a revisar el caso de nuevo.",
+  };
+}

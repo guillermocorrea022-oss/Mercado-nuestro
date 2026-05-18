@@ -24,9 +24,9 @@ const footerSections = [
   {
     title: "Nosotros",
     links: [
-      { href: "/sobre-nosotros", label: "Sobre nosotros" },
+      { href: "/quienes-somos", label: "Quiénes somos" },
       { href: "/contacto", label: "Contacto" },
-      { href: "/blog", label: "Blog" },
+      { href: "/ser-importador", label: "Ser importador avanzado" },
     ],
   },
   {

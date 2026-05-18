@@ -498,3 +498,184 @@ export async function closeCampaignAction(
     summary: (data ?? {}) as Record<string, unknown>,
   };
 }
+
+// ----------------------------------------------------------------------------
+// extendCampaignAction — extiende el cierre de una campaña (regla §5.4)
+// Validaciones reales (>=85% MOQ, <7 días, una vez) viven en la rpc SQL.
+// ----------------------------------------------------------------------------
+
+export type ExtendCampaignResult =
+  | { status: "success"; message: string; newClosesAt: string }
+  | { status: "error"; message: string };
+
+export async function extendCampaignAction(
+  campaignId: string,
+  newClosesAt: string,
+): Promise<ExtendCampaignResult> {
+  const guard = await assertAdmin();
+  if (!guard.ok) return { status: "error", message: guard.message };
+
+  const { data, error } = await guard.supabase.rpc("extend_campaign", {
+    p_campaign_id: campaignId,
+    p_new_closes_at: newClosesAt,
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message || "No pudimos extender la campaña.",
+    };
+  }
+
+  revalidatePath("/admin/campanas");
+  revalidatePath(`/admin/campanas/${campaignId}`);
+  revalidatePath("/campanas");
+
+  const result = (data as { new_closes_at?: string }) || {};
+  return {
+    status: "success",
+    message: "Extendiste la campaña y notificamos a los participantes.",
+    newClosesAt: result.new_closes_at ?? newClosesAt,
+  };
+}
+
+// ----------------------------------------------------------------------------
+// reviewVerificationAction — admin aprueba/rechaza un user_verifications.
+// ----------------------------------------------------------------------------
+
+export async function reviewVerificationAction(
+  verificationId: string,
+  decision: "aprobado" | "rechazado",
+  rejectionReason?: string,
+): Promise<{ status: "success" | "error"; message?: string }> {
+  const guard = await assertAdmin();
+  if (!guard.ok) return { status: "error", message: guard.message };
+
+  type Update = Database["public"]["Tables"]["user_verifications"]["Update"];
+  const update: Update = {
+    status: decision,
+    reviewed_by: guard.user.id,
+    reviewed_at: new Date().toISOString(),
+    rejection_reason: decision === "rechazado" ? (rejectionReason ?? null) : null,
+  };
+
+  const { error } = await guard.supabase
+    .from("user_verifications")
+    .update(update as never)
+    .eq("id", verificationId);
+
+  if (error) {
+    return { status: "error", message: error.message };
+  }
+
+  await guard.supabase.from("admin_actions_log").insert({
+    admin_id: guard.user.id,
+    action: "review_verification",
+    entity_type: "user_verification",
+    entity_id: verificationId,
+    after_state: { decision, rejection_reason: rejectionReason ?? null },
+  } as never);
+
+  revalidatePath("/admin/verificaciones");
+  return { status: "success" };
+}
+
+// ----------------------------------------------------------------------------
+// resolveClaimAction — admin resuelve un reclamo (a favor de uno u otro).
+// ----------------------------------------------------------------------------
+
+export async function resolveClaimAction(
+  claimId: string,
+  decision:
+    | "resuelto_a_favor_usuario"
+    | "resuelto_a_favor_vendedor"
+    | "cerrado",
+  notes?: string,
+): Promise<{ status: "success" | "error"; message?: string }> {
+  const guard = await assertAdmin();
+  if (!guard.ok) return { status: "error", message: guard.message };
+
+  type Update = Database["public"]["Tables"]["claims"]["Update"];
+  const update: Update = {
+    status: decision,
+    resolution: notes ?? null,
+    resolution_notes: notes ?? null,
+    resolved_at: new Date().toISOString(),
+  };
+
+  const { error } = await guard.supabase
+    .from("claims")
+    .update(update as never)
+    .eq("id", claimId);
+
+  if (error) return { status: "error", message: error.message };
+
+  await guard.supabase.from("admin_actions_log").insert({
+    admin_id: guard.user.id,
+    action: "resolve_claim",
+    entity_type: "claim",
+    entity_id: claimId,
+    after_state: { decision },
+  } as never);
+
+  revalidatePath("/admin/reclamos");
+  revalidatePath("/perfil/reclamos");
+  return { status: "success" };
+}
+
+// ----------------------------------------------------------------------------
+// processSellerPayoutsAction — corre la rpc mensual (regla §5.7)
+// ----------------------------------------------------------------------------
+
+export async function processSellerPayoutsAction(): Promise<{
+  status: "success" | "error";
+  message: string;
+}> {
+  const guard = await assertAdmin();
+  if (!guard.ok) return { status: "error", message: guard.message };
+
+  const { data, error } = await guard.supabase.rpc(
+    "process_monthly_seller_payouts",
+    {},
+  );
+
+  if (error) return { status: "error", message: error.message };
+
+  revalidatePath("/admin/comisiones");
+  const result = (data as { payouts_created?: number; total_cents?: number }) || {};
+  return {
+    status: "success",
+    message: `Creamos ${result.payouts_created ?? 0} payouts por USD ${(
+      (result.total_cents ?? 0) / 100
+    ).toFixed(2)}.`,
+  };
+}
+
+// ----------------------------------------------------------------------------
+// markPayoutPaidAction — admin marca un payout como pagado.
+// ----------------------------------------------------------------------------
+
+export async function markPayoutPaidAction(
+  payoutId: string,
+  proofUrl?: string,
+): Promise<{ status: "success" | "error"; message?: string }> {
+  const guard = await assertAdmin();
+  if (!guard.ok) return { status: "error", message: guard.message };
+
+  type Update = Database["public"]["Tables"]["commission_payouts"]["Update"];
+  const update: Update = {
+    status: "pagado",
+    paid_at: new Date().toISOString(),
+    proof_url: proofUrl ?? null,
+  };
+
+  const { error } = await guard.supabase
+    .from("commission_payouts")
+    .update(update as never)
+    .eq("id", payoutId);
+
+  if (error) return { status: "error", message: error.message };
+
+  revalidatePath("/admin/comisiones");
+  return { status: "success" };
+}

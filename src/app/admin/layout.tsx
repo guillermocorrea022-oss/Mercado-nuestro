@@ -2,12 +2,16 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   CalendarClock,
+  FileWarning,
   LayoutDashboard,
   LogOut,
   Megaphone,
   Package,
   Settings,
+  ShieldCheck,
+  ShoppingBag,
   Users,
+  Wallet,
 } from "lucide-react";
 
 import { signOutAction } from "@/app/(auth)/actions";
@@ -19,7 +23,11 @@ const adminNav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/campanas", label: "Campañas", icon: Megaphone },
   { href: "/admin/reservas", label: "Reservas", icon: CalendarClock },
+  { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
   { href: "/admin/productos", label: "Productos", icon: Package },
+  { href: "/admin/verificaciones", label: "Verificaciones", icon: ShieldCheck },
+  { href: "/admin/reclamos", label: "Reclamos", icon: FileWarning },
+  { href: "/admin/comisiones", label: "Comisiones", icon: Wallet },
   { href: "/admin/usuarios", label: "Usuarios", icon: Users },
   { href: "/admin/configuracion", label: "Configuración", icon: Settings },
 ];

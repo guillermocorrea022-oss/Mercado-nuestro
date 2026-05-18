@@ -367,3 +367,103 @@ export async function cancelReservationAction(
       "Tu reserva fue cancelada. Si pagaste seña, te la devolvemos al método original.",
   };
 }
+
+// ----------------------------------------------------------------------------
+// payCampaignBalanceAction — pagar el saldo restante de una reserva (regla §5.2)
+// ----------------------------------------------------------------------------
+
+export type ReservationActionResult =
+  | { status: "success"; message: string }
+  | { status: "error"; message: string };
+
+export async function payCampaignBalanceAction(
+  reservationId: string,
+): Promise<ReservationActionResult> {
+  if (!reservationId) {
+    return { status: "error", message: "Reserva inválida." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { status: "error", message: "Iniciá sesión para pagar el saldo." };
+  }
+
+  const { data, error } = await supabase.rpc("pay_campaign_balance", {
+    p_reservation_id: reservationId,
+  });
+
+  if (error) {
+    console.error("Error pagando saldo:", error);
+    return {
+      status: "error",
+      message: error.message || "No pudimos procesar el pago.",
+    };
+  }
+
+  revalidatePath("/mis-reservas");
+
+  const result = (data as { ok?: boolean; amount_cents?: number }) || {};
+  if (result.ok) {
+    return {
+      status: "success",
+      message:
+        result.amount_cents && result.amount_cents > 0
+          ? "Saldo pagado. Te avisamos cuando esté lista la entrega."
+          : "Ya no tenés saldo pendiente.",
+    };
+  }
+  return { status: "error", message: "No pudimos procesar el pago." };
+}
+
+// ----------------------------------------------------------------------------
+// refundFailedCampaignAction — al fallar el MOQ (regla §5.3): reembolso o credito + 5%
+// ----------------------------------------------------------------------------
+
+export async function refundFailedCampaignAction(
+  reservationId: string,
+  mode: "cash" | "credit",
+): Promise<ReservationActionResult> {
+  if (!reservationId) {
+    return { status: "error", message: "Reserva inválida." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { status: "error", message: "Iniciá sesión." };
+  }
+
+  const { data, error } = await supabase.rpc(
+    "refund_failed_campaign_reservation",
+    { p_reservation_id: reservationId, p_mode: mode },
+  );
+
+  if (error) {
+    console.error("Error procesando reembolso:", error);
+    return {
+      status: "error",
+      message: error.message || "No pudimos procesar el reembolso.",
+    };
+  }
+
+  revalidatePath("/mis-reservas");
+  revalidatePath("/perfil/credito");
+
+  const result =
+    (data as { ok?: boolean; mode?: string; credit_cents?: number }) || {};
+  if (result.ok) {
+    return {
+      status: "success",
+      message:
+        result.mode === "credit"
+          ? "Listo. Acreditamos la seña + 5% como crédito en cuenta."
+          : "Iniciamos el reembolso al método de pago original. Llega en hasta 7 días hábiles.",
+    };
+  }
+  return { status: "error", message: "No pudimos procesar el reembolso." };
+}

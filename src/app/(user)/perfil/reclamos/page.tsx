@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, FileWarning } from "lucide-react";
 
+import { AppealClaimButton } from "@/components/perfil/AppealClaimButton";
 import { NewClaimForm } from "@/components/perfil/NewClaimForm";
 import { Container } from "@/components/layout/Container";
 import {
@@ -106,6 +107,16 @@ export default async function ReclamosPage() {
                     <p className="mt-3 text-xs text-muted-foreground">
                       Resolución: {c.resolution_notes}
                     </p>
+                  ) : null}
+                  {c.status === "resuelto_a_favor_vendedor" ||
+                  c.status === "cerrado" ||
+                  c.status === "apelado" ? (
+                    <div className="mt-3 border-t border-border pt-3">
+                      <AppealClaimButton
+                        claimId={c.id}
+                        alreadyAppealed={c.appealed_at !== null}
+                      />
+                    </div>
                   ) : null}
                 </li>
               ))}

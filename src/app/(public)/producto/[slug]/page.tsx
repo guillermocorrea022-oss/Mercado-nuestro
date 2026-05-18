@@ -6,6 +6,7 @@ import { ArrowLeft, PackageCheck } from "lucide-react";
 
 import { Star } from "lucide-react";
 
+import { BuyInventoryForm } from "@/components/productos/BuyInventoryForm";
 import { ReviewForm } from "@/components/producto/ReviewForm";
 import { WishlistButton } from "@/components/producto/WishlistButton";
 import { Container } from "@/components/layout/Container";
@@ -119,6 +120,17 @@ export default async function ProductoPage({
     data: { user },
   } = await supabase.auth.getUser();
 
+  const addressesPromise = user
+    ? supabase
+        .from("user_addresses")
+        .select("id, label, city, department")
+        .eq("user_id", user.id)
+        .order("is_primary", { ascending: false })
+        .returns<
+          { id: string; label: string; city: string; department: string }[]
+        >()
+    : Promise.resolve({ data: [] as { id: string; label: string; city: string; department: string }[] });
+
   const [{ data: reviews }, wishlistRes] = await Promise.all([
     supabase
       .from("reviews")
@@ -153,6 +165,7 @@ export default async function ProductoPage({
       : Promise.resolve({ data: null }),
   ]);
 
+  const { data: addresses } = await addressesPromise;
   const reviewsList = reviews ?? [];
   const avgRating =
     reviewsList.length === 0
@@ -357,17 +370,26 @@ export default async function ProductoPage({
                   Llega a tu casa en 2 a 5 días hábiles. Retiro gratis en
                   Paysandú.
                 </p>
-                {/* TODO: server action de compra directa cuando esté MP */}
-                <button
-                  type="button"
-                  disabled
-                  className={cn(
-                    buttonVariants({ size: "lg" }),
-                    "mt-5 h-11 w-full text-base opacity-60",
-                  )}
-                >
-                  Próximamente: comprar ahora
-                </button>
+                {user ? (
+                  <div className="mt-5">
+                    <BuyInventoryForm
+                      itemId={product.inventory.id}
+                      unitPriceCents={product.inventory.unit_price_cents_usd}
+                      maxQuantity={product.inventory.quantity_available}
+                      addresses={addresses ?? []}
+                    />
+                  </div>
+                ) : (
+                  <Link
+                    href={`/login?next=/producto/${product.slug}`}
+                    className={cn(
+                      buttonVariants({ size: "lg" }),
+                      "mt-5 h-11 w-full text-base",
+                    )}
+                  >
+                    Iniciá sesión para comprar
+                  </Link>
+                )}
               </div>
             ) : null}
 
