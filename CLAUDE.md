@@ -148,6 +148,26 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
   - [/admin/campanas](src/app/admin/campanas/page.tsx) tabla con todas las campañas (todos los estados), status pill, progreso al MOQ, countdown, botón "Cerrar campaña" que dispara [`closeCampaignAction`](src/app/admin/actions.ts) → rpc `close_campaign` con feedback inline del resumen.
 - **/disponible** ([page.tsx](src/app/(public)/disponible/page.tsx)) lista `inventory_items` activos con `quantity > 0`. Card premium con precio, brand y stock. Empty state cuando vacío.
 - **src/types/database.ts** ampliado con tablas que se usan ahora (inventory, orders, order_items, payments, user_credits, credit_movements, notifications, settings, admin_actions_log, campaign_status_updates) + 7 enums + función `close_campaign` en `Functions`. Las tablas de Fase 2 (marketplace, catalog, comisiones, reviews) existen en la DB pero sin tipos TS hasta que se usen.
+- **Fase 2 grande: vendedores por catálogo, marketplace, reseñas y wishlists**:
+  - **Migración** [20260518160000_phase2_insert_policies.sql](supabase/migrations/20260518160000_phase2_insert_policies.sql) aplicada al cloud con policies INSERT/DELETE para `seller_profiles`, `catalog_links`, `marketplace_listings`, `marketplace_orders`, `wishlists`.
+  - **Vendedores por catálogo** ([§3.6 MASTER](docs/MASTER.md)):
+    - [/perfil/vendedor](src/app/(user)/perfil/vendedor/page.tsx) onboarding (form de slug + bio) o dashboard si ya está activo (cards de comisión pendiente / disponible / pagado).
+    - [activateSellerProfileAction](src/app/(user)/perfil/vendedor/actions.ts) crea `seller_profile` + asigna rol `vendedor_catalogo` + crea `catalog_link` inicial.
+    - **Catálogo público** [/vendedor/[slug]](src/app/(public)/vendedor/[slug]/page.tsx) con avatar, bio, stats, `ShareButton` y grid de campañas activas.
+    - **Link corto** [/v/[slug]](src/app/v/[slug]/route.ts) setea cookie `mn_seller` (30 días) y redirige al catálogo.
+    - **Atribución automática**: `createReservationAction` lee cookie, resuelve seller via `seller_profiles.slug`, guarda `attributed_seller_id` en la reserva y crea `catalog_sales` pendiente con `commission_pct` desde `settings.campaign_commission_default_pct` (default 12%).
+  - **Marketplace de reventa** ([§3.5 MASTER](docs/MASTER.md), modelo escrow):
+    - [/marketplace](src/app/(public)/marketplace/page.tsx) listado de `marketplace_listings` activos con `quantity > 0`. Card con imagen, brand, precio, stock, info del vendedor con rating.
+    - [/marketplace/[id]](src/app/(public)/marketplace/[id]/page.tsx) detalle con galería, descripción del producto, notas del vendedor, sidebar de compra (disabled hasta MP real) + card del vendedor con link a su catálogo. Bloque "Compra protegida" explicando el escrow.
+  - **Reseñas de producto**:
+    - [/producto/[slug]](src/app/(public)/producto/[slug]/page.tsx) trae `reviews` visibles + estado wishlist del user. Avg rating + count debajo del título.
+    - [ReviewForm](src/components/producto/ReviewForm.tsx) (Client) con selector visual de estrellas hover-state + título + body. Server Action [createReviewAction](src/app/(public)/producto/[slug]/actions.ts) con Zod.
+    - Listado de 10 reseñas más recientes con estrellas, autor (first_name), fecha.
+  - **Wishlists**:
+    - [WishlistButton](src/components/producto/WishlistButton.tsx) (Client) en cabezal del producto, toggle add/remove via `toggleWishlistAction`.
+    - [/perfil/deseos](src/app/(user)/perfil/deseos/page.tsx) lista productos guardados con imagen, brand y fecha. Empty state si vacía.
+  - **Perfil principal** ([/perfil](src/app/(user)/perfil/page.tsx)) ahora con 7 cards: Mis reservas / Notificaciones / Lista de deseos / Programa de vendedores / Mis direcciones / Crédito / Reclamos.
+  - **Tipos DB Fase 2** agregados a `database.ts`: `seller_profiles`, `catalog_links`, `catalog_sales`, `marketplace_listings`, `marketplace_orders`, `reviews`, `wishlists` + 4 enums (`listing_status`, `marketplace_order_status`, `catalog_sale_status`, `review_status`).
 - **Imágenes lifestyle de Unsplash en hero y secciones**:
   - Producto demo "Cámara IP WiFi" actualizado en DB con `photo-1558002038-1055907df827` (cámara de seguridad real). Aplica al detalle de campaña y a las cards.
   - Home con layout asimétrico tipo editorial: hero 2 columnas (texto + foto de cajas de importación), sección "El método" con foto de mercado/comunidad, CTA vendedores con foto de persona/celular. Tarjeta flotante con highlight de "precio escalonado" como detalle gluwz-style.
@@ -203,7 +223,7 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 2. Buscar los comentarios `TODO(MP)` y `TODO(resend)` y reemplazar las llamadas mock con SDK real.
 3. Hacer un signup + reserva real para validar end-to-end.
 
-**Pendientes para Fase 2** (cuando el MVP de Fase 1 esté validado con campaña real cerrada): vendedores por catálogo con link único + cookie de atribución de 30 días + comisiones consolidadas + payouts mensuales; marketplace (listings, mensajería interna, escrow); reseñas y reputación; WhatsApp via Twilio; verificación de teléfono SMS; lista de deseos (`wishlists`) con notificación de re-stock o baja de precio; gestión de inventario desde admin.
+**Pendientes Fase 2 que quedan**: panel revendedor (`/perfil/revendedor` con form para crear `marketplace_listings`, ver mis publicaciones y pedidos a despachar); compra real en marketplace con escrow (`createMarketplaceOrderAction` + flujo de despacho + liberación a 3 días sin reclamo); chat interno comprador-vendedor (`marketplace_messages`); WhatsApp via Twilio; verificación de teléfono SMS; promotor automático a `revendedor` cuando recibe 5+ unidades de una campaña (regla §2.5).
 
 **Pendientes técnicos menores:** Google OAuth provider (cuando tengas client_id/secret de Google Cloud Console). Reemplazar los `cast as never` en queries de Supabase por tipos reales generados via `npx supabase gen types` cuando Docker esté disponible. Confirmar email opcional en Supabase Auth (hoy es obligatorio por default).
 
