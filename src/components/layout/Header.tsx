@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogOut, UserRound } from "lucide-react";
+import { Bell, LogOut, UserRound } from "lucide-react";
 
 import { signOutAction } from "@/app/(auth)/actions";
 import { buttonVariants } from "@/components/ui/button";
@@ -20,6 +20,17 @@ export async function Header() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Conteo de notificaciones sin leer (solo si hay sesión).
+  let unread = 0;
+  if (user) {
+    const { count } = await supabase
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .is("read_at", null);
+    unread = count ?? 0;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/70 backdrop-blur-xl">
@@ -56,6 +67,21 @@ export async function Header() {
           <div className="flex items-center gap-2">
             {user ? (
               <>
+                <Link
+                  href="/perfil/notificaciones"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon-sm" }),
+                    "relative",
+                  )}
+                  aria-label={`Notificaciones${unread ? ` (${unread} sin leer)` : ""}`}
+                >
+                  <Bell className="size-4" aria-hidden />
+                  {unread > 0 ? (
+                    <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                      {unread > 99 ? "99+" : unread}
+                    </span>
+                  ) : null}
+                </Link>
                 <Link
                   href="/perfil"
                   className={cn(

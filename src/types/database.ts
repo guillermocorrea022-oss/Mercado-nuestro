@@ -98,6 +98,29 @@ export type CampaignUpdateType =
   | "listo_entrega"
   | "mensaje_general";
 
+export type ClaimType =
+  | "defectuoso"
+  | "no_llego"
+  | "llego_equivocado"
+  | "faltante"
+  | "no_corresponde_descripcion"
+  | "otro";
+
+export type ClaimStatus =
+  | "abierto"
+  | "en_revision"
+  | "resuelto_a_favor_usuario"
+  | "resuelto_a_favor_vendedor"
+  | "apelado"
+  | "cerrado";
+
+export type ProposalStatus =
+  | "abierta"
+  | "en_revision"
+  | "aprobada"
+  | "rechazada"
+  | "convertida";
+
 // ============================================================================
 // Database schema
 // ============================================================================
@@ -674,6 +697,97 @@ export interface Database {
         Relationships: [];
       };
 
+      claims: {
+        Row: {
+          id: string;
+          user_id: string;
+          order_id: string | null;
+          item_reference: string | null;
+          type: ClaimType;
+          description: string;
+          photos: string[];
+          status: ClaimStatus;
+          resolution: string | null;
+          refund_amount_cents_usd: number | null;
+          resolution_notes: string | null;
+          resolved_at: string | null;
+          opened_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          order_id?: string | null;
+          item_reference?: string | null;
+          type: ClaimType;
+          description: string;
+          photos?: string[];
+          status?: ClaimStatus;
+          resolution?: string | null;
+          refund_amount_cents_usd?: number | null;
+          resolution_notes?: string | null;
+          resolved_at?: string | null;
+          opened_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["claims"]["Insert"]>;
+        Relationships: [];
+      };
+
+      product_proposals: {
+        Row: {
+          id: string;
+          proposed_by: string;
+          title: string;
+          description: string | null;
+          reference_url: string | null;
+          photo_url: string | null;
+          category_id: string | null;
+          my_quantity: number | null;
+          max_price_cents_usd: number | null;
+          status: ProposalStatus;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          proposed_by: string;
+          title: string;
+          description?: string | null;
+          reference_url?: string | null;
+          photo_url?: string | null;
+          category_id?: string | null;
+          my_quantity?: number | null;
+          max_price_cents_usd?: number | null;
+          status?: ProposalStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["product_proposals"]["Insert"]>;
+        Relationships: [];
+      };
+
+      product_proposal_interests: {
+        Row: {
+          id: string;
+          proposal_id: string;
+          user_id: string;
+          quantity: number;
+          max_price_cents_usd: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          proposal_id: string;
+          user_id: string;
+          quantity: number;
+          max_price_cents_usd?: number | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["product_proposal_interests"]["Insert"]>;
+        Relationships: [];
+      };
+
       admin_actions_log: {
         Row: {
           id: string;
@@ -747,6 +861,9 @@ export interface Database {
       credit_movement_type: CreditMovementType;
       notification_channel: NotificationChannel;
       campaign_update_type: CampaignUpdateType;
+      claim_type: ClaimType;
+      claim_status: ClaimStatus;
+      proposal_status: ProposalStatus;
     };
 
     CompositeTypes: Record<string, never>;

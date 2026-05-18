@@ -2,13 +2,24 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
+import { reservationConfirmedEmail, sendEmail } from "@/lib/email/send";
+import { createNotification } from "@/lib/notifications/create";
 import { createClient } from "@/lib/supabase/server";
 import { findCurrentTier, type PricingTier } from "@/lib/campaigns";
 import { createReservationSchema } from "@/lib/validations/reservations";
 import type { Database } from "@/types/database";
 
 import type { ReserveFormState } from "./reserve-state";
+
+async function getOrigin(): Promise<string> {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  if (host) return `${proto}://${host}`;
+  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+}
 
 // Crea una reserva (estado `activa`) para la campaña indicada. La seña queda
 // asentada como `expected_deposit_cents_usd`; el pago real con Mercado Pago se
@@ -144,11 +155,14 @@ export async function createReservationAction(
     status: "activa",
   };
 
-  const { error: insertError } = await supabase
+  const { data: createdReservation, error: insertError } = await supabase
     .from("campaign_reservations")
-    .insert(newReservation as never);
+    .insert(newReservation as never)
+    .select("id")
+    .single()
+    .returns<{ id: string }>();
 
-  if (insertError) {
+  if (insertError || !createdReservation) {
     console.error("Error creating reservation:", insertError);
     return {
       status: "error",
@@ -156,7 +170,34 @@ export async function createReservationAction(
     };
   }
 
-  // 6. Invalidar caches y redirigir a confirmación.
+  // 6. Notificación in-app + email transaccional (stub si no hay Resend).
+  await createNotification(supabase, {
+    userId: user.id,
+    type: "campaign_reservation_created",
+    title: "Reserva confirmada",
+    body: `Reservaste ${quantity} unidad(es) en "${campaign.slug}". Seña pendiente.`,
+    contextData: {
+      reservation_id: createdReservation.id,
+      campaign_slug: campaign.slug,
+      quantity,
+      deposit_cents_usd: depositCents,
+    },
+  });
+
+  const origin = await getOrigin();
+  await sendEmail({
+    to: user.email ?? "",
+    subject: "Tu reserva en Mercado Nuestro",
+    text: reservationConfirmedEmail({
+      firstName: user.user_metadata?.first_name as string | undefined,
+      campaignTitle: campaign.slug,
+      quantity,
+      depositCents,
+      campaignUrl: `${origin}/campanas/${campaign.slug}`,
+    }),
+  });
+
+  // 7. Invalidar caches y redirigir a confirmación.
   revalidatePath("/campanas");
   revalidatePath(`/campanas/${campaign.slug}`);
   revalidatePath("/mis-reservas");

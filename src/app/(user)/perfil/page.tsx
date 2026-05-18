@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, MailCheck, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Bell,
+  MailCheck,
+  MapPin,
+  Package,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
 
 import { Container } from "@/components/layout/Container";
 import {
@@ -105,19 +113,55 @@ export default async function PerfilPage() {
           </Card>
         </div>
 
-        <div className="mt-8 space-y-3">
-          <Link
-            href="/mis-reservas"
-            className="flex items-center justify-between rounded-xl border border-border bg-card p-5 transition-colors hover:bg-muted"
-          >
-            <div>
-              <p className="text-base font-semibold">Mis reservas</p>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                Campañas en las que estás participando.
-              </p>
-            </div>
-            <ArrowRight className="size-5 text-muted-foreground" aria-hidden />
-          </Link>
+        <div className="mt-8 grid gap-3 sm:grid-cols-2">
+          {[
+            {
+              href: "/mis-reservas",
+              icon: Package,
+              title: "Mis reservas",
+              description: "Campañas en las que estás participando.",
+            },
+            {
+              href: "/perfil/notificaciones",
+              icon: Bell,
+              title: "Notificaciones",
+              description: "Avisos del estado de tus pedidos y campañas.",
+            },
+            {
+              href: "/perfil/direcciones",
+              icon: MapPin,
+              title: "Mis direcciones",
+              description: "Direcciones para envío de pedidos.",
+            },
+            {
+              href: "/perfil/credito",
+              icon: Wallet,
+              title: "Crédito en cuenta",
+              description: "Saldo a favor y movimientos.",
+            },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/30"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <item.icon className="size-4" aria-hidden />
+                </div>
+                <div>
+                  <p className="text-base font-semibold">{item.title}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+              <ArrowRight
+                className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </Link>
+          ))}
         </div>
       </div>
     </Container>

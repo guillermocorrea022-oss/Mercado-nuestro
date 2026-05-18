@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Clock, ShieldCheck, Users } from "lucide-react";
 
 import { CampaignReserveForm } from "@/components/campanas/CampaignReserveForm";
+import { ShareButton } from "@/components/campanas/ShareButton";
 import { Container } from "@/components/layout/Container";
 import { Reveal } from "@/components/motion/Reveal";
 import { createClient } from "@/lib/supabase/server";
@@ -93,6 +94,17 @@ async function getCampaignBySlug(slug: string) {
       Database["public"]["Views"]["campaign_progress_view"]["Row"] | null
     >();
 
+  // Status updates visibles para el usuario.
+  const { data: updates } = await supabase
+    .from("campaign_status_updates")
+    .select("*")
+    .eq("campaign_id", campaign.id)
+    .eq("visible_to_users", true)
+    .order("created_at", { ascending: false })
+    .returns<
+      Database["public"]["Tables"]["campaign_status_updates"]["Row"][]
+    >();
+
   return {
     ...campaign,
     product: Array.isArray(campaign.product)
@@ -100,6 +112,7 @@ async function getCampaignBySlug(slug: string) {
       : campaign.product,
     pricing_tiers: campaign.pricing_tiers ?? [],
     progress,
+    updates: updates ?? [],
   };
 }
 
@@ -200,9 +213,15 @@ export default async function CampaignDetailPage({
                   {product.brand}
                 </p>
               ) : null}
-              <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-                {campaign.title}
-              </h1>
+              <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+                <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+                  {campaign.title}
+                </h1>
+                <ShareButton
+                  url={`/campanas/${campaign.slug}`}
+                  title={campaign.title}
+                />
+              </div>
               {product?.name && product.name !== campaign.title ? (
                 <p className="mt-3 text-sm text-muted-foreground">
                   {product.name}
@@ -261,6 +280,41 @@ export default async function CampaignDetailPage({
                 })}
               </ol>
             </section>
+
+            {campaign.updates && campaign.updates.length > 0 ? (
+              <section className="mt-10">
+                <h2 className="text-xl font-semibold tracking-tight">
+                  Actualizaciones de la campaña
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Te mantenemos al tanto en cada paso de la importación.
+                </p>
+                <ol className="mt-6 relative space-y-6 border-l border-border pl-6">
+                  {campaign.updates.map((u) => (
+                    <li key={u.id} className="relative">
+                      <span
+                        aria-hidden
+                        className="absolute -left-[27px] top-2 size-2.5 rounded-full bg-primary ring-4 ring-background"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(u.created_at).toLocaleString("es-UY", {
+                          day: "numeric",
+                          month: "long",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                      <p className="mt-1 text-sm font-medium uppercase tracking-wide text-primary">
+                        {u.type.replace(/_/g, " ")}
+                      </p>
+                      <p className="mt-2 text-sm text-foreground">
+                        {u.description}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ) : null}
 
             {product?.long_description ? (
               <section className="mt-10">

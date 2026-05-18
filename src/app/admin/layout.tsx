@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LayoutDashboard, LogOut, Megaphone, Package, Settings } from "lucide-react";
+import {
+  CalendarClock,
+  LayoutDashboard,
+  LogOut,
+  Megaphone,
+  Package,
+  Settings,
+  Users,
+} from "lucide-react";
 
 import { signOutAction } from "@/app/(auth)/actions";
 import { buttonVariants } from "@/components/ui/button";
@@ -10,7 +18,9 @@ import { cn } from "@/lib/utils";
 const adminNav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/campanas", label: "Campañas", icon: Megaphone },
+  { href: "/admin/reservas", label: "Reservas", icon: CalendarClock },
   { href: "/admin/productos", label: "Productos", icon: Package },
+  { href: "/admin/usuarios", label: "Usuarios", icon: Users },
   { href: "/admin/configuracion", label: "Configuración", icon: Settings },
 ];
 

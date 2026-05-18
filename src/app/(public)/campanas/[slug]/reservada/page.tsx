@@ -122,17 +122,43 @@ export default async function ReservaConfirmadaPage({
           </CardContent>
         </Card>
 
-        <div className="mt-6 flex gap-3 rounded-2xl border border-dashed border-border bg-muted/30 p-4 text-sm">
-          <Package className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden />
-          <div>
-            <p className="font-medium">Próximo paso: pagar la seña</p>
-            <p className="mt-1 text-muted-foreground">
-              Estamos terminando de conectar Mercado Pago. En breve te
-              llegará un email con el link para abonar la seña. Tu lugar queda
-              asegurado mientras tanto.
-            </p>
+        {reservation.status === "activa" ? (
+          <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+            <div className="flex items-start gap-3">
+              <Package
+                className="mt-0.5 size-5 shrink-0 text-primary"
+                aria-hidden
+              />
+              <div>
+                <p className="font-medium">Próximo paso: pagar la seña</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Confirmá tu lugar pagando la seña ahora. Es seguro y solo te
+                  toma un minuto.
+                </p>
+              </div>
+            </div>
+            <Link
+              href={`/checkout/mercadopago-stub?reservation=${reservation.id}`}
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "mt-5 h-11 w-full text-base shadow-glow",
+              )}
+            >
+              Pagar seña con Mercado Pago
+            </Link>
           </div>
-        </div>
+        ) : (
+          <div className="mt-6 flex gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm">
+            <Package className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+            <div>
+              <p className="font-medium">Seña confirmada ✓</p>
+              <p className="mt-1 text-muted-foreground">
+                Ya recibimos tu pago. Cuando la campaña cierre, te avisamos
+                por email con el saldo a pagar (si corresponde).
+              </p>
+            </div>
+          </div>
+        )}
 
         {campaign.estimated_arrival_at ? (
           <div className="mt-3 flex gap-3 rounded-2xl border border-dashed border-border bg-muted/30 p-4 text-sm">
