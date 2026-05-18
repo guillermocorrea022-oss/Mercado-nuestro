@@ -937,6 +937,29 @@ export interface Database {
         Relationships: [];
       };
 
+      marketplace_listing_reviews: {
+        Row: {
+          id: string;
+          listing_id: string | null;
+          order_id: string | null;
+          user_id: string;
+          rating: number;
+          body: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          listing_id?: string | null;
+          order_id?: string | null;
+          user_id: string;
+          rating: number;
+          body?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["marketplace_listing_reviews"]["Insert"]>;
+        Relationships: [];
+      };
+
       wishlists: {
         Row: {
           id: string;
@@ -1105,6 +1128,14 @@ export interface Database {
       close_campaign: {
         Args: { p_campaign_id: string };
         Returns: Json;
+      };
+      release_marketplace_escrow: {
+        Args: { p_order_id: string };
+        Returns: Json;
+      };
+      auto_release_marketplace_escrow: {
+        Args: Record<string, never>;
+        Returns: { order_id: string; result: string }[];
       };
     };
 

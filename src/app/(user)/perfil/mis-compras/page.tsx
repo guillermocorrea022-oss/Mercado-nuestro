@@ -3,6 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Package, ShoppingBag } from "lucide-react";
 
+import { ConfirmDeliveryButton } from "@/components/marketplace/ConfirmDeliveryButton";
+import { ListingReviewForm } from "@/components/marketplace/ListingReviewForm";
 import { Container } from "@/components/layout/Container";
 import { formatUsdFromCents } from "@/lib/campaigns";
 import { createClient } from "@/lib/supabase/server";
@@ -71,10 +73,11 @@ export default async function MisComprasPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: orders } = await supabase
-    .from("marketplace_orders")
-    .select(
-      `
+  const [{ data: orders }, { data: existingReviews }] = await Promise.all([
+    supabase
+      .from("marketplace_orders")
+      .select(
+        `
       id, quantity, total_cents_usd, status, paid_at, shipped_at,
       delivered_at, tracking_code,
       listing:marketplace_listings!marketplace_orders_listing_id_fkey(
@@ -82,12 +85,21 @@ export default async function MisComprasPage({
       ),
       seller:seller_profiles!marketplace_orders_seller_id_fkey(display_name, slug)
       `,
-    )
-    .eq("buyer_id", user.id)
-    .order("created_at", { ascending: false })
-    .returns<OrderRow[]>();
+      )
+      .eq("buyer_id", user.id)
+      .order("created_at", { ascending: false })
+      .returns<OrderRow[]>(),
+    supabase
+      .from("marketplace_listing_reviews")
+      .select("order_id")
+      .eq("user_id", user.id)
+      .returns<{ order_id: string | null }[]>(),
+  ]);
 
   const list = orders ?? [];
+  const reviewedOrderIds = new Set(
+    (existingReviews ?? []).map((r) => r.order_id).filter(Boolean) as string[],
+  );
 
   return (
     <Container className="py-10 sm:py-16">
@@ -179,6 +191,31 @@ export default async function MisComprasPage({
                     <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Package className="size-3.5" aria-hidden />
                       Tracking: {o.tracking_code}
+                    </p>
+                  ) : null}
+                  {(o.status === "despachada" || o.status === "pagada") ? (
+                    <div className="mt-4 border-t border-border pt-4">
+                      <ConfirmDeliveryButton orderId={o.id} />
+                    </div>
+                  ) : null}
+                  {o.status === "entregada" &&
+                  !reviewedOrderIds.has(o.id) ? (
+                    <div className="mt-4 rounded-xl border border-dashed border-border bg-card/30 p-4">
+                      <p className="text-sm font-medium">
+                        Calificá esta compra
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Ayudás a otros compradores y mejorás la reputación
+                        del vendedor.
+                      </p>
+                      <div className="mt-3">
+                        <ListingReviewForm orderId={o.id} />
+                      </div>
+                    </div>
+                  ) : null}
+                  {o.status === "entregada" && reviewedOrderIds.has(o.id) ? (
+                    <p className="mt-4 text-xs text-muted-foreground">
+                      ✓ Ya calificaste esta compra. ¡Gracias!
                     </p>
                   ) : null}
                 </li>
