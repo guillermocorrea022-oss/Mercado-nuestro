@@ -1,8 +1,11 @@
 "use client";
 
 import { Minus, Plus } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useActionState, useState } from "react";
+import { useFormStatus } from "react-dom";
 
+import { createReservationAction } from "@/app/(public)/campanas/actions";
+import { initialReserveState } from "@/app/(public)/campanas/reserve-state";
 import { buttonVariants } from "@/components/ui/button";
 import {
   findCurrentTier,
@@ -13,29 +16,57 @@ import {
 import { cn } from "@/lib/utils";
 
 interface CampaignReserveFormProps {
+  campaignId: string;
   campaignSlug: string;
   pricingTiers: PricingTier[];
   reservedQuantity: number;
   depositPercentage: number;
   maxQuantity: number | null;
   status: string;
+  isLoggedIn: boolean;
+}
+
+function ReserveSubmitButton({
+  label,
+  pendingLabel,
+  disabled,
+}: {
+  label: string;
+  pendingLabel: string;
+  disabled?: boolean;
+}) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={disabled || pending}
+      className={cn(
+        buttonVariants({ size: "lg" }),
+        "mt-6 h-12 w-full text-base",
+      )}
+    >
+      {pending ? pendingLabel : label}
+    </button>
+  );
 }
 
 export function CampaignReserveForm({
+  campaignId,
   campaignSlug,
   pricingTiers,
   reservedQuantity,
   depositPercentage,
   maxQuantity,
   status,
+  isLoggedIn,
 }: CampaignReserveFormProps) {
   const [quantity, setQuantity] = useState(1);
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction] = useActionState(
+    createReservationAction,
+    initialReserveState,
+  );
 
-  // Tier vigente según el total alcanzado SI sumamos las unidades que el
-  // usuario está por reservar. Esto es el precio que el sistema mostraría
-  // como referencia "actual"; al cerrar, el precio final puede ser mejor
-  // si la campaña sigue subiendo.
+  // Precio del escalón vigente si sumamos las unidades del usuario al total.
   const projectedTotal = reservedQuantity + quantity;
   const projectedTier = findCurrentTier(pricingTiers, projectedTotal);
   const nextTier = findNextTier(pricingTiers, projectedTotal);
@@ -56,18 +87,15 @@ export function CampaignReserveForm({
   const canIncrement = quantity < upperBound;
   const isClosed = status !== "activa";
 
-  function handleReserve() {
-    startTransition(() => {
-      // TODO(auth): cuando esté implementado registro/login, esto debería
-      // ir a /checkout/campana/[slug]?quantity=... y exigir sesión.
-      window.location.href = `/login?next=/campanas/${encodeURIComponent(
-        campaignSlug,
-      )}/reservar?quantity=${quantity}`;
-    });
-  }
-
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <form
+      action={formAction}
+      className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+    >
+      <input type="hidden" name="campaignId" value={campaignId} />
+      <input type="hidden" name="campaignSlug" value={campaignSlug} />
+      <input type="hidden" name="quantity" value={quantity} />
+
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-3xl font-semibold tracking-tight">
           {formatUsdFromCents(unitPriceCents)}
@@ -151,25 +179,24 @@ export function CampaignReserveForm({
         </div>
       </dl>
 
-      <button
-        type="button"
-        onClick={handleReserve}
-        disabled={isClosed || isPending}
-        className={cn(
-          buttonVariants({ size: "lg" }),
-          "mt-6 h-12 w-full text-base",
-        )}
-      >
-        {isClosed
-          ? "Campaña cerrada"
-          : isPending
-            ? "Yendo al checkout..."
-            : "Reservar con seña"}
-      </button>
+      {state.status === "error" && state.message ? (
+        <div
+          role="alert"
+          className="mt-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+        >
+          {state.message}
+        </div>
+      ) : null}
+
+      <ReserveSubmitButton
+        label={isLoggedIn ? "Reservar con seña" : "Entrar para reservar"}
+        pendingLabel={isLoggedIn ? "Guardando reserva..." : "Llevándote al login..."}
+        disabled={isClosed}
+      />
 
       <p className="mt-3 text-center text-xs text-muted-foreground">
         Podés cancelar hasta 72 hs antes del cierre y recuperás la seña.
       </p>
-    </div>
+    </form>
   );
 }

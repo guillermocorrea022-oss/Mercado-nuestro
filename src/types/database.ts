@@ -83,6 +83,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
+        Relationships: [];
       };
 
       user_roles: {
@@ -107,6 +108,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["user_roles"]["Insert"]>;
+        Relationships: [];
       };
 
       user_addresses: {
@@ -141,6 +143,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["user_addresses"]["Insert"]>;
+        Relationships: [];
       };
 
       user_verifications: {
@@ -169,6 +172,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["user_verifications"]["Insert"]>;
+        Relationships: [];
       };
 
       categories: {
@@ -195,6 +199,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["categories"]["Insert"]>;
+        Relationships: [];
       };
 
       products: {
@@ -235,6 +240,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["products"]["Insert"]>;
+        Relationships: [];
       };
 
       product_variants: {
@@ -261,6 +267,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["product_variants"]["Insert"]>;
+        Relationships: [];
       };
 
       campaigns: {
@@ -309,6 +316,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["campaigns"]["Insert"]>;
+        Relationships: [];
       };
 
       campaign_pricing_tiers: {
@@ -333,6 +341,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["campaign_pricing_tiers"]["Insert"]>;
+        Relationships: [];
       };
 
       campaign_reservations: {
@@ -369,6 +378,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["campaign_reservations"]["Insert"]>;
+        Relationships: [];
       };
     };
 
@@ -388,6 +398,7 @@ export interface Database {
           moq_progress_pct: number | null;
           seconds_until_close: number | null;
         };
+        Relationships: [];
       };
     };
 

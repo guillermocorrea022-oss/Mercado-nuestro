@@ -133,6 +133,12 @@ export default async function CampaignDetailPage({
     notFound();
   }
 
+  // Saber si el visitante está logueado cambia el texto del botón de reserva.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const product = campaign.product;
   const reserved = campaign.progress?.reserved_quantity ?? 0;
   const moqPct = campaign.progress?.moq_progress_pct ?? 0;
@@ -331,12 +337,14 @@ export default async function CampaignDetailPage({
             </div>
 
             <CampaignReserveForm
+              campaignId={campaign.id}
               campaignSlug={campaign.slug}
               pricingTiers={sortedTiers}
               reservedQuantity={reserved}
               depositPercentage={campaign.deposit_percentage}
               maxQuantity={campaign.max_quantity}
               status={campaign.status}
+              isLoggedIn={Boolean(user)}
             />
           </aside>
         </div>
