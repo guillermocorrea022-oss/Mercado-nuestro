@@ -148,6 +148,12 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
   - [/admin/campanas](src/app/admin/campanas/page.tsx) tabla con todas las campañas (todos los estados), status pill, progreso al MOQ, countdown, botón "Cerrar campaña" que dispara [`closeCampaignAction`](src/app/admin/actions.ts) → rpc `close_campaign` con feedback inline del resumen.
 - **/disponible** ([page.tsx](src/app/(public)/disponible/page.tsx)) lista `inventory_items` activos con `quantity > 0`. Card premium con precio, brand y stock. Empty state cuando vacío.
 - **src/types/database.ts** ampliado con tablas que se usan ahora (inventory, orders, order_items, payments, user_credits, credit_movements, notifications, settings, admin_actions_log, campaign_status_updates) + 7 enums + función `close_campaign` en `Functions`. Las tablas de Fase 2 (marketplace, catalog, comisiones, reviews) existen en la DB pero sin tipos TS hasta que se usen.
+- **Imágenes lifestyle de Unsplash en hero y secciones**:
+  - Producto demo "Cámara IP WiFi" actualizado en DB con `photo-1558002038-1055907df827` (cámara de seguridad real). Aplica al detalle de campaña y a las cards.
+  - Home con layout asimétrico tipo editorial: hero 2 columnas (texto + foto de cajas de importación), sección "El método" con foto de mercado/comunidad, CTA vendedores con foto de persona/celular. Tarjeta flotante con highlight de "precio escalonado" como detalle gluwz-style.
+  - `/como-funciona` hero también en 2 columnas con foto de mercadería empaquetada.
+  - Home pasa a **Server Component async** que lee `campaigns` + `pricing_tiers` + `campaign_progress_view`. Sección "Campañas en curso" muestra `CampaignCard`s reales en lugar del empty state hardcoded (el empty solo cuando no hay activas).
+  - Todas con `next/image`, `sizes` responsive, `priority` en hero. `shadow-soft` para feel editorial.
 - **Cambio de paleta a light editorial estilo gluwz.be**:
   - Blanco cálido cremoso `oklch(0.985 0.006 85)` como fondo, verde sage muted `oklch(0.5 0.08 150)` como primary, beiges y grises cálidos en muted/accent.
   - Root layout sin clase `dark`, `colorScheme: light`. (La sección "dark premium" abajo es histórica — la paleta ahora es light editorial inspirada en gluwz.)
