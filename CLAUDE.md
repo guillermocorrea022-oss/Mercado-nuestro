@@ -94,6 +94,21 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
   - Hint del próximo escalón con unidades restantes.
   - Botón "Reservar con seña" redirige a `/login?next=/campanas/[slug]/reservar?quantity=...` como placeholder hasta tener auth.
   - Estado "Campaña cerrada" si el `status` no es `activa`.
+- **Rediseño visual a estética dark premium** (inspirado en legendslegalmarketing.com):
+  - Paleta **Carbon Black + Alabaster** + verde brillante como acento. `--background: oklch(0.09 0 0)`, `--foreground: oklch(0.96 0.005 90)`, `--primary: oklch(0.78 0.18 145)`. Border sutil 8% sobre negro.
+  - Root layout fuerza `class="dark"` + `style colorScheme: dark` — sin sistema de toggle, todo el sitio es dark.
+  - Utility classes nuevas en globals.css: `text-gradient` (degradado en headings), `bg-grain` (overlay de grano sutil), `shadow-glow` (resplandor verde para CTAs), `border-glow` (borde luminoso).
+  - Headings con letter-spacing negativo ajustado (-0.04em en h1).
+  - **Librería de animaciones**: `motion` (framer-motion v12 unificado) en [src/components/motion/](src/components/motion/):
+    - [Reveal](src/components/motion/Reveal.tsx): fade + slide-up al scroll, respeta `prefers-reduced-motion`.
+    - [Stagger](src/components/motion/Stagger.tsx) + `StaggerItem`: entrada escalonada de hijos.
+    - Easing premium `[0.22, 1, 0.36, 1]` consistente en todo el sitio.
+  - **Home** rehecho: hero con eyebrow pill, headline gradient sobre 2 líneas, CTAs con glow, fila de 4 stats animados. Sección "El método" con números monospace 01/02/03 en grid `gap-px` sobre `bg-border`. Sección "Por qué" con cards de icon chips ring-inset. CTA final con orb blur primary.
+  - **/como-funciona** mismo lenguaje visual: hero con orb, journey en grid, tabla de escalones con row destacado en `primary/5`.
+  - **/campanas**: hero con eyebrow + orb, listado con Stagger animation.
+  - **CampaignCard**: aspect-[4/3], imagen con scale al hover, overlay gradient hacia el card, arrow chip que aparece al hover.
+  - **Detalle de campaña**: hero image con border, brand como eyebrow uppercase tracking, h1 más grande con tracking ajustado, Reveal en el hero. ReserveForm con `shadow-glow`.
+  - **Auth screens** ((auth)/layout): gradient orb + grain overlay, header con backdrop-blur, brand con dot y "Nuestro" en muted.
 - **Catálogo público base armado** (semana 4 del plan, parcial):
   - Layout público en [src/app/(public)/layout.tsx](src/app/(public)/layout.tsx) con `Header` sticky (logo + nav desktop + CTA "Entrar / Crear cuenta") y `Footer` con 4 columnas (Comprar / Vender / Mercado Nuestro / Legal) + dirección del local de Paysandú. Componentes en `src/components/layout/`. `Container` helper para max-width consistente.
   - Home [src/app/(public)/page.tsx](src/app/(public)/page.tsx) con hero ("Importá en grupo, pagá precio mayorista"), 3 pasos de cómo funciona, sección de campañas destacadas (empty state mientras no haya data), 4 propuestas de valor con iconos de Lucide y CTA al programa de vendedores.
