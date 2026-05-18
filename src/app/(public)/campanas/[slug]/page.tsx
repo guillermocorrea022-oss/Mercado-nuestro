@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle2, Clock, ShieldCheck, Users } from "lucide-react
 
 import { CampaignReserveForm } from "@/components/campanas/CampaignReserveForm";
 import { Container } from "@/components/layout/Container";
+import { Reveal } from "@/components/motion/Reveal";
 import { createClient } from "@/lib/supabase/server";
 import {
   formatTimeRemaining,
@@ -161,7 +162,7 @@ export default async function CampaignDetailPage({
 
   return (
     <>
-      <Container className="py-6">
+      <Container className="py-8">
         <Link
           href="/campanas"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -171,42 +172,48 @@ export default async function CampaignDetailPage({
         </Link>
       </Container>
 
-      <Container className="pb-12">
+      <Container className="pb-20">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
           <div>
-            <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-muted">
-              {heroImage ? (
-                <Image
-                  src={heroImage}
-                  alt={campaign.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  className="object-cover"
-                  priority
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-xs uppercase tracking-wide text-muted-foreground">
-                  Sin imagen
-                </div>
-              )}
-            </div>
+            <Reveal>
+              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-muted">
+                {heroImage ? (
+                  <Image
+                    src={heroImage}
+                    alt={campaign.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-xs uppercase tracking-wide text-muted-foreground">
+                    Sin imagen
+                  </div>
+                )}
+              </div>
+            </Reveal>
 
-            <div className="mt-8">
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            <Reveal delay={0.1} className="mt-10">
+              {product?.brand ? (
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+                  {product.brand}
+                </p>
+              ) : null}
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
                 {campaign.title}
               </h1>
               {product?.name && product.name !== campaign.title ? (
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {product.brand ? `${product.brand} · ` : ""}
+                <p className="mt-3 text-sm text-muted-foreground">
                   {product.name}
                 </p>
               ) : null}
               {campaign.description ? (
-                <p className="mt-4 text-base text-muted-foreground">
+                <p className="mt-6 text-base leading-relaxed text-muted-foreground">
                   {campaign.description}
                 </p>
               ) : null}
-            </div>
+            </Reveal>
 
             <section className="mt-10">
               <h2 className="text-xl font-semibold tracking-tight">

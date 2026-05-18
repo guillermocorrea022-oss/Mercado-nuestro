@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { Container } from "@/components/layout/Container";
 import { CampaignCard, type CampaignCardData } from "@/components/campanas/CampaignCard";
+import { Reveal } from "@/components/motion/Reveal";
+import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -86,45 +88,58 @@ export default async function CampanasPage() {
 
   return (
     <>
-      <section className="border-b border-border bg-gradient-to-b from-accent/30 via-background to-background">
-        <Container className="py-12 sm:py-16">
-          <div className="max-w-3xl">
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              Campañas activas
-            </h1>
-            <p className="mt-4 text-muted-foreground">
-              Estos son los productos que estamos importando ahora. Reservá tu
-              lugar con seña y pagás el saldo cuando se cierre la campaña al mejor
-              precio alcanzado.
+      <section className="relative isolate overflow-hidden border-b border-border">
+        <div aria-hidden className="absolute inset-0 -z-10 bg-grain" />
+        <div
+          aria-hidden
+          className="absolute -top-32 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
+        />
+        <Container className="py-20 sm:py-24">
+          <Reveal className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+              Activas ahora
             </p>
-          </div>
+            <h1 className="mt-4 text-5xl font-semibold tracking-tight sm:text-6xl">
+              Campañas en curso
+            </h1>
+            <p className="mt-6 text-lg text-muted-foreground">
+              Estos son los productos que estamos importando ahora. Reservá tu
+              lugar con seña y pagás el saldo cuando se cierre la campaña, al
+              mejor precio alcanzado.
+            </p>
+          </Reveal>
         </Container>
       </section>
 
-      <section className="py-10 sm:py-12">
+      <section className="py-16 sm:py-20">
         <Container>
           {campaigns.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-              <p className="text-base font-medium">
-                Todavía no hay campañas abiertas.
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Estamos cerrando acuerdos con proveedores. Mientras tanto, leé{" "}
-                <Link
-                  href="/como-funciona"
-                  className="font-medium text-primary hover:underline"
-                >
-                  cómo funciona el sistema
-                </Link>{" "}
-                para llegar listo.
-              </p>
-            </div>
+            <Reveal>
+              <div className="rounded-2xl border border-dashed border-border bg-card/30 p-16 text-center backdrop-blur">
+                <p className="text-lg font-medium">
+                  Todavía no hay campañas abiertas
+                </p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Estamos cerrando acuerdos con proveedores. Mientras tanto,
+                  leé{" "}
+                  <Link
+                    href="/como-funciona"
+                    className="font-medium text-primary underline-offset-4 hover:underline"
+                  >
+                    cómo funciona el sistema
+                  </Link>{" "}
+                  para llegar listo.
+                </p>
+              </div>
+            </Reveal>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {campaigns.map((campaign) => (
-                <CampaignCard key={campaign.id} campaign={campaign} />
+                <StaggerItem key={campaign.id}>
+                  <CampaignCard campaign={campaign} />
+                </StaggerItem>
               ))}
-            </div>
+            </Stagger>
           )}
         </Container>
       </section>

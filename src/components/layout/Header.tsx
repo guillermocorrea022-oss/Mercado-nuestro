@@ -22,26 +22,31 @@ export async function Header() {
   } = await supabase.auth.getUser();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/70 backdrop-blur-xl">
       <Container>
-        <div className="flex h-16 items-center justify-between gap-4">
+        <div className="flex h-16 items-center justify-between gap-6">
           <Link
             href="/"
-            className="flex items-center gap-2 text-base font-semibold tracking-tight"
+            className="flex items-center gap-2.5 text-base font-semibold tracking-tight"
           >
-            <span
-              aria-hidden
-              className="inline-block size-3 rounded-full bg-primary"
-            />
-            <span>Mercado Nuestro</span>
+            <span aria-hidden className="relative flex size-2.5">
+              <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-30" />
+              <span className="relative inline-block size-2.5 rounded-full bg-primary" />
+            </span>
+            <span>
+              Mercado <span className="text-muted-foreground">Nuestro</span>
+            </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1" aria-label="Menú principal">
+          <nav
+            className="hidden md:flex items-center gap-1"
+            aria-label="Menú principal"
+          >
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 {link.label}
               </Link>
@@ -88,7 +93,10 @@ export async function Header() {
                 </Link>
                 <Link
                   href="/registro"
-                  className={buttonVariants({ size: "sm" })}
+                  className={cn(
+                    buttonVariants({ size: "sm" }),
+                    "shadow-glow",
+                  )}
                 >
                   Crear cuenta
                 </Link>

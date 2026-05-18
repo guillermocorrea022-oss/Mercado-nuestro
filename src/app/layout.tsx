@@ -30,7 +30,10 @@ export default function RootLayout({
   return (
     <html
       lang="es-UY"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // Forzamos dark mode siempre — el sitio entero usa la paleta Carbon
+      // Black + Alabaster definida en globals.css.
+      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      style={{ colorScheme: "dark" }}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}

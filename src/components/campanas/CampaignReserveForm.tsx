@@ -90,7 +90,7 @@ export function CampaignReserveForm({
   return (
     <form
       action={formAction}
-      className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+      className="rounded-2xl border border-border bg-card p-6 shadow-glow"
     >
       <input type="hidden" name="campaignId" value={campaignId} />
       <input type="hidden" name="campaignSlug" value={campaignSlug} />

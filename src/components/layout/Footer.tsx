@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MapPin } from "lucide-react";
 
 import { Container } from "./Container";
 
@@ -21,7 +22,7 @@ const footerSections = [
     ],
   },
   {
-    title: "Mercado Nuestro",
+    title: "Nosotros",
     links: [
       { href: "/sobre-nosotros", label: "Sobre nosotros" },
       { href: "/contacto", label: "Contacto" },
@@ -41,44 +42,56 @@ const footerSections = [
 
 export function Footer() {
   return (
-    <footer className="mt-24 border-t border-border bg-muted/30">
-      <Container className="py-12">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {footerSections.map((section) => (
-            <div key={section.title}>
-              <h3 className="text-sm font-semibold text-foreground">
-                {section.title}
-              </h3>
-              <ul className="mt-3 space-y-2">
-                {section.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+    <footer className="relative mt-32 overflow-hidden border-t border-border bg-background bg-grain">
+      <Container className="py-20">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_3fr]">
+          <div>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2.5 text-xl font-semibold tracking-tight"
+            >
+              <span aria-hidden className="size-2.5 rounded-full bg-primary" />
+              Mercado Nuestro
+            </Link>
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
+              Plataforma uruguaya de compra colaborativa. Importamos en grupo
+              para que pagues precio mayorista.
+            </p>
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
+              <MapPin className="size-3.5" aria-hidden />
+              Leandro Gómez 1076, Paysandú · Uruguay
             </div>
-          ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+            {footerSections.map((section) => (
+              <div key={section.title}>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {section.title}
+                </h3>
+                <ul className="mt-4 space-y-3">
+                  {section.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-sm text-foreground/80 transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 text-sm">
-            <span
-              aria-hidden
-              className="inline-block size-2.5 rounded-full bg-primary"
-            />
-            <span className="font-medium">Mercado Nuestro</span>
-            <span className="text-muted-foreground">
-              · Leandro Gómez 1076, Paysandú, Uruguay
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Mercado Nuestro. Todos los derechos reservados.
+        <div className="mt-16 flex flex-col gap-3 border-t border-border pt-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            © {new Date().getFullYear()} Mercado Nuestro. Todos los derechos
+            reservados.
           </p>
+          <p>Hecho en Uruguay 🇺🇾</p>
         </div>
       </Container>
     </footer>

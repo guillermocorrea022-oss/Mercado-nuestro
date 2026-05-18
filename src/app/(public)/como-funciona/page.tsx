@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 
 import { Container } from "@/components/layout/Container";
+import { Reveal } from "@/components/motion/Reveal";
+import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -69,7 +71,7 @@ const guarantees = [
   },
   {
     icon: Coins,
-    title: "Si la campaña no llega al mínimo, te devolvemos",
+    title: "Si no llegamos al mínimo, te devolvemos",
     description:
       "Reembolsamos la seña al método original en hasta 7 días hábiles. Opcional: dejarla como crédito con 5% extra.",
   },
@@ -78,153 +80,178 @@ const guarantees = [
 export default function ComoFuncionaPage() {
   return (
     <>
-      <section className="border-b border-border bg-gradient-to-b from-accent/30 via-background to-background">
-        <Container className="py-16 sm:py-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-              Cómo funciona Mercado Nuestro
-            </h1>
-            <p className="mt-6 text-lg text-muted-foreground">
-              Nos juntamos entre muchas personas para importar productos al precio
-              que paga un mayorista. La plataforma se encarga del trámite, la
-              aduana y la logística. Vos solo elegís y reservás.
+      <section className="relative isolate overflow-hidden border-b border-border">
+        <div aria-hidden className="absolute inset-0 -z-10 bg-grain" />
+        <div
+          aria-hidden
+          className="absolute -top-40 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
+        />
+        <Container className="py-24 sm:py-32">
+          <Reveal className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+              El sistema
             </p>
-          </div>
+            <h1 className="mt-6 text-5xl font-semibold tracking-tight sm:text-6xl">
+              Cómo funciona <span className="text-gradient">Mercado Nuestro</span>
+            </h1>
+            <p className="mt-8 text-lg text-muted-foreground sm:text-xl">
+              Nos juntamos entre muchas personas para importar productos al
+              precio que paga un mayorista. La plataforma se encarga del
+              trámite, la aduana y la logística. Vos solo elegís y reservás.
+            </p>
+          </Reveal>
         </Container>
       </section>
 
-      <section className="py-16 sm:py-24">
+      <section className="py-24 sm:py-32">
         <Container>
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+              Paso a paso
+            </p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
               El camino de una campaña
             </h2>
-            <p className="mt-3 text-muted-foreground">
+            <p className="mt-5 text-muted-foreground">
               Desde que abrimos la importación hasta que el producto llega a tu
               casa.
             </p>
-          </div>
+          </Reveal>
 
-          <ol className="mx-auto mt-12 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Stagger className="mx-auto mt-16 grid max-w-6xl gap-px overflow-hidden rounded-2xl border border-border bg-border/60 sm:grid-cols-2 lg:grid-cols-3">
             {journey.map((step, idx) => (
-              <li
-                key={step.title}
-                className="rounded-2xl border border-border bg-card p-6"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                    {idx + 1}
+              <StaggerItem key={step.title} className="bg-background p-8">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-medium text-primary">
+                    {String(idx + 1).padStart(2, "0")}
                   </span>
-                  <step.icon className="size-5 text-muted-foreground" aria-hidden />
+                  <step.icon
+                    className="size-5 text-muted-foreground"
+                    aria-hidden
+                  />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold tracking-tight">
+                <h3 className="mt-6 text-lg font-semibold tracking-tight">
                   {step.title}
                 </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                   {step.description}
                 </p>
-              </li>
+              </StaggerItem>
             ))}
-          </ol>
+          </Stagger>
         </Container>
       </section>
 
-      <section className="border-y border-border bg-muted/30 py-16 sm:py-20">
+      <section className="border-y border-border bg-card/30 py-24 sm:py-32">
         <Container>
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold tracking-tight">
-              Cómo se construye el precio
-            </h2>
-            <p className="mt-4 text-muted-foreground">
-              Cada campaña tiene escalones de precio definidos antes de abrirla.
-              Por ejemplo:
+          <Reveal className="mx-auto max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+              Precio escalonado
             </p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+              Cuanto más se suma, más baja el precio
+            </h2>
+            <p className="mt-5 text-muted-foreground">
+              Cada campaña tiene escalones definidos antes de abrirla. Al
+              cerrar, todos pagan el mejor escalón alcanzado. Ejemplo:
+            </p>
+          </Reveal>
 
-            <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-background">
+          <Reveal delay={0.1} className="mx-auto mt-10 max-w-3xl">
+            <div className="overflow-hidden rounded-2xl border border-border bg-background">
               <table className="w-full text-left text-sm">
-                <thead className="bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
+                <thead className="border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
                   <tr>
-                    <th className="px-4 py-3">Unidades reservadas</th>
-                    <th className="px-4 py-3">Precio por unidad</th>
+                    <th className="px-6 py-4 font-medium">Unidades</th>
+                    <th className="px-6 py-4 font-medium">Precio por unidad</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   <tr>
-                    <td className="px-4 py-3">1 – 10</td>
-                    <td className="px-4 py-3 font-medium">USD 120</td>
+                    <td className="px-6 py-4 text-foreground/80">1 – 10</td>
+                    <td className="px-6 py-4 font-semibold">USD 120</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-3">11 – 30</td>
-                    <td className="px-4 py-3 font-medium">USD 105</td>
+                    <td className="px-6 py-4 text-foreground/80">11 – 30</td>
+                    <td className="px-6 py-4 font-semibold">USD 105</td>
                   </tr>
-                  <tr>
-                    <td className="px-4 py-3">31 – 100</td>
-                    <td className="px-4 py-3 font-medium text-primary">USD 92</td>
+                  <tr className="bg-primary/5">
+                    <td className="px-6 py-4 text-foreground/80">31 – 100</td>
+                    <td className="px-6 py-4 text-base font-semibold text-primary">
+                      USD 92
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-
-            <p className="mt-6 text-sm text-muted-foreground">
-              Al cerrar la campaña, todas las personas pagan el precio del mejor
-              escalón alcanzado. Si vos reservaste cuando estaba en USD 120 y la
-              campaña llegó a 35 unidades, terminás pagando USD 92 igual que
-              quien reservó último.
+            <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+              Si reservaste cuando estaba en USD 120 y la campaña llegó a 35
+              unidades, terminás pagando USD 92 igual que quien reservó último.
             </p>
-          </div>
+          </Reveal>
         </Container>
       </section>
 
-      <section className="py-16 sm:py-24">
+      <section className="py-24 sm:py-32">
         <Container>
-          <div className="mx-auto max-w-4xl">
-            <h2 className="text-3xl font-semibold tracking-tight text-center">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
               Nuestras garantías
+            </p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+              Pagás con confianza
             </h2>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
-              {guarantees.map((g) => (
-                <div
-                  key={g.title}
-                  className="flex gap-4 rounded-2xl border border-border bg-card p-6"
-                >
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          </Reveal>
+
+          <Stagger className="mx-auto mt-16 grid max-w-4xl gap-5 sm:grid-cols-2">
+            {guarantees.map((g) => (
+              <StaggerItem key={g.title}>
+                <div className="h-full rounded-2xl border border-border bg-card p-8">
+                  <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-inset ring-primary/20">
                     <g.icon className="size-5" aria-hidden />
                   </div>
-                  <div>
-                    <h3 className="text-base font-semibold tracking-tight">
-                      {g.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {g.description}
-                    </p>
-                  </div>
+                  <h3 className="mt-6 text-lg font-semibold tracking-tight">
+                    {g.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {g.description}
+                  </p>
                 </div>
-              ))}
-            </div>
-          </div>
+              </StaggerItem>
+            ))}
+          </Stagger>
         </Container>
       </section>
 
-      <section className="pb-20">
+      <section className="pb-24">
         <Container>
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              Listo para empezar
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Mirá las campañas activas y reservá la tuya en menos de cinco minutos.
-            </p>
-            <Link
-              href="/campanas"
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "mt-8 h-11 px-6 text-base",
-              )}
-            >
-              Ver campañas activas
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
-          </div>
+          <Reveal>
+            <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-12 text-center sm:p-20">
+              <div
+                aria-hidden
+                className="absolute inset-x-0 -top-40 mx-auto size-[500px] rounded-full bg-primary/10 blur-3xl"
+              />
+              <div className="relative">
+                <h2 className="mx-auto max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
+                  Listo para empezar
+                </h2>
+                <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
+                  Mirá las campañas activas y reservá la tuya en menos de cinco
+                  minutos.
+                </p>
+                <Link
+                  href="/campanas"
+                  className={cn(
+                    buttonVariants({ size: "lg" }),
+                    "mt-10 h-12 px-7 text-base shadow-glow",
+                  )}
+                >
+                  Ver campañas activas
+                  <ArrowRight className="size-4" aria-hidden />
+                </Link>
+              </div>
+            </div>
+          </Reveal>
         </Container>
       </section>
     </>

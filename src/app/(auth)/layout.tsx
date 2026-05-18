@@ -7,22 +7,29 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-muted/30">
-      <header className="border-b border-border bg-background">
+    <div className="relative isolate flex min-h-screen flex-col bg-background">
+      <div aria-hidden className="absolute inset-0 -z-10 bg-grain" />
+      <div
+        aria-hidden
+        className="absolute -top-40 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
+      />
+      <header className="border-b border-border bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-5xl items-center px-4 sm:px-6">
           <Link
             href="/"
-            className="flex items-center gap-2 text-base font-semibold tracking-tight"
+            className="flex items-center gap-2.5 text-base font-semibold tracking-tight"
           >
             <span
               aria-hidden
-              className="inline-block size-3 rounded-full bg-primary"
+              className="inline-block size-2.5 rounded-full bg-primary"
             />
-            <span>Mercado Nuestro</span>
+            <span>
+              Mercado <span className="text-muted-foreground">Nuestro</span>
+            </span>
           </Link>
         </div>
       </header>
-      <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">
+      <main className="flex flex-1 items-center justify-center px-4 py-16 sm:px-6">
         {children}
       </main>
     </div>
