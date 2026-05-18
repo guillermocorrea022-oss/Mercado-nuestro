@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
         hostname: "ujvzbyzxfllczvoiywap.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      // Placeholders usados en seed de desarrollo. Quitar cuando subamos
+      // imágenes reales a Supabase Storage.
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
 };
