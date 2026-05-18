@@ -148,7 +148,13 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
   - [/admin/campanas](src/app/admin/campanas/page.tsx) tabla con todas las campañas (todos los estados), status pill, progreso al MOQ, countdown, botón "Cerrar campaña" que dispara [`closeCampaignAction`](src/app/admin/actions.ts) → rpc `close_campaign` con feedback inline del resumen.
 - **/disponible** ([page.tsx](src/app/(public)/disponible/page.tsx)) lista `inventory_items` activos con `quantity > 0`. Card premium con precio, brand y stock. Empty state cuando vacío.
 - **src/types/database.ts** ampliado con tablas que se usan ahora (inventory, orders, order_items, payments, user_credits, credit_movements, notifications, settings, admin_actions_log, campaign_status_updates) + 7 enums + función `close_campaign` en `Functions`. Las tablas de Fase 2 (marketplace, catalog, comisiones, reviews) existen en la DB pero sin tipos TS hasta que se usen.
-- **Rediseño visual a estética dark premium** (inspirado en legendslegalmarketing.com):
+- **Cambio de paleta a light editorial estilo gluwz.be**:
+  - Blanco cálido cremoso `oklch(0.985 0.006 85)` como fondo, verde sage muted `oklch(0.5 0.08 150)` como primary, beiges y grises cálidos en muted/accent.
+  - Root layout sin clase `dark`, `colorScheme: light`. (La sección "dark premium" abajo es histórica — la paleta ahora es light editorial inspirada en gluwz.)
+  - Utility `shadow-glow` reemplazada por sombra suave estilo papel (sin glow agresivo). Nueva utility `shadow-soft` para cards.
+  - Orbes blur del hero a `bg-primary/8` (más sutiles en fondo claro).
+  - Warnings (avisos modo demo, status "abierto" en reclamos) ahora con `bg-amber-100 text-amber-900`.
+- **Rediseño visual previo dark premium** (histórico, inspirado en legendslegalmarketing.com):
   - Paleta **Carbon Black + Alabaster** + verde brillante como acento. `--background: oklch(0.09 0 0)`, `--foreground: oklch(0.96 0.005 90)`, `--primary: oklch(0.78 0.18 145)`. Border sutil 8% sobre negro.
   - Root layout fuerza `class="dark"` + `style colorScheme: dark` — sin sistema de toggle, todo el sitio es dark.
   - Utility classes nuevas en globals.css: `text-gradient` (degradado en headings), `bg-grain` (overlay de grano sutil), `shadow-glow` (resplandor verde para CTAs), `border-glow` (borde luminoso).
