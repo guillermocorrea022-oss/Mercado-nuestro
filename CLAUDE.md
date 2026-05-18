@@ -61,16 +61,24 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - Build de producción pasa sin warnings (incluyendo el de `middleware.ts` deprecado, resuelto al renombrar a `proxy.ts`).
 - Dev server arranca en ~1.5s en `http://localhost:3000`.
 
+- **Proyecto Supabase cloud creado y operativo**:
+  - Nombre: `mercado-nuestro` · Org: `guillermo.correa022@gmail.com's Org` (Free).
+  - Project ID: `ujvzbyzxfllczvoiywap` · Region: `sa-east-1` (São Paulo).
+  - URL: `https://ujvzbyzxfllczvoiywap.supabase.co`.
+  - `.env.local` creado con `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y `SUPABASE_DB_PASSWORD` (legacy JWT — el proyecto también tiene los nuevos `sb_publishable_*` / `sb_secret_*`, ambos formatos son válidos en `supabase-js` v2).
+- **Migración inicial aplicada al proyecto Supabase** vía SQL Editor. Verificado en el Table Editor que las 10 tablas + 1 vista existen con RLS habilitado en todas. Query guardada en el dashboard como "Initial schema for import campaigns and reservations".
+- **Tipos TypeScript reales** en [src/types/database.ts](src/types/database.ts) (≈400 líneas): Row/Insert/Update por cada tabla, vista `campaign_progress_view`, función `has_role`, 6 enums tipados. Generados manualmente porque `supabase gen types --db-url` requiere Docker (no instalado). El comentario del archivo documenta cómo regenerar cuando se conecte Docker o se haga `supabase login`.
+- Build pasa con tipos reales conectados.
+
 **Pendiente en cimientos técnicos:**
-- Crear proyecto Supabase real (cloud o local con `supabase` CLI) y completar `.env.local` con las claves reales.
-- Aplicar la migración inicial al proyecto (`supabase db push` o copiar/pegar en SQL editor del dashboard).
-- Generar tipos TypeScript reales con `npx supabase gen types typescript` y reemplazar el stub.
-- Migraciones siguientes: marketplace (listings, orders, messages), orders unificadora + order_items + payments, vendedores por catálogo (catalog_links, attributions, sales, commission_tiers, payouts), reviews/ratings, wishlists, support_tickets/claims, notifications, settings.
+- Conectar las features clave de Supabase Auth desde el dashboard: redirect URLs (`http://localhost:3000/auth/callback` para dev), Google OAuth provider (cuando se tengan client_id/secret), confirmar email habilitado.
+- Migraciones siguientes: marketplace (listings, orders, messages), orders unificadora + order_items + payments, vendedores por catálogo (catalog_links, attributions, sales, commission_tiers, payouts), reviews/ratings, wishlists, support_tickets/claims, notifications, settings, admin_actions_log.
 - Layout principal de `src/app/layout.tsx` con header/footer y tipografía del proyecto (preliminar: Inter o Geist; sin definir aún).
+- Smoke test: una página que lea `categories` (vacía) o `campaigns` para validar el cliente en ejecución.
 
-**Próxima funcionalidad a implementar:** Layout público base (header, footer, navegación) + home con hero estático y placeholder de carrusel de campañas. Server Component que lea `campaigns` y `campaign_progress_view` cuando haya proyecto Supabase conectado; mientras tanto, datos mock.
+**Próxima funcionalidad a implementar:** Layout público base (header, footer, navegación) + home con hero estático y placeholder de carrusel de campañas. Server Component conectado al cliente Supabase server que lea `campaigns` activas y `campaign_progress_view`. Mientras no haya datos, mostrar estado "empty" con CTA "ver cómo funciona".
 
-**Última decisión técnica tomada:** Renombrar `src/middleware.ts` a `src/proxy.ts` con export `proxy` (no `middleware`) — Next 16 deprecó la convención `middleware.ts` a favor de `proxy.ts`. Detectado por warning en build. Doc oficial en `node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md`.
+**Última decisión técnica tomada:** Generar los tipos de la DB a mano en lugar de pelearnos con Docker. Trade-off conocido: hay que mantenerlos sincronizados con cada migración. Cuando alguien instale Docker localmente o configure `supabase login`, se puede regenerar automáticamente y eliminar la deuda de mantenimiento manual.
 
 ---
 
