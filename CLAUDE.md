@@ -61,6 +61,22 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - Build de producción pasa sin warnings (incluyendo el de `middleware.ts` deprecado, resuelto al renombrar a `proxy.ts`).
 - Dev server arranca en ~1.5s en `http://localhost:3000`.
 
+- **Data demo en la DB**: seed idempotente en [supabase/seed.sql](supabase/seed.sql) (DO block PL/pgSQL) crea usuario admin `admin@mercadonuestro.uy` (password temporal `Admin_MN_2026!Temp`, no usar para login real), 4 categorías raíz, producto "Cámara IP WiFi 1080P interior/exterior" y campaña "Primera tanda 2026" con 3 escalones (USD 25 / USD 18 / USD 14), MOQ 30, max 150 unidades, cierre a 14 días, llegada estimada a 60 días. Aplicado al cloud vía SQL Editor.
+- **Detalle de campaña** [/campanas/[slug]](src/app/(public)/campanas/[slug]/page.tsx) — la pantalla más crítica del MVP según §6.2 del MASTER:
+  - Server Component que hace dos queries: `campaigns` con join a `products` y `campaign_pricing_tiers`, y `campaign_progress_view` por separado.
+  - Galería con `next/image` (placeholders de `placehold.co` por ahora, agregado a `remotePatterns` en `next.config.ts`).
+  - Header con título, descripción de la campaña, brand + nombre del producto.
+  - Grid de **escalones de precio con checkmark** en los desbloqueados.
+  - **Características del producto** desde el JSON `attributes` del producto (Object.entries → grid de dt/dd).
+  - Descripción larga del producto y bloque de política de devolución.
+  - Sidebar sticky con barra de progreso al MOQ + countdown + fecha estimada de llegada, y el formulario de reserva.
+  - 404 vía `notFound()` si el slug no existe.
+- **CampaignReserveForm** [src/components/campanas/CampaignReserveForm.tsx](src/components/campanas/CampaignReserveForm.tsx) (Client Component):
+  - Selector de cantidad con +/- y bounds según `max_quantity - reserved`.
+  - Cálculo dinámico de **precio actual estimado** (escalón vigente para reservados+quantity), **seña** según `deposit_percentage`, y **saldo al cierre**.
+  - Hint del próximo escalón con unidades restantes.
+  - Botón "Reservar con seña" redirige a `/login?next=/campanas/[slug]/reservar?quantity=...` como placeholder hasta tener auth.
+  - Estado "Campaña cerrada" si el `status` no es `activa`.
 - **Catálogo público base armado** (semana 4 del plan, parcial):
   - Layout público en [src/app/(public)/layout.tsx](src/app/(public)/layout.tsx) con `Header` sticky (logo + nav desktop + CTA "Entrar / Crear cuenta") y `Footer` con 4 columnas (Comprar / Vender / Mercado Nuestro / Legal) + dirección del local de Paysandú. Componentes en `src/components/layout/`. `Container` helper para max-width consistente.
   - Home [src/app/(public)/page.tsx](src/app/(public)/page.tsx) con hero ("Importá en grupo, pagá precio mayorista"), 3 pasos de cómo funciona, sección de campañas destacadas (empty state mientras no haya data), 4 propuestas de valor con iconos de Lucide y CTA al programa de vendedores.
@@ -84,9 +100,11 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - Layout principal de `src/app/layout.tsx` con header/footer y tipografía del proyecto (preliminar: Inter o Geist; sin definir aún).
 - Smoke test: una página que lea `categories` (vacía) o `campaigns` para validar el cliente en ejecución.
 
-**Próxima funcionalidad a implementar:** Detalle de campaña ([campanas/[slug]/page.tsx]) — la pantalla más crítica del sitio (sección 6.2 del MASTER). Necesita: galería de imágenes, barra de progreso de escalones (con checkmarks para los alcanzados), countdown, selector de cantidad con cálculo dinámico de seña/saldo, botón "Reservar" (lleva a auth si no logueado), botón "Compartir" con WhatsApp/copiar link/QR, descripción + características + FAQ + política de devolución. Mobile first. Para probar todo este flujo bien hace falta seedear al menos 1 campaña de demo con escalones — lo coordinamos antes de empezar.
+**Próxima funcionalidad a implementar:** Auth completo con Supabase Auth — pantallas `/registro`, `/login`, `/auth/callback`, recuperación de password, verificación de teléfono. Email + Google OAuth (provider a configurar en el dashboard de Supabase). Después de auth, el botón "Reservar con seña" del detalle de campaña pasa a `/checkout/campana/[slug]` con Server Action que valida cantidad disponible, crea `campaign_reservations` y inicia el flujo de Mercado Pago para cobrar la seña. Es el cierre del bucle de la home → catálogo → reserva.
 
-**Última decisión técnica tomada:** Para queries con joins, usar `.returns<T>()` con tipo local explícito en lugar de inferencia automática, porque nuestro `Database` no incluye `Relationships`. Cuando regeneremos tipos vía CLI con `--link`, supabase-js inferirá las relaciones solas y se puede sacar el cast.
+**Pendientes adicionales pre-auth:** botón "Compartir" en detalle (WhatsApp/copiar/QR), FAQ por campaña en SQL, listado y detalle de productos disponibles (stock local), middleware proxy que ya está pero no usa role/permission gating (cuando haya admin panel se conecta).
+
+**Última decisión técnica tomada:** El seed se aplica con un DO block PL/pgSQL idempotente que inserta directo en `auth.users` y deja que el trigger `on_auth_user_created` cree el `profile` y rol `comprador`. Después se suma rol `admin` con `on conflict do nothing`. Esto evita depender del CLI de Supabase o de hacer signup manual para tener un `created_by` válido en campañas demo.
 
 ---
 
