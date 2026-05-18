@@ -61,6 +61,23 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - Build de producción pasa sin warnings (incluyendo el de `middleware.ts` deprecado, resuelto al renombrar a `proxy.ts`).
 - Dev server arranca en ~1.5s en `http://localhost:3000`.
 
+- **Auth completo con Supabase email/password** (semana 5-6 del plan, parcial):
+  - Server Actions con Zod en [src/app/(auth)/actions.ts](src/app/(auth)/actions.ts): `signUpAction`, `signInAction`, `signOutAction`, `requestPasswordResetAction`, `updatePasswordAction`. Mensajes de error traducidos al español rioplatense.
+  - Pantallas bajo grupo `(auth)/` con layout minimal (solo logo): `/registro`, `/registro/verifica-email`, `/login`, `/recuperar-password`, `/actualizar-password`. Forms con `useActionState` + `useFormStatus` para feedback inline.
+  - Route handler [auth/callback/route.ts](src/app/auth/callback/route.ts) que intercambia el `code` del email de confirmación o reset por sesión y respeta `next` (validando que sea path interno).
+  - [Header](src/components/layout/Header.tsx) ahora es Server Component async, lee sesión y muestra **"Mi cuenta" + "Salir"** cuando hay user o **"Entrar / Crear cuenta"** si no. SignOut es un form que llama a la Server Action.
+  - Grupo `(user)/` con [layout que redirige a /login](src/app/(user)/layout.tsx) si no hay sesión.
+  - Página [/perfil](src/app/(user)/perfil/page.tsx) con datos del user + roles activos (badges con label en español).
+  - Componentes UI nuevos de shadcn: `Input`, `Label`, `Card`.
+  - Schemas Zod en [src/lib/validations/auth.ts](src/lib/validations/auth.ts) con mensajes amables.
+- **Bucle de reserva end-to-end conectado**:
+  - Server Action [createReservationAction](src/app/(public)/campanas/actions.ts) valida sesión (redirige a `/login?next=...` si no), campaña activa, cupo disponible (`max_quantity - reserved >= quantity`), calcula escalón vigente y seña según `deposit_percentage`, inserta en `campaign_reservations` con status `activa`.
+  - [CampaignReserveForm](src/components/campanas/CampaignReserveForm.tsx) usa `useActionState` con la Server Action en lugar de `window.location`. Hidden inputs propagan `campaignId`, `campaignSlug`, `quantity`.
+  - Página [/campanas/[slug]/reservada](src/app/(public)/campanas/[slug]/reservada/page.tsx) muestra confirmación con resumen (cantidad, precio referencia, seña pendiente) y mensaje "estamos terminando de conectar Mercado Pago".
+  - Página [/mis-reservas](src/app/(user)/mis-reservas/page.tsx) lista todas las reservas del user con estado, countdown, totales y seña pendiente. Empty state si no hay ninguna.
+  - Schemas Zod en [src/lib/validations/reservations.ts](src/lib/validations/reservations.ts).
+- **Fix técnico en tipos**: agregado `Relationships: []` a cada tabla y vista en `src/types/database.ts` para que `supabase-js` infiera correctamente tipos de queries con joins, inserts y updates. Sin esto, todo terminaba inferido como `never`.
+- **Patrón Server Actions Next 16**: archivos con `"use server"` solo pueden exportar funciones async; los `initialState` y types se movieron a archivos separados (`src/app/(auth)/state.ts`, `src/app/(public)/campanas/reserve-state.ts`).
 - **Data demo en la DB**: seed idempotente en [supabase/seed.sql](supabase/seed.sql) (DO block PL/pgSQL) crea usuario admin `admin@mercadonuestro.uy` (password temporal `Admin_MN_2026!Temp`, no usar para login real), 4 categorías raíz, producto "Cámara IP WiFi 1080P interior/exterior" y campaña "Primera tanda 2026" con 3 escalones (USD 25 / USD 18 / USD 14), MOQ 30, max 150 unidades, cierre a 14 días, llegada estimada a 60 días. Aplicado al cloud vía SQL Editor.
 - **Detalle de campaña** [/campanas/[slug]](src/app/(public)/campanas/[slug]/page.tsx) — la pantalla más crítica del MVP según §6.2 del MASTER:
   - Server Component que hace dos queries: `campaigns` con join a `products` y `campaign_pricing_tiers`, y `campaign_progress_view` por separado.
@@ -100,11 +117,11 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - Layout principal de `src/app/layout.tsx` con header/footer y tipografía del proyecto (preliminar: Inter o Geist; sin definir aún).
 - Smoke test: una página que lea `categories` (vacía) o `campaigns` para validar el cliente en ejecución.
 
-**Próxima funcionalidad a implementar:** Auth completo con Supabase Auth — pantallas `/registro`, `/login`, `/auth/callback`, recuperación de password, verificación de teléfono. Email + Google OAuth (provider a configurar en el dashboard de Supabase). Después de auth, el botón "Reservar con seña" del detalle de campaña pasa a `/checkout/campana/[slug]` con Server Action que valida cantidad disponible, crea `campaign_reservations` y inicia el flujo de Mercado Pago para cobrar la seña. Es el cierre del bucle de la home → catálogo → reserva.
+**Próxima funcionalidad a implementar:** Pago de la seña con **Mercado Pago Checkout Pro**. La reserva hoy queda en estado `activa` sin pago; necesitamos: crear preferencia de MP desde una Server Action al confirmar la reserva, redirigir al checkout de MP, recibir el webhook `payment.created`/`payment.updated` en `/api/webhooks/mercadopago`, validar firma, marcar la reserva como `confirmada` y registrar el pago en `campaign_payments`. Esto cierra el primer flujo monetario real.
 
-**Pendientes adicionales pre-auth:** botón "Compartir" en detalle (WhatsApp/copiar/QR), FAQ por campaña en SQL, listado y detalle de productos disponibles (stock local), middleware proxy que ya está pero no usa role/permission gating (cuando haya admin panel se conecta).
+**Pendientes adicionales (siguientes chunks):** Google OAuth provider en Supabase (cuando tengas Client ID/Secret del Google Cloud Console). Verificación de teléfono SMS para reservas (regla §10 del CLAUDE.md). Cancelación de reserva (Server Action que respeta el plazo de 72 hs). Notificaciones in-app + email transaccional (Resend). Stock disponible. Panel admin para crear campañas desde la web. Botón "Compartir" en detalle con WhatsApp/QR.
 
-**Última decisión técnica tomada:** El seed se aplica con un DO block PL/pgSQL idempotente que inserta directo en `auth.users` y deja que el trigger `on_auth_user_created` cree el `profile` y rol `comprador`. Después se suma rol `admin` con `on conflict do nothing`. Esto evita depender del CLI de Supabase o de hacer signup manual para tener un `created_by` válido en campañas demo.
+**Última decisión técnica tomada:** Para hacer funcionar los tipos generados a mano con `supabase-js`, hubo que agregar `Relationships: []` en cada tabla y vista del schema. Sin eso, `supabase-js` inferre `never` en todas las operaciones. La estructura completa que espera el cliente es: `{ Row, Insert, Update, Relationships }` por tabla, `{ Row, Relationships }` por vista. Cuando regeneremos tipos vía CLI con `--link`, las relaciones reales (FKs) se llenan solas y los joins se infieren sin ayudar.
 
 ---
 
