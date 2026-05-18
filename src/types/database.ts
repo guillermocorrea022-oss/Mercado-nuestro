@@ -879,6 +879,31 @@ export interface Database {
         Relationships: [];
       };
 
+      marketplace_messages: {
+        Row: {
+          id: string;
+          conversation_id: string;
+          sender_id: string;
+          recipient_id: string;
+          body: string;
+          attachments: Json;
+          sent_at: string;
+          read_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          conversation_id: string;
+          sender_id: string;
+          recipient_id: string;
+          body: string;
+          attachments?: Json;
+          sent_at?: string;
+          read_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["marketplace_messages"]["Insert"]>;
+        Relationships: [];
+      };
+
       reviews: {
         Row: {
           id: string;

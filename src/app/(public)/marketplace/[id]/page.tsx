@@ -4,16 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ShieldCheck, Star, Store } from "lucide-react";
 
+import { BuyListingForm } from "@/components/marketplace/BuyListingForm";
 import { Container } from "@/components/layout/Container";
 import { Reveal } from "@/components/motion/Reveal";
-import { buttonVariants } from "@/components/ui/button";
 import { formatUsdFromCents } from "@/lib/campaigns";
 import { createClient } from "@/lib/supabase/server";
-import { cn } from "@/lib/utils";
 import type { Database } from "@/types/database";
 
 type ListingDetail = {
   id: string;
+  seller_id: string;
   price_cents_usd: number;
   quantity_available: number;
   description: string | null;
@@ -67,7 +67,7 @@ async function getListing(id: string) {
     .from("marketplace_listings")
     .select(
       `
-      id, price_cents_usd, quantity_available, description, status, additional_image_urls,
+      id, seller_id, price_cents_usd, quantity_available, description, status, additional_image_urls,
       product:products(slug, name, brand, short_description, long_description, main_image_url, attributes),
       seller:seller_profiles!marketplace_listings_seller_id_fkey(display_name, slug, bio, rating_avg, total_sales, joined_at)
       `,
@@ -115,6 +115,13 @@ export default async function ListingDetailPage({
     : listing.seller;
 
   if (!product) notFound();
+
+  // Verificar sesión + ownership.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isOwnListing = user?.id === listing.seller_id;
 
   return (
     <>
@@ -207,21 +214,25 @@ export default async function ListingDetailPage({
                 {listing.quantity_available} disponibles
               </p>
 
-              <button
-                type="button"
-                disabled
-                className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "mt-6 h-12 w-full text-base opacity-60",
-                )}
-              >
-                Próximamente: comprar ahora
-              </button>
-              <p className="mt-3 text-center text-xs text-muted-foreground">
-                Cuando se conecte el cobro con Mercado Pago, vas a poder
-                comprar desde acá.
-              </p>
+              <div className="mt-6">
+                <BuyListingForm
+                  listingId={listing.id}
+                  unitPriceCents={listing.price_cents_usd}
+                  quantityAvailable={listing.quantity_available}
+                  isLoggedIn={Boolean(user)}
+                  isOwnListing={isOwnListing}
+                />
+              </div>
             </div>
+
+            {user && !isOwnListing ? (
+              <Link
+                href={`/perfil/mensajes/${listing.id}`}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
+              >
+                Consultar al vendedor
+              </Link>
+            ) : null}
 
             {seller ? (
               <Link

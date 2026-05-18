@@ -9,8 +9,11 @@ import {
   MailCheck,
   MapPin,
   Megaphone,
+  MessageSquare,
   Package,
   ShieldCheck,
+  ShoppingBag,
+  Store,
   Wallet,
 } from "lucide-react";
 
@@ -131,6 +134,18 @@ export default async function PerfilPage() {
               description: "Avisos del estado de tus pedidos y campañas.",
             },
             {
+              href: "/perfil/mis-compras",
+              icon: ShoppingBag,
+              title: "Mis compras marketplace",
+              description: "Pedidos hechos en el marketplace.",
+            },
+            {
+              href: "/perfil/mensajes",
+              icon: MessageSquare,
+              title: "Mensajes",
+              description: "Conversaciones con vendedores y compradores.",
+            },
+            {
               href: "/perfil/deseos",
               icon: Heart,
               title: "Lista de deseos",
@@ -141,6 +156,12 @@ export default async function PerfilPage() {
               icon: Megaphone,
               title: "Programa de vendedores",
               description: "Compartí tu catálogo y ganá comisión.",
+            },
+            {
+              href: "/perfil/revendedor",
+              icon: Store,
+              title: "Vender en marketplace",
+              description: "Publicá tu stock y vendé entre la comunidad.",
             },
             {
               href: "/perfil/direcciones",
