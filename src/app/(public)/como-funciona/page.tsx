@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -84,22 +85,38 @@ export default function ComoFuncionaPage() {
         <div aria-hidden className="absolute inset-0 -z-10 bg-grain" />
         <div
           aria-hidden
-          className="absolute -top-40 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
+          className="absolute -top-40 -left-40 -z-10 size-[500px] rounded-full bg-primary/8 blur-3xl"
         />
-        <Container className="py-24 sm:py-32">
-          <Reveal className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              El sistema
-            </p>
-            <h1 className="mt-6 text-5xl font-semibold tracking-tight sm:text-6xl">
-              Cómo funciona <span className="text-gradient">Mercado Nuestro</span>
-            </h1>
-            <p className="mt-8 text-lg text-muted-foreground sm:text-xl">
-              Nos juntamos entre muchas personas para importar productos al
-              precio que paga un mayorista. La plataforma se encarga del
-              trámite, la aduana y la logística. Vos solo elegís y reservás.
-            </p>
-          </Reveal>
+        <Container className="py-20 sm:py-24">
+          <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-16">
+            <Reveal>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+                El sistema
+              </p>
+              <h1 className="mt-6 text-5xl font-semibold tracking-tight sm:text-6xl">
+                Cómo funciona{" "}
+                <span className="text-gradient">Mercado Nuestro</span>
+              </h1>
+              <p className="mt-8 text-lg text-muted-foreground sm:text-xl">
+                Nos juntamos entre muchas personas para importar productos al
+                precio que paga un mayorista. La plataforma se encarga del
+                trámite, la aduana y la logística. Vos solo elegís y reservás.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-muted shadow-soft">
+                <Image
+                  src="https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=80"
+                  alt="Mercadería preparada para envío"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 45vw"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            </Reveal>
+          </div>
         </Container>
       </section>
 
