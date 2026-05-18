@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { reservationConfirmedEmail, sendEmail } from "@/lib/email/send";
 import { createNotification } from "@/lib/notifications/create";
@@ -143,6 +143,32 @@ export async function createReservationAction(
     (totalCents * campaign.deposit_percentage) / 100,
   );
 
+  // 4b. Resolver atribución por cookie de vendedor (si hay).
+  const cookieStore = await cookies();
+  const sellerSlug = cookieStore.get("mn_seller")?.value;
+  let attributedSellerId: string | null = null;
+  let attributedCommissionPct = 0;
+  if (sellerSlug) {
+    const { data: seller } = await supabase
+      .from("seller_profiles")
+      .select("user_id")
+      .eq("slug", sellerSlug)
+      .maybeSingle()
+      .returns<{ user_id: string } | null>();
+    if (seller && seller.user_id !== user.id) {
+      attributedSellerId = seller.user_id;
+      // Comisión base de la setting (default 12% si no hay).
+      const { data: setting } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "campaign_commission_default_pct")
+        .maybeSingle()
+        .returns<{ value: unknown } | null>();
+      attributedCommissionPct =
+        typeof setting?.value === "number" ? setting.value : 12;
+    }
+  }
+
   // 5. Insertar la reserva. RLS verifica que user_id == auth.uid().
   type ReservationInsert =
     Database["public"]["Tables"]["campaign_reservations"]["Insert"];
@@ -153,6 +179,7 @@ export async function createReservationAction(
     unit_price_at_reservation_cents_usd: unitPriceCents,
     expected_deposit_cents_usd: depositCents,
     status: "activa",
+    attributed_seller_id: attributedSellerId,
   };
 
   const { data: createdReservation, error: insertError } = await supabase
@@ -168,6 +195,25 @@ export async function createReservationAction(
       status: "error",
       message: "No pudimos guardar tu reserva. Intentá de nuevo en un minuto.",
     };
+  }
+
+  // 5b. Si hay vendedor atribuido, registrar venta de catálogo pendiente.
+  if (attributedSellerId) {
+    const attributableCents = unitPriceCents * quantity;
+    const commissionCents = Math.round(
+      (attributableCents * attributedCommissionPct) / 100,
+    );
+    type SaleInsert =
+      Database["public"]["Tables"]["catalog_sales"]["Insert"];
+    const saleInsert: SaleInsert = {
+      seller_id: attributedSellerId,
+      reservation_id: createdReservation.id,
+      attributable_cents_usd: attributableCents,
+      commission_pct: attributedCommissionPct,
+      commission_cents_usd: commissionCents,
+      status: "pendiente",
+    };
+    await supabase.from("catalog_sales").insert(saleInsert as never);
   }
 
   // 6. Notificación in-app + email transaccional (stub si no hay Resend).

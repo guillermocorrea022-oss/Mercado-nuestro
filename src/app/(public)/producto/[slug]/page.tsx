@@ -4,6 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, PackageCheck } from "lucide-react";
 
+import { Star } from "lucide-react";
+
+import { ReviewForm } from "@/components/producto/ReviewForm";
+import { WishlistButton } from "@/components/producto/WishlistButton";
 import { Container } from "@/components/layout/Container";
 import { Reveal } from "@/components/motion/Reveal";
 import { buttonVariants } from "@/components/ui/button";
@@ -109,6 +113,53 @@ export default async function ProductoPage({
     ([, v]) => typeof v === "string" && v.length > 0,
   ) as [string, string][];
 
+  // Reseñas + estado wishlist del usuario actual.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [{ data: reviews }, wishlistRes] = await Promise.all([
+    supabase
+      .from("reviews")
+      .select(
+        "id, rating, title, body, created_at, user:profiles!reviews_user_id_fkey(first_name)",
+      )
+      .eq("product_id", product.id)
+      .eq("status", "visible")
+      .order("created_at", { ascending: false })
+      .limit(10)
+      .returns<
+        {
+          id: string;
+          rating: number;
+          title: string | null;
+          body: string | null;
+          created_at: string;
+          user:
+            | { first_name: string | null }
+            | { first_name: string | null }[]
+            | null;
+        }[]
+      >(),
+    user
+      ? supabase
+          .from("wishlists")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("product_id", product.id)
+          .maybeSingle()
+          .returns<{ id: string } | null>()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const reviewsList = reviews ?? [];
+  const avgRating =
+    reviewsList.length === 0
+      ? 0
+      : reviewsList.reduce((acc, r) => acc + r.rating, 0) / reviewsList.length;
+  const isInWishlist = Boolean(wishlistRes.data);
+
   return (
     <>
       <Container className="py-8">
@@ -145,9 +196,27 @@ export default async function ProductoPage({
                   {product.brand}
                 </p>
               ) : null}
-              <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-                {product.name}
-              </h1>
+              <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+                <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+                  {product.name}
+                </h1>
+                {user ? (
+                  <WishlistButton
+                    productId={product.id}
+                    initialActive={isInWishlist}
+                  />
+                ) : null}
+              </div>
+              {avgRating > 0 ? (
+                <p className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <Star
+                    className="size-4 fill-primary text-primary"
+                    aria-hidden
+                  />
+                  {avgRating.toFixed(1)} ({reviewsList.length} reseña
+                  {reviewsList.length === 1 ? "" : "s"})
+                </p>
+              ) : null}
               {product.short_description ? (
                 <p className="mt-6 text-base leading-relaxed text-muted-foreground">
                   {product.short_description}
@@ -186,6 +255,90 @@ export default async function ProductoPage({
                 </dl>
               </section>
             ) : null}
+
+            <section className="mt-12">
+              <h2 className="text-xl font-semibold tracking-tight">
+                Reseñas
+              </h2>
+              {reviewsList.length === 0 ? (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Todavía nadie reseñó este producto. Si lo compraste, sé el
+                  primero.
+                </p>
+              ) : (
+                <ul className="mt-6 space-y-5">
+                  {reviewsList.map((r) => {
+                    const u = Array.isArray(r.user) ? r.user[0] : r.user;
+                    return (
+                      <li
+                        key={r.id}
+                        className="rounded-2xl border border-border bg-card p-5"
+                      >
+                        <div className="flex items-center gap-2">
+                          {[1, 2, 3, 4, 5].map((n) => (
+                            <Star
+                              key={n}
+                              className={cn(
+                                "size-4",
+                                r.rating >= n
+                                  ? "fill-primary text-primary"
+                                  : "text-muted-foreground/30",
+                              )}
+                              aria-hidden
+                            />
+                          ))}
+                          <span className="text-xs text-muted-foreground">
+                            {u?.first_name ?? "Usuario"} ·{" "}
+                            {new Date(r.created_at).toLocaleDateString("es-UY", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
+                        {r.title ? (
+                          <p className="mt-3 text-base font-semibold">
+                            {r.title}
+                          </p>
+                        ) : null}
+                        {r.body ? (
+                          <p className="mt-2 text-sm text-muted-foreground">
+                            {r.body}
+                          </p>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+
+              {user ? (
+                <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+                  <h3 className="text-base font-semibold tracking-tight">
+                    Dejá tu reseña
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Ayudás a otros compradores a decidir.
+                  </p>
+                  <div className="mt-5">
+                    <ReviewForm
+                      productId={product.id}
+                      productSlug={product.slug}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-8 rounded-2xl border border-dashed border-border bg-card/30 p-6 text-center text-sm text-muted-foreground">
+                  <Link
+                    href="/login"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Iniciá sesión
+                  </Link>{" "}
+                  para dejar una reseña.
+                </div>
+              )}
+            </section>
           </div>
 
           <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">

@@ -121,6 +121,23 @@ export type ProposalStatus =
   | "rechazada"
   | "convertida";
 
+export type ListingStatus = "activa" | "pausada" | "agotada" | "eliminada";
+
+export type MarketplaceOrderStatus =
+  | "pagada"
+  | "despachada"
+  | "entregada"
+  | "cancelada"
+  | "reembolsada";
+
+export type CatalogSaleStatus =
+  | "pendiente"
+  | "consolidada"
+  | "pagada"
+  | "descartada";
+
+export type ReviewStatus = "visible" | "oculto_admin" | "reportado";
+
 // ============================================================================
 // Database schema
 // ============================================================================
@@ -697,6 +714,225 @@ export interface Database {
         Relationships: [];
       };
 
+      seller_profiles: {
+        Row: {
+          user_id: string;
+          display_name: string;
+          slug: string;
+          bio: string | null;
+          public_avatar_url: string | null;
+          rating_avg: number;
+          total_sales: number;
+          payout_method: string | null;
+          payout_data: Json | null;
+          joined_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          display_name: string;
+          slug: string;
+          bio?: string | null;
+          public_avatar_url?: string | null;
+          rating_avg?: number;
+          total_sales?: number;
+          payout_method?: string | null;
+          payout_data?: Json | null;
+          joined_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["seller_profiles"]["Insert"]>;
+        Relationships: [];
+      };
+
+      catalog_links: {
+        Row: {
+          id: string;
+          seller_id: string;
+          slug: string;
+          internal_name: string | null;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          seller_id: string;
+          slug: string;
+          internal_name?: string | null;
+          active?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["catalog_links"]["Insert"]>;
+        Relationships: [];
+      };
+
+      catalog_sales: {
+        Row: {
+          id: string;
+          seller_id: string;
+          order_id: string | null;
+          reservation_id: string | null;
+          attributable_cents_usd: number;
+          commission_pct: number;
+          commission_cents_usd: number;
+          status: CatalogSaleStatus;
+          consolidated_at: string | null;
+          paid_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          seller_id: string;
+          order_id?: string | null;
+          reservation_id?: string | null;
+          attributable_cents_usd: number;
+          commission_pct: number;
+          commission_cents_usd: number;
+          status?: CatalogSaleStatus;
+          consolidated_at?: string | null;
+          paid_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["catalog_sales"]["Insert"]>;
+        Relationships: [];
+      };
+
+      marketplace_listings: {
+        Row: {
+          id: string;
+          seller_id: string;
+          product_id: string;
+          variant_id: string | null;
+          quantity_available: number;
+          quantity_total: number;
+          price_cents_usd: number;
+          additional_image_urls: string[];
+          description: string | null;
+          status: ListingStatus;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          seller_id: string;
+          product_id: string;
+          variant_id?: string | null;
+          quantity_available: number;
+          quantity_total: number;
+          price_cents_usd: number;
+          additional_image_urls?: string[];
+          description?: string | null;
+          status?: ListingStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["marketplace_listings"]["Insert"]>;
+        Relationships: [];
+      };
+
+      marketplace_orders: {
+        Row: {
+          id: string;
+          listing_id: string;
+          buyer_id: string;
+          seller_id: string;
+          quantity: number;
+          unit_price_cents_usd: number;
+          total_cents_usd: number;
+          commission_cents_usd: number;
+          seller_amount_cents_usd: number;
+          status: MarketplaceOrderStatus;
+          paid_at: string | null;
+          shipped_at: string | null;
+          delivered_at: string | null;
+          tracking_code: string | null;
+          shipping_address: Json | null;
+          shipping_method: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          listing_id: string;
+          buyer_id: string;
+          seller_id: string;
+          quantity: number;
+          unit_price_cents_usd: number;
+          total_cents_usd: number;
+          commission_cents_usd?: number;
+          seller_amount_cents_usd: number;
+          status?: MarketplaceOrderStatus;
+          paid_at?: string | null;
+          shipped_at?: string | null;
+          delivered_at?: string | null;
+          tracking_code?: string | null;
+          shipping_address?: Json | null;
+          shipping_method?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["marketplace_orders"]["Insert"]>;
+        Relationships: [];
+      };
+
+      reviews: {
+        Row: {
+          id: string;
+          product_id: string;
+          user_id: string;
+          order_id: string | null;
+          rating: number;
+          title: string | null;
+          body: string | null;
+          photos: string[];
+          status: ReviewStatus;
+          admin_response: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          user_id: string;
+          order_id?: string | null;
+          rating: number;
+          title?: string | null;
+          body?: string | null;
+          photos?: string[];
+          status?: ReviewStatus;
+          admin_response?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["reviews"]["Insert"]>;
+        Relationships: [];
+      };
+
+      wishlists: {
+        Row: {
+          id: string;
+          user_id: string;
+          product_id: string;
+          notify_price_drop: boolean;
+          notify_back_in_stock: boolean;
+          added_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          product_id: string;
+          notify_price_drop?: boolean;
+          notify_back_in_stock?: boolean;
+          added_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["wishlists"]["Insert"]>;
+        Relationships: [];
+      };
+
       claims: {
         Row: {
           id: string;
@@ -864,6 +1100,10 @@ export interface Database {
       claim_type: ClaimType;
       claim_status: ClaimStatus;
       proposal_status: ProposalStatus;
+      listing_status: ListingStatus;
+      marketplace_order_status: MarketplaceOrderStatus;
+      catalog_sale_status: CatalogSaleStatus;
+      review_status: ReviewStatus;
     };
 
     CompositeTypes: Record<string, never>;

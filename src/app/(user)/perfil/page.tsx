@@ -4,8 +4,11 @@ import { redirect } from "next/navigation";
 import {
   ArrowRight,
   Bell,
+  FileWarning,
+  Heart,
   MailCheck,
   MapPin,
+  Megaphone,
   Package,
   ShieldCheck,
   Wallet,
@@ -128,6 +131,18 @@ export default async function PerfilPage() {
               description: "Avisos del estado de tus pedidos y campañas.",
             },
             {
+              href: "/perfil/deseos",
+              icon: Heart,
+              title: "Lista de deseos",
+              description: "Productos guardados para después.",
+            },
+            {
+              href: "/perfil/vendedor",
+              icon: Megaphone,
+              title: "Programa de vendedores",
+              description: "Compartí tu catálogo y ganá comisión.",
+            },
+            {
               href: "/perfil/direcciones",
               icon: MapPin,
               title: "Mis direcciones",
@@ -138,6 +153,12 @@ export default async function PerfilPage() {
               icon: Wallet,
               title: "Crédito en cuenta",
               description: "Saldo a favor y movimientos.",
+            },
+            {
+              href: "/perfil/reclamos",
+              icon: FileWarning,
+              title: "Reclamos",
+              description: "Abrir o seguir un reclamo.",
             },
           ].map((item) => (
             <Link
