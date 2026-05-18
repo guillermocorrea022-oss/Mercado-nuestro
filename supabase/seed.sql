@@ -1,0 +1,9 @@
+-- ============================================================================
+-- Seed data — solo para desarrollo local
+-- ----------------------------------------------------------------------------
+-- Este archivo lo aplica `supabase db reset` cuando se trabaja con Supabase CLI.
+-- NO se ejecuta en producción.
+--
+-- Se completa más adelante con: categorías raíz, productos de muestra,
+-- una campaña activa de demo y al menos un usuario admin de prueba.
+-- ============================================================================
