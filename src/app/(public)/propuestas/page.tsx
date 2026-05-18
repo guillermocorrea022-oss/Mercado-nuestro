@@ -65,7 +65,7 @@ export default async function PropuestasPage() {
         <div aria-hidden className="absolute inset-0 -z-10 bg-grain" />
         <div
           aria-hidden
-          className="absolute -top-32 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
+          className="absolute -top-32 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
         />
         <Container className="py-20 sm:py-24">
           <Reveal className="max-w-3xl">

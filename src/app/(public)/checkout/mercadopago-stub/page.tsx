@@ -59,7 +59,7 @@ export default async function MpStubPage({
   return (
     <Container className="py-16">
       <div className="mx-auto max-w-xl">
-        <div className="flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300">
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
           <AlertCircle className="size-3.5" aria-hidden />
           Modo demo — todavía no hay credenciales reales de Mercado Pago.
         </div>

@@ -11,7 +11,7 @@ export default function AuthLayout({
       <div aria-hidden className="absolute inset-0 -z-10 bg-grain" />
       <div
         aria-hidden
-        className="absolute -top-40 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
+        className="absolute -top-40 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
       />
       <header className="border-b border-border bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-5xl items-center px-4 sm:px-6">

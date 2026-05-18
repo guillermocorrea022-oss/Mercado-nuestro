@@ -84,7 +84,7 @@ export default function ComoFuncionaPage() {
         <div aria-hidden className="absolute inset-0 -z-10 bg-grain" />
         <div
           aria-hidden
-          className="absolute -top-40 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
+          className="absolute -top-40 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
         />
         <Container className="py-24 sm:py-32">
           <Reveal className="mx-auto max-w-3xl text-center">
@@ -229,7 +229,7 @@ export default function ComoFuncionaPage() {
             <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-12 text-center sm:p-20">
               <div
                 aria-hidden
-                className="absolute inset-x-0 -top-40 mx-auto size-[500px] rounded-full bg-primary/10 blur-3xl"
+                className="absolute inset-x-0 -top-40 mx-auto size-[500px] rounded-full bg-primary/8 blur-3xl"
               />
               <div className="relative">
                 <h2 className="mx-auto max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">

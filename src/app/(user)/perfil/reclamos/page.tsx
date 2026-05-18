@@ -26,11 +26,11 @@ const STATUS_STYLES: Record<
   Database["public"]["Enums"]["claim_status"],
   string
 > = {
-  abierto: "bg-yellow-500/10 text-yellow-300",
+  abierto: "bg-amber-100 text-amber-900",
   en_revision: "bg-primary/10 text-primary",
   resuelto_a_favor_usuario: "bg-primary/10 text-primary",
   resuelto_a_favor_vendedor: "bg-muted text-muted-foreground",
-  apelado: "bg-yellow-500/10 text-yellow-300",
+  apelado: "bg-amber-100 text-amber-900",
   cerrado: "bg-muted text-muted-foreground",
 };
 
