@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRight, PackageOpen } from "lucide-react";
 
+import { CancelReservationButton } from "@/components/campanas/CancelReservationButton";
 import { Container } from "@/components/layout/Container";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -128,42 +129,59 @@ export default async function MisReservasPage() {
               const totalCents =
                 r.unit_price_at_reservation_cents_usd * r.quantity;
 
+              // Permite cancelar si la reserva está activa Y faltan más de 72hs
+              // al cierre (la validación real la hace el server action de nuevo).
+              const canCancel =
+                r.status === "activa" &&
+                secondsLeft !== null &&
+                secondsLeft > 72 * 3600;
+
               return (
                 <li key={r.id}>
-                  <Link
-                    href={`/campanas/${campaign.slug}`}
-                    className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:bg-muted/30"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span
-                          className={cn(
-                            "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                            statusInfo.className,
-                          )}
-                        >
-                          {statusInfo.label}
-                        </span>
-                        {r.status === "activa" ? (
-                          <span className="text-xs text-muted-foreground">
-                            Cierra en {formatTimeRemaining(secondsLeft)}
+                  <div className="rounded-2xl border border-border bg-card p-5 transition-colors hover:bg-muted/10">
+                    <Link
+                      href={`/campanas/${campaign.slug}`}
+                      className="flex items-center justify-between gap-4"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                              statusInfo.className,
+                            )}
+                          >
+                            {statusInfo.label}
                           </span>
-                        ) : null}
+                          {r.status === "activa" ? (
+                            <span className="text-xs text-muted-foreground">
+                              Cierra en {formatTimeRemaining(secondsLeft)}
+                            </span>
+                          ) : null}
+                        </div>
+                        <h2 className="mt-2 line-clamp-1 text-base font-semibold tracking-tight">
+                          {campaign.title}
+                        </h2>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {r.quantity} unidad(es) ·{" "}
+                          {formatUsdFromCents(totalCents)} total ·{" "}
+                          Seña {formatUsdFromCents(r.expected_deposit_cents_usd)}
+                        </p>
                       </div>
-                      <h2 className="mt-2 line-clamp-1 text-base font-semibold tracking-tight">
-                        {campaign.title}
-                      </h2>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {r.quantity} unidad(es) ·{" "}
-                        {formatUsdFromCents(totalCents)} total ·{" "}
-                        Seña {formatUsdFromCents(r.expected_deposit_cents_usd)}
-                      </p>
-                    </div>
-                    <ArrowRight
-                      className="size-5 shrink-0 text-muted-foreground"
-                      aria-hidden
-                    />
-                  </Link>
+                      <ArrowRight
+                        className="size-5 shrink-0 text-muted-foreground"
+                        aria-hidden
+                      />
+                    </Link>
+                    {canCancel ? (
+                      <div className="mt-4 border-t border-border pt-4">
+                        <CancelReservationButton
+                          reservationId={r.id}
+                          canCancel={canCancel}
+                        />
+                      </div>
+                    ) : null}
+                  </div>
                 </li>
               );
             })}

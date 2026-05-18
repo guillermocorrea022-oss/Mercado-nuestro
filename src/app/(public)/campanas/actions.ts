@@ -163,3 +163,120 @@ export async function createReservationAction(
 
   redirect(`/campanas/${campaign.slug}/reservada?quantity=${quantity}`);
 }
+
+// ----------------------------------------------------------------------------
+// cancelReservationAction — cancela una reserva del usuario actual.
+// Regla §5.3 del CLAUDE.md: permitido hasta 72 hs antes del cierre.
+// ----------------------------------------------------------------------------
+
+export type CancelReservationResult =
+  | { status: "success"; message: string }
+  | { status: "error"; message: string };
+
+export async function cancelReservationAction(
+  reservationId: string,
+  reason?: string,
+): Promise<CancelReservationResult> {
+  if (!reservationId) {
+    return { status: "error", message: "Reserva inválida." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { status: "error", message: "Tenés que iniciar sesión." };
+  }
+
+  // Buscamos la reserva del user (RLS también lo refuerza).
+  const { data: reservation, error: rErr } = await supabase
+    .from("campaign_reservations")
+    .select(
+      `
+      id, status, user_id, campaign_id,
+      campaign:campaigns(id, slug, status, closes_at)
+      `,
+    )
+    .eq("id", reservationId)
+    .eq("user_id", user.id)
+    .maybeSingle()
+    .returns<{
+      id: string;
+      status: Database["public"]["Enums"]["reservation_status"];
+      user_id: string;
+      campaign_id: string;
+      campaign:
+        | { id: string; slug: string; status: string; closes_at: string }
+        | { id: string; slug: string; status: string; closes_at: string }[]
+        | null;
+    } | null>();
+
+  if (rErr || !reservation) {
+    return { status: "error", message: "No encontramos esa reserva." };
+  }
+
+  if (reservation.status === "cancelada") {
+    return { status: "error", message: "Esta reserva ya está cancelada." };
+  }
+
+  const campaign = Array.isArray(reservation.campaign)
+    ? reservation.campaign[0]
+    : reservation.campaign;
+  if (!campaign) {
+    return { status: "error", message: "Campaña no disponible." };
+  }
+
+  // Solo se puede cancelar si la campaña todavía está activa.
+  if (campaign.status !== "activa") {
+    return {
+      status: "error",
+      message:
+        "La campaña ya cerró. Si querés gestionar tu reserva, abrí un ticket de soporte.",
+    };
+  }
+
+  // Validamos los 72hs antes del cierre.
+  const closesAtMs = new Date(campaign.closes_at).getTime();
+  const cutoffMs = closesAtMs - 72 * 60 * 60 * 1000;
+  if (Date.now() > cutoffMs) {
+    return {
+      status: "error",
+      message:
+        "Ya pasó el plazo para cancelar (72 hs antes del cierre). Tu reserva sigue activa.",
+    };
+  }
+
+  // Actualizamos. RLS verifica que sea el dueño.
+  type ReservationUpdate =
+    Database["public"]["Tables"]["campaign_reservations"]["Update"];
+  const update: ReservationUpdate = {
+    status: "cancelada",
+    cancelled_at: new Date().toISOString(),
+    cancellation_reason: reason?.trim() || "Cancelación voluntaria del usuario",
+  };
+
+  const { error: uErr } = await supabase
+    .from("campaign_reservations")
+    .update(update as never)
+    .eq("id", reservationId)
+    .eq("user_id", user.id);
+
+  if (uErr) {
+    console.error("Error cancelando reserva:", uErr);
+    return {
+      status: "error",
+      message: "No pudimos cancelar la reserva. Probá de nuevo en un minuto.",
+    };
+  }
+
+  revalidatePath("/mis-reservas");
+  revalidatePath(`/campanas/${campaign.slug}`);
+
+  return {
+    status: "success",
+    message:
+      "Tu reserva fue cancelada. Si pagaste seña, te la devolvemos al método original.",
+  };
+}

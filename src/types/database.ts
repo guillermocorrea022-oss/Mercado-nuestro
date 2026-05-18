@@ -48,6 +48,56 @@ export type ReservationStatus =
   | "pagada_total"
   | "entregada";
 
+export type OrderStatus =
+  | "pendiente_pago"
+  | "pagada"
+  | "en_proceso"
+  | "enviada"
+  | "entregada"
+  | "cancelada"
+  | "reembolsada";
+
+export type OrderItemType =
+  | "campaign_reservation"
+  | "inventory_item"
+  | "marketplace_listing";
+
+export type PaymentMethod =
+  | "mercado_pago"
+  | "transferencia"
+  | "abitab"
+  | "redpagos"
+  | "credito_cuenta"
+  | "manual";
+
+export type PaymentStatus =
+  | "pendiente"
+  | "aprobado"
+  | "rechazado"
+  | "reembolsado"
+  | "expirado";
+
+export type CreditMovementType =
+  | "ajuste_precio_campana"
+  | "devolucion_sena_campana_fallida"
+  | "bonus_campana_fallida"
+  | "reembolso"
+  | "uso_en_compra"
+  | "regalo"
+  | "ajuste_manual";
+
+export type NotificationChannel = "in_app" | "email" | "sms" | "whatsapp";
+
+export type CampaignUpdateType =
+  | "pedido_confirmado_proveedor"
+  | "producto_despachado_origen"
+  | "en_transito"
+  | "llego_aduana"
+  | "despacho_aduanero"
+  | "llego_deposito"
+  | "listo_entrega"
+  | "mensaje_general";
+
 // ============================================================================
 // Database schema
 // ============================================================================
@@ -380,6 +430,276 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["campaign_reservations"]["Insert"]>;
         Relationships: [];
       };
+
+      campaign_status_updates: {
+        Row: {
+          id: string;
+          campaign_id: string;
+          type: CampaignUpdateType;
+          description: string;
+          photo_url: string | null;
+          visible_to_users: boolean;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          campaign_id: string;
+          type: CampaignUpdateType;
+          description: string;
+          photo_url?: string | null;
+          visible_to_users?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["campaign_status_updates"]["Insert"]>;
+        Relationships: [];
+      };
+
+      inventory_items: {
+        Row: {
+          id: string;
+          product_id: string;
+          variant_id: string | null;
+          quantity_available: number;
+          quantity_reserved: number;
+          location: string;
+          unit_price_cents_usd: number;
+          cost_cents_usd: number | null;
+          source_campaign_id: string | null;
+          notes: string | null;
+          active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          variant_id?: string | null;
+          quantity_available?: number;
+          quantity_reserved?: number;
+          location?: string;
+          unit_price_cents_usd: number;
+          cost_cents_usd?: number | null;
+          source_campaign_id?: string | null;
+          notes?: string | null;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["inventory_items"]["Insert"]>;
+        Relationships: [];
+      };
+
+      orders: {
+        Row: {
+          id: string;
+          user_id: string;
+          total_cents_usd: number;
+          currency: string;
+          status: OrderStatus;
+          shipping_address_id: string | null;
+          shipping_method: string | null;
+          attributed_seller_id: string | null;
+          share_referral_code: string | null;
+          customer_notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          total_cents_usd: number;
+          currency?: string;
+          status?: OrderStatus;
+          shipping_address_id?: string | null;
+          shipping_method?: string | null;
+          attributed_seller_id?: string | null;
+          share_referral_code?: string | null;
+          customer_notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["orders"]["Insert"]>;
+        Relationships: [];
+      };
+
+      order_items: {
+        Row: {
+          id: string;
+          order_id: string;
+          item_type: OrderItemType;
+          reference_id: string;
+          quantity: number;
+          unit_price_cents_usd: number;
+          subtotal_cents_usd: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          order_id: string;
+          item_type: OrderItemType;
+          reference_id: string;
+          quantity: number;
+          unit_price_cents_usd: number;
+          subtotal_cents_usd: number;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["order_items"]["Insert"]>;
+        Relationships: [];
+      };
+
+      payments: {
+        Row: {
+          id: string;
+          order_id: string | null;
+          reservation_id: string | null;
+          amount_cents: number;
+          currency: string;
+          method: PaymentMethod;
+          status: PaymentStatus;
+          external_id: string | null;
+          external_status: string | null;
+          raw_payload: Json | null;
+          processed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          order_id?: string | null;
+          reservation_id?: string | null;
+          amount_cents: number;
+          currency?: string;
+          method: PaymentMethod;
+          status?: PaymentStatus;
+          external_id?: string | null;
+          external_status?: string | null;
+          raw_payload?: Json | null;
+          processed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["payments"]["Insert"]>;
+        Relationships: [];
+      };
+
+      user_credits: {
+        Row: {
+          user_id: string;
+          available_cents_usd: number;
+          reserved_cents_usd: number;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          available_cents_usd?: number;
+          reserved_cents_usd?: number;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["user_credits"]["Insert"]>;
+        Relationships: [];
+      };
+
+      credit_movements: {
+        Row: {
+          id: string;
+          user_id: string;
+          amount_cents_usd: number;
+          type: CreditMovementType;
+          reference_type: string | null;
+          reference_id: string | null;
+          description: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          amount_cents_usd: number;
+          type: CreditMovementType;
+          reference_type?: string | null;
+          reference_id?: string | null;
+          description?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["credit_movements"]["Insert"]>;
+        Relationships: [];
+      };
+
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: string;
+          title: string;
+          body: string | null;
+          context_data: Json;
+          read_at: string | null;
+          sent_at: string;
+          channel: NotificationChannel;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: string;
+          title: string;
+          body?: string | null;
+          context_data?: Json;
+          read_at?: string | null;
+          sent_at?: string;
+          channel?: NotificationChannel;
+        };
+        Update: Partial<Database["public"]["Tables"]["notifications"]["Insert"]>;
+        Relationships: [];
+      };
+
+      settings: {
+        Row: {
+          key: string;
+          value: Json;
+          description: string | null;
+          value_type: string | null;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          key: string;
+          value: Json;
+          description?: string | null;
+          value_type?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["settings"]["Insert"]>;
+        Relationships: [];
+      };
+
+      admin_actions_log: {
+        Row: {
+          id: string;
+          admin_id: string;
+          action: string;
+          entity_type: string | null;
+          entity_id: string | null;
+          before_state: Json | null;
+          after_state: Json | null;
+          ip_address: string | null;
+          performed_at: string;
+        };
+        Insert: {
+          id?: string;
+          admin_id: string;
+          action: string;
+          entity_type?: string | null;
+          entity_id?: string | null;
+          before_state?: Json | null;
+          after_state?: Json | null;
+          ip_address?: string | null;
+          performed_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["admin_actions_log"]["Insert"]>;
+        Relationships: [];
+      };
     };
 
     Views: {
@@ -407,6 +727,10 @@ export interface Database {
         Args: { check_user_id: string; check_role: UserRole };
         Returns: boolean;
       };
+      close_campaign: {
+        Args: { p_campaign_id: string };
+        Returns: Json;
+      };
     };
 
     Enums: {
@@ -416,6 +740,13 @@ export interface Database {
       verification_status: VerificationStatus;
       campaign_status: CampaignStatus;
       reservation_status: ReservationStatus;
+      order_status: OrderStatus;
+      order_item_type: OrderItemType;
+      payment_method: PaymentMethod;
+      payment_status: PaymentStatus;
+      credit_movement_type: CreditMovementType;
+      notification_channel: NotificationChannel;
+      campaign_update_type: CampaignUpdateType;
     };
 
     CompositeTypes: Record<string, never>;
