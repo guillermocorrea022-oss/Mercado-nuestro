@@ -61,6 +61,14 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - Build de producción pasa sin warnings (incluyendo el de `middleware.ts` deprecado, resuelto al renombrar a `proxy.ts`).
 - Dev server arranca en ~1.5s en `http://localhost:3000`.
 
+- **Catálogo público base armado** (semana 4 del plan, parcial):
+  - Layout público en [src/app/(public)/layout.tsx](src/app/(public)/layout.tsx) con `Header` sticky (logo + nav desktop + CTA "Entrar / Crear cuenta") y `Footer` con 4 columnas (Comprar / Vender / Mercado Nuestro / Legal) + dirección del local de Paysandú. Componentes en `src/components/layout/`. `Container` helper para max-width consistente.
+  - Home [src/app/(public)/page.tsx](src/app/(public)/page.tsx) con hero ("Importá en grupo, pagá precio mayorista"), 3 pasos de cómo funciona, sección de campañas destacadas (empty state mientras no haya data), 4 propuestas de valor con iconos de Lucide y CTA al programa de vendedores.
+  - [/como-funciona](src/app/(public)/como-funciona/page.tsx) con journey de 6 pasos, tabla de escalones de precio de ejemplo y bloque de garantías (precio retroactivo + devolución si no se alcanza el MOQ).
+  - **Listado /campanas conectado a Supabase** [src/app/(public)/campanas/page.tsx](src/app/(public)/campanas/page.tsx) como Server Component. Lee `campaigns` activas con join a `products` y `campaign_pricing_tiers`, más una segunda consulta a `campaign_progress_view`. Mergea por `campaign_id` en código (sin Relationships en `Database`, usamos `.returns<T>()` con tipo local explícito). Card [src/components/campanas/CampaignCard.tsx](src/components/campanas/CampaignCard.tsx) con imagen, escalón actual, faltantes para próximo escalón, barra de progreso al MOQ, countdown.
+  - Helpers en [src/lib/campaigns.ts](src/lib/campaigns.ts): `formatUsdFromCents` (Intl es-UY), `formatTimeRemaining`, `findCurrentTier`, `findNextTier`, `unitsUntilNextTier`.
+  - Identidad visual neutra: primary verde `oklch(0.55 0.16 150)` light / `oklch(0.72 0.17 150)` dark, accent verde claro como tinte. Geist como `--font-sans`, `lang="es-UY"` en root layout.
+  - `next.config.ts` con `remotePatterns` para imágenes de Supabase Storage.
 - **Proyecto Supabase cloud creado y operativo**:
   - Nombre: `mercado-nuestro` · Org: `guillermo.correa022@gmail.com's Org` (Free).
   - Project ID: `ujvzbyzxfllczvoiywap` · Region: `sa-east-1` (São Paulo).
@@ -76,9 +84,9 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - Layout principal de `src/app/layout.tsx` con header/footer y tipografía del proyecto (preliminar: Inter o Geist; sin definir aún).
 - Smoke test: una página que lea `categories` (vacía) o `campaigns` para validar el cliente en ejecución.
 
-**Próxima funcionalidad a implementar:** Layout público base (header, footer, navegación) + home con hero estático y placeholder de carrusel de campañas. Server Component conectado al cliente Supabase server que lea `campaigns` activas y `campaign_progress_view`. Mientras no haya datos, mostrar estado "empty" con CTA "ver cómo funciona".
+**Próxima funcionalidad a implementar:** Detalle de campaña ([campanas/[slug]/page.tsx]) — la pantalla más crítica del sitio (sección 6.2 del MASTER). Necesita: galería de imágenes, barra de progreso de escalones (con checkmarks para los alcanzados), countdown, selector de cantidad con cálculo dinámico de seña/saldo, botón "Reservar" (lleva a auth si no logueado), botón "Compartir" con WhatsApp/copiar link/QR, descripción + características + FAQ + política de devolución. Mobile first. Para probar todo este flujo bien hace falta seedear al menos 1 campaña de demo con escalones — lo coordinamos antes de empezar.
 
-**Última decisión técnica tomada:** Generar los tipos de la DB a mano en lugar de pelearnos con Docker. Trade-off conocido: hay que mantenerlos sincronizados con cada migración. Cuando alguien instale Docker localmente o configure `supabase login`, se puede regenerar automáticamente y eliminar la deuda de mantenimiento manual.
+**Última decisión técnica tomada:** Para queries con joins, usar `.returns<T>()` con tipo local explícito en lugar de inferencia automática, porque nuestro `Database` no incluye `Relationships`. Cuando regeneremos tipos vía CLI con `--link`, supabase-js inferirá las relaciones solas y se puede sacar el cast.
 
 ---
 
