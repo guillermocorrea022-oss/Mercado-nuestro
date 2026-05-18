@@ -148,6 +148,16 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
   - [/admin/campanas](src/app/admin/campanas/page.tsx) tabla con todas las campañas (todos los estados), status pill, progreso al MOQ, countdown, botón "Cerrar campaña" que dispara [`closeCampaignAction`](src/app/admin/actions.ts) → rpc `close_campaign` con feedback inline del resumen.
 - **/disponible** ([page.tsx](src/app/(public)/disponible/page.tsx)) lista `inventory_items` activos con `quantity > 0`. Card premium con precio, brand y stock. Empty state cuando vacío.
 - **src/types/database.ts** ampliado con tablas que se usan ahora (inventory, orders, order_items, payments, user_credits, credit_movements, notifications, settings, admin_actions_log, campaign_status_updates) + 7 enums + función `close_campaign` en `Functions`. Las tablas de Fase 2 (marketplace, catalog, comisiones, reviews) existen en la DB pero sin tipos TS hasta que se usen.
+- **Cierre del marketplace de reventa** (línea 2 del bloque 1 del MASTER):
+  - **Panel revendedor** [/perfil/revendedor](src/app/(user)/perfil/revendedor/page.tsx): onboarding con `ActivateResellerButton` (aprobación automática en MVP) o, si ya activo, dashboard con pedidos a despachar + listado de mis publicaciones + form para crear nueva publicación. Server Actions: `activateResellerRoleAction`, `createListingAction`, `toggleListingStatusAction`, `markOrderShippedAction`.
+  - **Compra real**: [BuyListingForm](src/components/marketplace/BuyListingForm.tsx) en sidebar del detalle de listing → [createMarketplaceOrderAction](src/app/(public)/marketplace/actions.ts) valida sesión + stock + no-ownership, lee comisión de settings, crea `marketplace_order` status `pagada`, reduce stock y notifica al vendedor.
+  - **[/perfil/mis-compras](src/app/(user)/perfil/mis-compras/page.tsx)**: lista pedidos del buyer con status, tracking si hay.
+  - **Chat interno** (`marketplace_messages`):
+    - `conversation_id` = `listing_id`.
+    - [sendMarketplaceMessageAction](src/app/(user)/perfil/mensajes/actions.ts) resuelve destinatario por rol del sender, notifica al recibidor.
+    - [/perfil/mensajes](src/app/(user)/perfil/mensajes/page.tsx) lista conversaciones; [/perfil/mensajes/[id]](src/app/(user)/perfil/mensajes/[id]/page.tsx) hilo con burbujas + [MessageComposer](src/components/marketplace/MessageComposer.tsx).
+    - Botón "Consultar al vendedor" en `/marketplace/[id]` abre la conversación.
+  - `/perfil` principal con 11 cards.
 - **Fase 2 grande: vendedores por catálogo, marketplace, reseñas y wishlists**:
   - **Migración** [20260518160000_phase2_insert_policies.sql](supabase/migrations/20260518160000_phase2_insert_policies.sql) aplicada al cloud con policies INSERT/DELETE para `seller_profiles`, `catalog_links`, `marketplace_listings`, `marketplace_orders`, `wishlists`.
   - **Vendedores por catálogo** ([§3.6 MASTER](docs/MASTER.md)):
