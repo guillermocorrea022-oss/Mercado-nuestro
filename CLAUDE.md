@@ -94,6 +94,26 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
   - Hint del próximo escalón con unidades restantes.
   - Botón "Reservar con seña" redirige a `/login?next=/campanas/[slug]/reservar?quantity=...` como placeholder hasta tener auth.
   - Estado "Campaña cerrada" si el `status` no es `activa`.
+- **Migración Phase 1 (orders, payments, marketplace, notifications, etc.)** aplicada al cloud:
+  - 13 enums nuevos (`order_status`, `payment_method`, `notification_channel`, `campaign_update_type`, etc.).
+  - 25+ tablas nuevas: `inventory_items`, `orders`, `order_items`, `payments`, `user_credits`, `credit_movements`, `seller_profiles`, `marketplace_listings`, `marketplace_orders`, `marketplace_messages`, `catalog_links`, `catalog_attributions`, `catalog_sales`, `commission_tiers`, `commission_payouts`, `reviews`, `marketplace_listing_reviews`, `wishlists`, `product_proposals`, `product_proposal_interests`, `support_tickets`, `support_ticket_messages`, `claims`, `notifications`, `notification_preferences`, `settings`, `admin_actions_log`, `campaign_status_updates`.
+  - Seed inicial de `settings` con tipo de cambio, comisiones default y plazos.
+  - RLS habilitado con políticas base en todas las tablas con datos de usuarios.
+- **Función SQL [close_campaign](supabase/migrations/20260518140000_close_campaign_function.sql)** aplicada al cloud:
+  - Solo admins (chequeo interno con `has_role`).
+  - Si `reserved >= moq` → status `cerrada_exitosa` + aplica precio del mejor escalón a todas las reservas + genera `credit_movements` (tipo `ajuste_precio_campana`) por diferencia + actualiza `user_credits`.
+  - Si `reserved < moq` → status `cerrada_fallida` + cancela todas las reservas activas.
+  - Devuelve JSON con resumen del cierre.
+- **Cancelación de reserva** (regla §5.3):
+  - [cancelReservationAction](src/app/(public)/campanas/actions.ts) valida sesión + reserva propia + status activo + plazo de 72 hs antes del cierre.
+  - [CancelReservationButton](src/components/campanas/CancelReservationButton.tsx) (Client) con confirmación inline en `/mis-reservas`. Solo aparece para reservas activas con countdown > 72hs.
+- **Panel admin** (`/admin`):
+  - [Layout protegido](src/app/admin/layout.tsx) verifica `has_role admin` via rpc; redirige a `/perfil` si no.
+  - Sidebar fijo con Dashboard / Campañas / Productos / Configuración + signOut.
+  - [Dashboard](src/app/admin/page.tsx) con cards de stats (campañas activas, reservas vigentes, usuarios, productos).
+  - [/admin/campanas](src/app/admin/campanas/page.tsx) tabla con todas las campañas (todos los estados), status pill, progreso al MOQ, countdown, botón "Cerrar campaña" que dispara [`closeCampaignAction`](src/app/admin/actions.ts) → rpc `close_campaign` con feedback inline del resumen.
+- **/disponible** ([page.tsx](src/app/(public)/disponible/page.tsx)) lista `inventory_items` activos con `quantity > 0`. Card premium con precio, brand y stock. Empty state cuando vacío.
+- **src/types/database.ts** ampliado con tablas que se usan ahora (inventory, orders, order_items, payments, user_credits, credit_movements, notifications, settings, admin_actions_log, campaign_status_updates) + 7 enums + función `close_campaign` en `Functions`. Las tablas de Fase 2 (marketplace, catalog, comisiones, reviews) existen en la DB pero sin tipos TS hasta que se usen.
 - **Rediseño visual a estética dark premium** (inspirado en legendslegalmarketing.com):
   - Paleta **Carbon Black + Alabaster** + verde brillante como acento. `--background: oklch(0.09 0 0)`, `--foreground: oklch(0.96 0.005 90)`, `--primary: oklch(0.78 0.18 145)`. Border sutil 8% sobre negro.
   - Root layout fuerza `class="dark"` + `style colorScheme: dark` — sin sistema de toggle, todo el sitio es dark.
@@ -132,11 +152,16 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - Layout principal de `src/app/layout.tsx` con header/footer y tipografía del proyecto (preliminar: Inter o Geist; sin definir aún).
 - Smoke test: una página que lea `categories` (vacía) o `campaigns` para validar el cliente en ejecución.
 
-**Próxima funcionalidad a implementar:** Pago de la seña con **Mercado Pago Checkout Pro**. La reserva hoy queda en estado `activa` sin pago; necesitamos: crear preferencia de MP desde una Server Action al confirmar la reserva, redirigir al checkout de MP, recibir el webhook `payment.created`/`payment.updated` en `/api/webhooks/mercadopago`, validar firma, marcar la reserva como `confirmada` y registrar el pago en `campaign_payments`. Esto cierra el primer flujo monetario real.
+**Próxima funcionalidad a implementar:** Pago de la seña con **Mercado Pago Checkout Pro** + Resend para emails transaccionales. Esperando credenciales:
+- MP: cuenta en https://www.mercadopago.com.uy/developers, app "Mercado Nuestro", credenciales TEST (Access Token + Public Key + Webhook secret).
+- Resend: cuenta en resend.com, API key `re_*`.
+Una vez con credenciales: crear preferencia de MP en Server Action al hacer reserva, redirigir al checkout, recibir webhook en `/api/webhooks/mercadopago`, validar firma, marcar reserva como `confirmada` y persistir en tabla `payments`. Resend para emails de: confirmación de reserva, recordatorio de saldo, actualizaciones de campaña (las que se cargan en `campaign_status_updates`).
 
-**Pendientes adicionales (siguientes chunks):** Google OAuth provider en Supabase (cuando tengas Client ID/Secret del Google Cloud Console). Verificación de teléfono SMS para reservas (regla §10 del CLAUDE.md). Cancelación de reserva (Server Action que respeta el plazo de 72 hs). Notificaciones in-app + email transaccional (Resend). Stock disponible. Panel admin para crear campañas desde la web. Botón "Compartir" en detalle con WhatsApp/QR.
+**Pendientes adicionales (más chunks de Fase 1):** crear/editar campañas desde el panel admin (formulario), `/admin/productos` para gestión de catálogo, `/admin/configuracion` para editar `settings` (tipo de cambio, comisiones), `/admin/pedidos` para ver órdenes y reclamos, `/admin/usuarios` para gestión y promoción a admin. Verificación de teléfono SMS (regla §10). Notificaciones in-app con polling. Reclamos (`/perfil/reclamos`). Detalle de producto `/producto/[slug]`. Botón "Compartir" en campaña con WhatsApp/QR. Google OAuth (cuando tengas client_id/secret).
 
-**Última decisión técnica tomada:** Para hacer funcionar los tipos generados a mano con `supabase-js`, hubo que agregar `Relationships: []` en cada tabla y vista del schema. Sin eso, `supabase-js` inferre `never` en todas las operaciones. La estructura completa que espera el cliente es: `{ Row, Insert, Update, Relationships }` por tabla, `{ Row, Relationships }` por vista. Cuando regeneremos tipos vía CLI con `--link`, las relaciones reales (FKs) se llenan solas y los joins se infieren sin ayudar.
+**Pendientes Fase 2 (futuro):** marketplace (publicar, comprar, mensajería), vendedores por catálogo (link único, comisiones, payouts), propuestas comunitarias, reseñas y reputación, WhatsApp via Twilio.
+
+**Última decisión técnica tomada:** Función SQL `close_campaign(uuid)` con `SECURITY DEFINER` para aplicar la regla de precio retroactivo al cerrar (§5.1). Encapsula la lógica monetaria en la DB para garantizar atomicidad (si falla a la mitad, rollback completo). El check de permiso "solo admin" lo hace internamente con `has_role()` en lugar de delegarlo al cliente. Llamable desde JS via `supabase.rpc("close_campaign", { p_campaign_id })`.
 
 ---
 
