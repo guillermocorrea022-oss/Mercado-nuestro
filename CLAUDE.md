@@ -37,16 +37,40 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - shadcn/ui inicializado (preset `base-nova`, base color `neutral`, icon library Lucide, CSS variables habilitadas). Primer componente `Button` instalado en `src/components/ui/button.tsx`. Config en `components.json` (raíz).
 - `MASTER.md` movido a `/docs/MASTER.md`.
 - `.env.example` creado en raíz con todas las variables de la sección 16.
-- `.gitignore` ajustado para excluir `.env*` pero permitir `.env.example` versionado.
-- `AGENTS.md` (generado por Next.js) preservado en raíz — contiene la advertencia oficial de Next 16 sobre breaking changes vs versiones anteriores.
-- Build de producción pasa sin errores (TypeScript OK, 4 páginas estáticas generadas).
+- `.gitignore` ajustado para excluir `.env*` pero permitir `.env.example` versionado, y para excluir `.claude/` (settings locales).
+- `AGENTS.md` (generado por Next.js) preservado en raíz — advertencia oficial de Next 16 sobre breaking changes vs versiones anteriores.
+- **Git inicializado** en raíz (rama `main`, sin remote todavía). Dos commits hechos:
+  1. `chore: inicializar proyecto Next.js 16 con TS, Tailwind v4 y shadcn/ui`
+  2. `feat(supabase): clientes SSR + migración inicial con tablas troncales`
+- **Supabase configurado para SSR** con `@supabase/ssr` 0.10.3:
+  - `src/lib/supabase/client.ts` (Client Components)
+  - `src/lib/supabase/server.ts` (Server Components / Actions / Route Handlers, con cookies asíncronas)
+  - `src/lib/supabase/middleware.ts` (helper `updateSession` para refrescar tokens)
+  - `src/proxy.ts` — convención nueva de Next 16 (antes `middleware.ts`, ahora deprecado). Invoca el refresh de sesión en cada request, con matcher que excluye `_next/static`, `_next/image` y assets.
+  - `src/types/database.ts` como stub hasta generar tipos con el CLI de Supabase.
+- **Primera migración SQL** en `supabase/migrations/20260518120000_initial_schema.sql` con:
+  - Helper `handle_updated_at()` para mantener `updated_at` en todas las tablas.
+  - Enums: `user_role`, `user_status`, `verification_type`, `verification_status`, `campaign_status`, `reservation_status`.
+  - Tablas: `profiles` (1:1 con `auth.users`), `user_roles` (acumulables), `user_addresses`, `user_verifications`, `categories`, `products`, `product_variants`, `campaigns`, `campaign_pricing_tiers`, `campaign_reservations`.
+  - Trigger `on_auth_user_created` que crea `profile` + asigna rol `comprador` automáticamente al registrarse.
+  - Función `has_role(user, role)` para usar en políticas RLS futuras (SECURITY DEFINER).
+  - Vista `campaign_progress_view` con cantidad reservada, % al MOQ y segundos hasta cierre.
+  - **RLS habilitado en todas las tablas con políticas base** (lectura propia, escritura propia, lectura pública para catálogo/categorías/campañas visibles).
+  - Dinero almacenado como `bigint` en centavos USD (jamás floats), según §15 punto 4.
+- Dependencias instaladas: `@supabase/ssr`, `@supabase/supabase-js`, `zod`.
+- Build de producción pasa sin warnings (incluyendo el de `middleware.ts` deprecado, resuelto al renombrar a `proxy.ts`).
 - Dev server arranca en ~1.5s en `http://localhost:3000`.
 
-**Pendiente en cimientos técnicos:** `git init` en raíz (la carpeta vive en OneDrive, confirmar con el dueño si se usa así o se mueve), cliente Supabase (`src/lib/supabase/{client,server,middleware}.ts`), primera migración SQL con tablas troncales, políticas RLS base, layout principal (`src/app/layout.tsx`) con header/footer y tipografía.
+**Pendiente en cimientos técnicos:**
+- Crear proyecto Supabase real (cloud o local con `supabase` CLI) y completar `.env.local` con las claves reales.
+- Aplicar la migración inicial al proyecto (`supabase db push` o copiar/pegar en SQL editor del dashboard).
+- Generar tipos TypeScript reales con `npx supabase gen types typescript` y reemplazar el stub.
+- Migraciones siguientes: marketplace (listings, orders, messages), orders unificadora + order_items + payments, vendedores por catálogo (catalog_links, attributions, sales, commission_tiers, payouts), reviews/ratings, wishlists, support_tickets/claims, notifications, settings.
+- Layout principal de `src/app/layout.tsx` con header/footer y tipografía del proyecto (preliminar: Inter o Geist; sin definir aún).
 
-**Próxima funcionalidad a implementar:** Configurar cliente Supabase (server + client + middleware con `@supabase/ssr`) y crear la primera migración con las tablas troncales identificadas en sección 8 del CLAUDE.md y bloque 4 del MASTER (`users` extendido, `user_roles`, `user_addresses`, `categories`, `products`, `campaigns`, `campaign_pricing_tiers`). RLS obligatorio en todas las tablas con datos de usuarios.
+**Próxima funcionalidad a implementar:** Layout público base (header, footer, navegación) + home con hero estático y placeholder de carrusel de campañas. Server Component que lea `campaigns` y `campaign_progress_view` cuando haya proyecto Supabase conectado; mientras tanto, datos mock.
 
-**Última decisión técnica tomada:** Adoptar Next.js 16 (no 15) y Tailwind v4 (no v3) porque son las versiones que instala `create-next-app@latest` hoy. Trae breaking changes vs Next 15: Turbopack por default, React 19.2.4, Tailwind v4 con config CSS-first (sin `tailwind.config.ts`). Sección 3 del CLAUDE.md actualizada con versiones reales.
+**Última decisión técnica tomada:** Renombrar `src/middleware.ts` a `src/proxy.ts` con export `proxy` (no `middleware`) — Next 16 deprecó la convención `middleware.ts` a favor de `proxy.ts`. Detectado por warning en build. Doc oficial en `node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md`.
 
 ---
 
