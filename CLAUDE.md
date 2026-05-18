@@ -94,6 +94,40 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
   - Hint del próximo escalón con unidades restantes.
   - Botón "Reservar con seña" redirige a `/login?next=/campanas/[slug]/reservar?quantity=...` como placeholder hasta tener auth.
   - Estado "Campaña cerrada" si el `status` no es `activa`.
+- **Panel admin completo** con sidebar y gating por rol:
+  - [/admin](src/app/admin/page.tsx) dashboard con 4 stats (campañas activas, reservas vigentes, usuarios, productos).
+  - [/admin/campanas](src/app/admin/campanas/page.tsx) tabla con TODAS las campañas (todos los estados) + botón "Cerrar campaña".
+  - [/admin/campanas/nueva](src/app/admin/campanas/nueva/page.tsx) form con escalones dinámicos (`+/-` rows).
+  - [/admin/campanas/[id]](src/app/admin/campanas/[id]/page.tsx) ficha + form para postear `campaign_status_updates`.
+  - [/admin/productos](src/app/admin/productos/page.tsx) listado + [/admin/productos/nuevo](src/app/admin/productos/nuevo/page.tsx).
+  - [/admin/configuracion](src/app/admin/configuracion/page.tsx) edita `settings` (tipo de cambio, comisiones, plazos).
+  - [/admin/usuarios](src/app/admin/usuarios/page.tsx) lista con toggles de roles (asignar / quitar admin, comprador, etc).
+  - [/admin/reservas](src/app/admin/reservas/page.tsx) vista global con email del usuario y campaña.
+  - Todas las Server Actions en [actions.ts](src/app/admin/actions.ts) validan rol admin via `has_role()` y loguean en `admin_actions_log`.
+- **Migración admin_policies** ([20260518150000](supabase/migrations/20260518150000_admin_policies.sql)) aplicada al cloud:
+  - Policies de SELECT/INSERT/UPDATE/DELETE para admin en profiles, user_roles, campaigns, pricing_tiers, products, categories, settings, admin_actions_log, campaign_reservations, inventory_items, campaign_status_updates.
+- **Detalle de campaña enriquecido**:
+  - Botón [ShareButton](src/components/campanas/ShareButton.tsx) (Client) con WhatsApp pre-armado, copiar link, modal de QR (via `api.qrserver.com`).
+  - Timeline de `campaign_status_updates` visibles para usuarios en el cuerpo de la pantalla.
+- **Detalle de producto** [/producto/[slug]](src/app/(public)/producto/[slug]/page.tsx) con galería, descripción, atributos, sidebar con stock disponible o campañas activas vinculadas.
+- **Perfil completo** ([/perfil](src/app/(user)/perfil/page.tsx)) con 4 cards a sub-páginas:
+  - [/perfil/direcciones](src/app/(user)/perfil/direcciones/page.tsx) CRUD con form colapsable, soporta "principal".
+  - [/perfil/credito](src/app/(user)/perfil/credito/page.tsx) muestra `user_credits.available_cents_usd` + `credit_movements`.
+  - [/perfil/notificaciones](src/app/(user)/perfil/notificaciones/page.tsx) lista + acción "marcar todas leídas". Header muestra badge con conteo de no leídas.
+  - [/perfil/reclamos](src/app/(user)/perfil/reclamos/page.tsx) lista + form para abrir reclamo nuevo.
+- **Propuestas comunitarias** (regla §3.10):
+  - [/propuestas](src/app/(public)/propuestas/page.tsx) listado público con conteo de interesados y unidades.
+  - [/proponer-producto](src/app/(public)/proponer-producto/page.tsx) form (requiere sesión).
+  - [createProposalAction](src/app/(public)/propuestas/actions.ts) crea propuesta + suma al proponente como primer interesado automáticamente.
+- **Mercado Pago + Resend como stubs** (estructura completa, esperando credenciales reales):
+  - [src/lib/mercadopago/client.ts](src/lib/mercadopago/client.ts): `createCampaignDepositPreference` detecta `MERCADOPAGO_ACCESS_TOKEN`; devuelve URL mock a `/checkout/mercadopago-stub` si no hay credenciales.
+  - [src/lib/email/send.ts](src/lib/email/send.ts): `sendEmail` que loguea a consola si no hay `RESEND_API_KEY`, o llama al SDK real cuando esté.
+  - [src/lib/notifications/create.ts](src/lib/notifications/create.ts): helper para crear `notifications` in-app.
+  - [/checkout/mercadopago-stub](src/app/(public)/checkout/mercadopago-stub/page.tsx): página que simula el checkout real con botón "Simular pago exitoso" que crea `payment`, marca reserva como `confirmada` y dispara notificación.
+  - [/api/webhooks/mercadopago](src/app/api/webhooks/mercadopago/route.ts) route handler que valida firma (stub permisivo si no hay secret real), inserta `payment` y actualiza reserva. Cuando estén las credenciales, solo cambia `.env.local` y reemplazás los `TODO(MP)` con el SDK.
+- **Flujo end-to-end andando con stubs**:
+  - Reserva → crea `campaign_reservations` + notification in-app + email (stub) + redirect a `/campanas/[slug]/reservada` con botón "Pagar seña con MP" que va al stub checkout.
+- **Tipos DB extendidos** con `claims`, `product_proposals`, `product_proposal_interests`, y enums `claim_type`, `claim_status`, `proposal_status`. Total: 19 tablas y 1 vista tipadas + 13 enums + 2 funciones SQL.
 - **Migración Phase 1 (orders, payments, marketplace, notifications, etc.)** aplicada al cloud:
   - 13 enums nuevos (`order_status`, `payment_method`, `notification_channel`, `campaign_update_type`, etc.).
   - 25+ tablas nuevas: `inventory_items`, `orders`, `order_items`, `payments`, `user_credits`, `credit_movements`, `seller_profiles`, `marketplace_listings`, `marketplace_orders`, `marketplace_messages`, `catalog_links`, `catalog_attributions`, `catalog_sales`, `commission_tiers`, `commission_payouts`, `reviews`, `marketplace_listing_reviews`, `wishlists`, `product_proposals`, `product_proposal_interests`, `support_tickets`, `support_ticket_messages`, `claims`, `notifications`, `notification_preferences`, `settings`, `admin_actions_log`, `campaign_status_updates`.
@@ -152,16 +186,16 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
 - Layout principal de `src/app/layout.tsx` con header/footer y tipografía del proyecto (preliminar: Inter o Geist; sin definir aún).
 - Smoke test: una página que lea `categories` (vacía) o `campaigns` para validar el cliente en ejecución.
 
-**Próxima funcionalidad a implementar:** Pago de la seña con **Mercado Pago Checkout Pro** + Resend para emails transaccionales. Esperando credenciales:
-- MP: cuenta en https://www.mercadopago.com.uy/developers, app "Mercado Nuestro", credenciales TEST (Access Token + Public Key + Webhook secret).
-- Resend: cuenta en resend.com, API key `re_*`.
-Una vez con credenciales: crear preferencia de MP en Server Action al hacer reserva, redirigir al checkout, recibir webhook en `/api/webhooks/mercadopago`, validar firma, marcar reserva como `confirmada` y persistir en tabla `payments`. Resend para emails de: confirmación de reserva, recordatorio de saldo, actualizaciones de campaña (las que se cargan en `campaign_status_updates`).
+**Próxima funcionalidad a implementar:** Activar pagos reales con credenciales de Mercado Pago y emails reales con Resend. El código ya está estructurado en stubs ([src/lib/mercadopago/client.ts](src/lib/mercadopago/client.ts), [src/lib/email/send.ts](src/lib/email/send.ts)). Cuando lleguen las claves:
+1. Completar en `.env.local`: `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`, `RESEND_API_KEY`.
+2. Buscar los comentarios `TODO(MP)` y `TODO(resend)` y reemplazar las llamadas mock con SDK real.
+3. Hacer un signup + reserva real para validar end-to-end.
 
-**Pendientes adicionales (más chunks de Fase 1):** crear/editar campañas desde el panel admin (formulario), `/admin/productos` para gestión de catálogo, `/admin/configuracion` para editar `settings` (tipo de cambio, comisiones), `/admin/pedidos` para ver órdenes y reclamos, `/admin/usuarios` para gestión y promoción a admin. Verificación de teléfono SMS (regla §10). Notificaciones in-app con polling. Reclamos (`/perfil/reclamos`). Detalle de producto `/producto/[slug]`. Botón "Compartir" en campaña con WhatsApp/QR. Google OAuth (cuando tengas client_id/secret).
+**Pendientes para Fase 2** (cuando el MVP de Fase 1 esté validado con campaña real cerrada): vendedores por catálogo con link único + cookie de atribución de 30 días + comisiones consolidadas + payouts mensuales; marketplace (listings, mensajería interna, escrow); reseñas y reputación; WhatsApp via Twilio; verificación de teléfono SMS; lista de deseos (`wishlists`) con notificación de re-stock o baja de precio; gestión de inventario desde admin.
 
-**Pendientes Fase 2 (futuro):** marketplace (publicar, comprar, mensajería), vendedores por catálogo (link único, comisiones, payouts), propuestas comunitarias, reseñas y reputación, WhatsApp via Twilio.
+**Pendientes técnicos menores:** Google OAuth provider (cuando tengas client_id/secret de Google Cloud Console). Reemplazar los `cast as never` en queries de Supabase por tipos reales generados via `npx supabase gen types` cuando Docker esté disponible. Confirmar email opcional en Supabase Auth (hoy es obligatorio por default).
 
-**Última decisión técnica tomada:** Función SQL `close_campaign(uuid)` con `SECURITY DEFINER` para aplicar la regla de precio retroactivo al cerrar (§5.1). Encapsula la lógica monetaria en la DB para garantizar atomicidad (si falla a la mitad, rollback completo). El check de permiso "solo admin" lo hace internamente con `has_role()` en lugar de delegarlo al cliente. Llamable desde JS via `supabase.rpc("close_campaign", { p_campaign_id })`.
+**Última decisión técnica tomada:** Para que el flujo monetario funcione end-to-end sin credenciales reales, se construyó un **modo stub completo** que reproduce el contrato de MP (checkout page + webhook handler) sin tocar el SDK real. Esto permite probar registro → reserva → "pago" → confirmación → notification → email de la app en local hoy mismo. Cuando lleguen las credenciales, el código que cambia está aislado en `src/lib/mercadopago/client.ts` (1 función) y `src/lib/email/send.ts` (1 función). Riesgo controlado: el resto del sistema no se entera de que el pago era mock.
 
 ---
 
