@@ -11,9 +11,11 @@ import {
   Megaphone,
   MessageSquare,
   Package,
+  Phone,
   ShieldCheck,
   ShoppingBag,
   Store,
+  Users,
   Wallet,
 } from "lucide-react";
 
@@ -38,6 +40,10 @@ const ROLE_LABELS: Record<Database["public"]["Enums"]["user_role"], string> = {
   revendedor: "Revendedor",
   importador_avanzado: "Importador avanzado",
   admin: "Administrador",
+  admin_super: "Administrador · super",
+  admin_operador_campanas: "Administrador · operador",
+  admin_atencion: "Administrador · atención",
+  admin_local: "Administrador · local",
 };
 
 export default async function PerfilPage() {
@@ -180,6 +186,18 @@ export default async function PerfilPage() {
               icon: FileWarning,
               title: "Reclamos",
               description: "Abrir o seguir un reclamo.",
+            },
+            {
+              href: "/perfil/verificacion-telefono",
+              icon: Phone,
+              title: "Verificar teléfono",
+              description: "Confirmá tu número antes del primer pago.",
+            },
+            {
+              href: "/perfil/referidos",
+              icon: Users,
+              title: "Programa de referidos",
+              description: "Invitá amigos y ganá crédito en cuenta.",
             },
           ].map((item) => (
             <Link

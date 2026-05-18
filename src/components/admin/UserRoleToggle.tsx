@@ -15,6 +15,10 @@ const ROLE_LABELS: Record<UserRole, string> = {
   revendedor: "Revendedor",
   importador_avanzado: "Importador avanzado",
   admin: "Admin",
+  admin_super: "Admin · super",
+  admin_operador_campanas: "Admin · operador campañas",
+  admin_atencion: "Admin · atención",
+  admin_local: "Admin · local",
 };
 
 interface UserRoleToggleProps {

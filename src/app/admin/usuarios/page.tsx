@@ -8,12 +8,19 @@ export const metadata: Metadata = {
   title: "Usuarios · Admin",
 };
 
-const ROLES: Database["public"]["Enums"]["user_role"][] = [
+const BASE_ROLES: Database["public"]["Enums"]["user_role"][] = [
   "comprador",
   "vendedor_catalogo",
   "revendedor",
   "importador_avanzado",
   "admin",
+];
+
+const ADMIN_SUB_ROLES: Database["public"]["Enums"]["user_role"][] = [
+  "admin_super",
+  "admin_operador_campanas",
+  "admin_atencion",
+  "admin_local",
 ];
 
 type ProfileRow = {
@@ -103,7 +110,7 @@ export default async function AdminUsuariosPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-2">
-                        {ROLES.map((role) => (
+                        {BASE_ROLES.map((role) => (
                           <UserRoleToggle
                             key={role}
                             userId={p.id}
@@ -112,6 +119,23 @@ export default async function AdminUsuariosPage() {
                           />
                         ))}
                       </div>
+                      {userRoles.has("admin") ? (
+                        <div className="mt-3">
+                          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                            Sub-roles admin
+                          </p>
+                          <div className="mt-1.5 flex flex-wrap gap-2">
+                            {ADMIN_SUB_ROLES.map((role) => (
+                              <UserRoleToggle
+                                key={role}
+                                userId={p.id}
+                                role={role}
+                                active={userRoles.has(role)}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
                     </td>
                   </tr>
                 );

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Sparkles, Star, Users } from "lucide-react";
+import { MessageCircle, Sparkles, Star, Users } from "lucide-react";
 
 import {
   CampaignCard,
@@ -31,6 +31,18 @@ type FeaturedCampaignRow = {
     | null;
 };
 
+type SellerReviewRow = {
+  id: string;
+  rating: number;
+  body: string | null;
+  created_at: string;
+  user: { first_name: string | null } | { first_name: string | null }[] | null;
+  order:
+    | { seller_id: string; listing: { product: { name: string } | { name: string }[] | null } | { product: { name: string } | { name: string }[] | null }[] | null }
+    | { seller_id: string; listing: { product: { name: string } | { name: string }[] | null } | { product: { name: string } | { name: string }[] | null }[] | null }[]
+    | null;
+};
+
 async function getSeller(slug: string) {
   const supabase = await createClient();
   const { data: seller } = await supabase
@@ -40,6 +52,29 @@ async function getSeller(slug: string) {
     .maybeSingle()
     .returns<SellerRow | null>();
   if (!seller) return null;
+
+  // Reseñas hechas a este vendedor (a través de marketplace_orders).
+  const { data: reviewsRaw } = await supabase
+    .from("marketplace_listing_reviews")
+    .select(
+      `
+      id, rating, body, created_at,
+      user:profiles!marketplace_listing_reviews_user_id_fkey(first_name),
+      order:marketplace_orders!marketplace_listing_reviews_order_id_fkey(
+        seller_id,
+        listing:marketplace_listings!marketplace_orders_listing_id_fkey(
+          product:products(name)
+        )
+      )
+      `,
+    )
+    .order("created_at", { ascending: false })
+    .limit(20)
+    .returns<SellerReviewRow[]>();
+  const sellerReviews = (reviewsRaw ?? []).filter((r) => {
+    const o = Array.isArray(r.order) ? r.order[0] : r.order;
+    return o?.seller_id === seller.user_id;
+  });
 
   // Campañas activas (mismo set que el listado público — el vendedor
   // distribuye TODAS las campañas activas de la plataforma).
@@ -85,7 +120,7 @@ async function getSeller(slug: string) {
     progress: progressByCampaign.get(c.id) ?? null,
   }));
 
-  return { seller, featuredCampaigns };
+  return { seller, featuredCampaigns, sellerReviews };
 }
 
 export async function generateMetadata({
@@ -112,7 +147,7 @@ export default async function VendedorCatalogoPage({
   const { slug } = await params;
   const result = await getSeller(slug);
   if (!result) notFound();
-  const { seller, featuredCampaigns } = result;
+  const { seller, featuredCampaigns, sellerReviews } = result;
 
   return (
     <>
@@ -212,6 +247,77 @@ export default async function VendedorCatalogoPage({
           )}
         </Container>
       </section>
+
+      {sellerReviews.length > 0 ? (
+        <section className="border-t border-border bg-secondary/40 py-16 sm:py-20">
+          <Container>
+            <Reveal>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+                Reseñas
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+                Lo que dicen quienes le compraron
+              </h2>
+            </Reveal>
+            <ul className="mt-10 grid gap-4 sm:grid-cols-2">
+              {sellerReviews.map((r) => {
+                const u = Array.isArray(r.user) ? r.user[0] : r.user;
+                const order = Array.isArray(r.order) ? r.order[0] : r.order;
+                const listing = order
+                  ? Array.isArray(order.listing)
+                    ? order.listing[0]
+                    : order.listing
+                  : null;
+                const productName = listing
+                  ? Array.isArray(listing.product)
+                    ? listing.product[0]?.name
+                    : listing.product?.name
+                  : null;
+                return (
+                  <li
+                    key={r.id}
+                    className="rounded-2xl border border-border bg-card p-5"
+                  >
+                    <div className="flex items-center gap-2">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <Star
+                          key={n}
+                          className={
+                            r.rating >= n
+                              ? "size-4 fill-primary text-primary"
+                              : "size-4 text-muted-foreground/30"
+                          }
+                          aria-hidden
+                        />
+                      ))}
+                      <span className="text-xs text-muted-foreground">
+                        {u?.first_name ?? "Comprador"} ·{" "}
+                        {new Date(r.created_at).toLocaleDateString("es-UY", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </span>
+                    </div>
+                    {productName ? (
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Sobre &ldquo;{productName}&rdquo;
+                      </p>
+                    ) : null}
+                    {r.body ? (
+                      <p className="mt-2 text-sm">{r.body}</p>
+                    ) : (
+                      <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <MessageCircle className="size-3.5" aria-hidden />
+                        Sin comentario
+                      </p>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </Container>
+        </section>
+      ) : null}
     </>
   );
 }

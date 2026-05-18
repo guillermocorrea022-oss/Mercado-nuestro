@@ -23,7 +23,11 @@ export type UserRole =
   | "vendedor_catalogo"
   | "revendedor"
   | "importador_avanzado"
-  | "admin";
+  | "admin"
+  | "admin_super"
+  | "admin_operador_campanas"
+  | "admin_atencion"
+  | "admin_local";
 
 export type UserStatus = "activa" | "suspendida" | "eliminada";
 
@@ -152,10 +156,12 @@ export interface Database {
           first_name: string | null;
           last_name: string | null;
           phone: string | null;
+          phone_verified_at: string | null;
           birth_date: string | null;
           avatar_url: string | null;
           status: UserStatus;
           last_active_at: string | null;
+          referral_code: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -165,10 +171,12 @@ export interface Database {
           first_name?: string | null;
           last_name?: string | null;
           phone?: string | null;
+          phone_verified_at?: string | null;
           birth_date?: string | null;
           avatar_url?: string | null;
           status?: UserStatus;
           last_active_at?: string | null;
+          referral_code?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -1096,6 +1104,52 @@ export interface Database {
           performed_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["admin_actions_log"]["Insert"]>;
+        Relationships: [];
+      };
+
+      phone_verification_codes: {
+        Row: {
+          id: string;
+          user_id: string;
+          code: string;
+          expires_at: string;
+          consumed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          code: string;
+          expires_at: string;
+          consumed_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["phone_verification_codes"]["Insert"]
+        >;
+        Relationships: [];
+      };
+
+      referrals: {
+        Row: {
+          id: string;
+          referrer_id: string;
+          referred_user_id: string;
+          status: string;
+          reward_cents_usd: number;
+          consolidated_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          referrer_id: string;
+          referred_user_id: string;
+          status?: string;
+          reward_cents_usd?: number;
+          consolidated_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["referrals"]["Insert"]>;
         Relationships: [];
       };
     };
