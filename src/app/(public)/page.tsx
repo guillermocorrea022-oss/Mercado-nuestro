@@ -3,12 +3,15 @@ import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
+  Building2,
+  Calendar,
   Clock,
+  GraduationCap,
   MapPin,
-  PackageCheck,
   Phone,
-  ShieldCheck,
+  ShoppingBasket,
   Sparkles,
+  Star,
   Truck,
   Users,
 } from "lucide-react";
@@ -17,6 +20,12 @@ import {
   CampaignCard,
   type CampaignCardData,
 } from "@/components/campanas/CampaignCard";
+import {
+  ActivityCard,
+  type ActivityCardData,
+} from "@/components/home/ActivityCard";
+import { PricingTabs } from "@/components/home/PricingTabs";
+import { QuickStartForm } from "@/components/home/QuickStartForm";
 import { TestimonialCard } from "@/components/home/TestimonialCard";
 import { Container } from "@/components/layout/Container";
 import { BlobDivider } from "@/components/motion/BlobDivider";
@@ -85,185 +94,150 @@ async function getFeaturedCampaigns(): Promise<CampaignCardData[]> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Contenido estático del home — copy editorial, en rioplatense.
+// Contenido estático del home — copy rioplatense.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const businessLines = [
+const activities: ActivityCardData[] = [
   {
     id: "campanas",
-    eyebrow: "Línea 01",
-    title: "Campañas de importación grupal",
+    badge: "Línea 01",
+    title: "Importación grupal",
+    requirements: "Reserva con seña del 30% · Saldo al cerrar la campaña",
+    description:
+      "Sumate con otros uruguayos a importar el mismo producto. Cuanto más cantidad reservamos entre todos, mejor es el precio para todos.",
     image:
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
-    short:
-      "Sumate a otros uruguayos para comprar en grupo y pagar precio mayorista.",
-    href: "/campanas",
     details: [
       {
-        id: "01-1",
-        title: "¿Qué es una campaña?",
+        id: "c-1",
+        title: "Qué es una campaña",
         content:
-          "Abrimos una ventana de tiempo en la que muchas personas reservan unidades de un mismo producto. Cuanta más cantidad sumamos entre todos, mejor es el precio para todos.",
+          "Una ventana de tiempo donde reservás unidades del mismo producto. Al cerrar, todos pagan el precio del mejor escalón alcanzado.",
       },
       {
-        id: "01-2",
-        title: "¿Cómo reservo?",
+        id: "c-2",
+        title: "Si no llegamos al objetivo",
         content:
-          "Elegís cuántas unidades querés, pagás una seña del 30% para asegurar tu lugar y, cuando cerramos la campaña, abonás el saldo al mejor precio escalonado alcanzado.",
-      },
-      {
-        id: "01-3",
-        title: "¿Qué pasa si no llegamos al objetivo?",
-        content:
-          "Te devolvemos toda la seña al método de pago original, o si elegís, la dejás como crédito en cuenta con un 5% extra de bonificación.",
+          "Devolvemos la seña al método de pago original o, si elegís, queda como crédito en cuenta con 5% extra de bonificación.",
       },
     ],
-  },
-  {
-    id: "marketplace",
-    eyebrow: "Línea 02",
-    title: "Marketplace de reventa entre vecinos",
-    image:
-      "https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=80",
-    short:
-      "Quien importó publica el sobrante. Pago protegido por la plataforma, retiro local.",
-    href: "/marketplace",
-    details: [
-      {
-        id: "02-1",
-        title: "¿Quién vende en el marketplace?",
-        content:
-          "Personas comunes que ya recibieron stock de una campaña y quieren revender lo que les sobró. No son grandes empresas: son tus vecinos.",
-      },
-      {
-        id: "02-2",
-        title: "¿Cómo se cuida el dinero?",
-        content:
-          "Pagás a Mercado Nuestro, no al vendedor directamente. Liberamos el pago recién cuando confirmás recepción, o pasados 3 días desde el despacho sin reclamo.",
-      },
-      {
-        id: "02-3",
-        title: "¿Y si hay problemas?",
-        content:
-          "Abrís un reclamo dentro de los 7 días. Lo resolvemos en 5 días hábiles, y si no estás conforme tenés derecho a una apelación.",
-      },
+    included: [
+      "Precio escalonado retroactivo",
+      "Seña reembolsable",
+      "Soporte en español",
     ],
+    excluded: ["Stock inmediato", "Entrega en menos de 30 días"],
+    primaryCta: { label: "Ver campañas", href: "/campanas" },
+    secondaryCta: { label: "Cómo funciona", href: "/como-funciona" },
   },
   {
     id: "disponible",
-    eyebrow: "Línea 03",
-    title: "Stock disponible, entrega rápida",
+    badge: "Línea 02",
+    title: "Stock disponible",
+    requirements: "Entrega 2 a 5 días hábiles · Retiro gratis en Paysandú",
+    description:
+      "Productos que ya están en nuestro local de Paysandú o en depósito. Comprás y te llegan rapidísimo, como cualquier eCommerce.",
     image:
       "https://images.unsplash.com/photo-1556909211-d5b0bb0e6f6d?auto=format&fit=crop&w=1200&q=80",
-    short:
-      "Productos físicamente acá, en el local de Paysandú o en depósito. Llegan en 2 a 5 días.",
-    href: "/disponible",
     details: [
       {
-        id: "03-1",
-        title: "¿Cómo es la entrega?",
+        id: "d-1",
+        title: "Cómo es la entrega",
         content:
-          "Despachamos a todo Uruguay en 2 a 5 días hábiles. Si vivís cerca, retiro gratis en nuestro local de Leandro Gómez 1076, Paysandú.",
+          "Despacho a todo Uruguay en 2 a 5 días hábiles. Si vivís en Paysandú, retiro gratis en Leandro Gómez 1076.",
       },
       {
-        id: "03-2",
-        title: "¿Qué métodos de pago aceptan?",
+        id: "d-2",
+        title: "Métodos de pago",
         content:
-          "Mercado Pago, transferencia, Abitab, Redpagos o crédito en tu cuenta. Sin recargos por elegir uno u otro.",
-      },
-      {
-        id: "03-3",
-        title: "¿Tiene garantía?",
-        content:
-          "Sí. Si algo llega mal, lo resolvemos acá, en español, sin esperar respuestas de China.",
+          "Mercado Pago, transferencia, Abitab, Redpagos o crédito en cuenta. Sin recargos por elegir uno u otro.",
       },
     ],
+    included: ["Garantía local 6 meses", "Cambios sin cargo", "Factura"],
+    excluded: ["Precios de campaña"],
+    primaryCta: { label: "Ver stock", href: "/disponible" },
+    secondaryCta: { label: "Garantía", href: "/devoluciones" },
+  },
+  {
+    id: "marketplace",
+    badge: "Línea 03",
+    title: "Marketplace de reventa",
+    requirements: "Pago protegido · Vendedores verificados",
+    description:
+      "Quien importó publica el sobrante con precios competitivos. El dinero queda retenido hasta que confirmás que recibiste.",
+    image:
+      "https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=80",
+    details: [
+      {
+        id: "m-1",
+        title: "Cómo funciona el escrow",
+        content:
+          "Pagás a Mercado Nuestro, no al vendedor. Liberamos cuando confirmás recepción o pasados 3 días desde el despacho sin reclamo.",
+      },
+      {
+        id: "m-2",
+        title: "Si algo sale mal",
+        content:
+          "Abrís un reclamo dentro de los 7 días. Lo resolvemos en 5 días hábiles, con derecho a apelación.",
+      },
+    ],
+    included: ["Pago protegido (escrow)", "Reseñas reales", "Chat interno"],
+    excluded: ["Pago directo al vendedor", "Trato por fuera"],
+    primaryCta: { label: "Ver marketplace", href: "/marketplace" },
+    secondaryCta: { label: "Vender", href: "/perfil/revendedor" },
   },
   {
     id: "vendedores",
-    eyebrow: "Línea 04",
-    title: "Red de vendedores por catálogo",
+    badge: "Línea 04",
+    title: "Vendedores por catálogo",
+    requirements: "Sin stock propio · Pago mensual de comisiones",
+    description:
+      "Compartís tu link personal. Cada persona que compra por tu link te genera comisión. Bonus escalonados según volumen mensual.",
     image:
       "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80",
-    short:
-      "Compartís tu link personal, alguien compra, vos ganás comisión. Sin stock propio.",
-    href: "/perfil/vendedor",
     details: [
       {
-        id: "04-1",
-        title: "¿Cómo gano comisión?",
+        id: "v-1",
+        title: "Cuánto puedo ganar",
         content:
-          "Cada vez que alguien entra por tu link y reserva o compra, queda atribuido a vos por 30 días. La comisión se consolida cuando confirma recepción.",
+          "Comisión base + bonus por volumen: +2% sobre USD 500, +3% sobre USD 1500, +5% sobre USD 3000.",
       },
       {
-        id: "04-2",
-        title: "¿Cuánto puedo ganar?",
+        id: "v-2",
+        title: "Cuándo me pagan",
         content:
-          "Comisión base + bonus escalonados por volumen mensual: +2% sobre USD 500, +3% sobre USD 1500, +5% sobre USD 3000. Sin techo.",
-      },
-      {
-        id: "04-3",
-        title: "¿Cuándo me pagan?",
-        content:
-          "Una vez al mes, los primeros 5 días hábiles, con un mínimo de USD 20 acumulados. Por transferencia bancaria.",
+          "Primeros 5 días hábiles de cada mes, mínimo USD 20 acumulados. Por transferencia.",
       },
     ],
+    included: ["Link personal", "Dashboard de ventas", "Pago mensual"],
+    excluded: ["Stock propio", "Trámites con cliente final"],
+    primaryCta: { label: "Activar mi catálogo", href: "/perfil/vendedor" },
+    secondaryCta: { label: "Más info", href: "/perfil/vendedor" },
   },
 ];
 
-const howItWorksSteps = [
+const events = [
   {
-    n: "01",
-    title: "Elegí una campaña",
+    icon: Building2,
+    title: "Empresas",
     description:
-      "Mirá los productos que estamos importando ahora. Cada uno tiene su precio escalonado según cuántas unidades reservamos entre todos.",
+      "Pedidos al por mayor con facturación. RUT, logística dedicada y precios a medida.",
+    href: "/contacto",
   },
   {
-    n: "02",
-    title: "Reservá con una seña",
+    icon: GraduationCap,
+    title: "Instituciones",
     description:
-      "Pagás solo el 30% para asegurar tu lugar. Cuando se completa la campaña, abonás el saldo al mejor precio alcanzado.",
+      "Clubes, sindicatos o cooperativas que quieran usar Mercado Nuestro como canal de compras grupales.",
+    href: "/contacto",
   },
-  {
-    n: "03",
-    title: "Recibí tu pedido",
-    description:
-      "Retirás gratis en nuestro local de Paysandú o lo enviamos a tu domicilio. Te avisamos en cada paso del camino.",
-  },
-];
-
-const valueProps = [
   {
     icon: Users,
-    title: "Comprás en grupo",
+    title: "Importadores avanzados",
     description:
-      "Sumamos pedidos de muchas personas para conseguir precios de importador, no de tienda.",
+      "¿Ya importás y querés abrir tus propias campañas en la plataforma? Postulate al programa.",
+    href: "/ser-importador",
   },
-  {
-    icon: ShieldCheck,
-    title: "Pagás con confianza",
-    description:
-      "Mercado Pago, Abitab, Redpagos o transferencia. La plataforma cuida tu dinero hasta que llega lo que reservaste.",
-  },
-  {
-    icon: Truck,
-    title: "Llega a todo Uruguay",
-    description:
-      "Despacho a Montevideo, Paysandú, Salto y resto del país. También podés retirar gratis en nuestro local.",
-  },
-  {
-    icon: PackageCheck,
-    title: "Garantía local",
-    description:
-      "Si algo no llega como te lo prometimos, lo resolvemos acá. Soporte en español, sin esperar respuestas de China.",
-  },
-];
-
-const stats = [
-  { value: "Hasta 60%", label: "menos que el precio de tienda" },
-  { value: "30%", label: "de seña para reservar" },
-  { value: "72 hs", label: "para cancelar sin cargo" },
-  { value: "Paysandú", label: "local físico para retirar" },
 ];
 
 const testimonials = [
@@ -271,22 +245,19 @@ const testimonials = [
     author: "Carolina, Paysandú",
     role: "Compradora en 3 campañas",
     rating: 5,
-    body:
-      "Conseguí una cámara IP a la mitad de precio que la veía en cualquier comercio. La seña fue facilísima y me llegó cuando dijeron. Recomendado al 100%.",
+    body: "Conseguí una cámara IP a la mitad de precio que la veía en cualquier comercio. La seña fue facilísima y me llegó cuando dijeron. Recomendado al 100%.",
   },
   {
     author: "Diego, Montevideo",
     role: "Revendedor",
     rating: 5,
-    body:
-      "Importé 20 unidades y vendí lo que me sobró por el marketplace. El sistema de escrow me dio mucha tranquilidad. Recibí el dinero sin pelearme con nadie.",
+    body: "Importé 20 unidades y vendí lo que me sobró por el marketplace. El sistema de escrow me dio mucha tranquilidad. Recibí el dinero sin pelearme con nadie.",
   },
   {
     author: "Susana, Salto",
     role: "Vendedora por catálogo",
     rating: 4.5,
-    body:
-      "Le comparto el link a mi familia y a vecinos por WhatsApp. En el primer mes ya cobré comisiones para los primeros mates del fin de semana. Increíble.",
+    body: "Le comparto el link a mi familia y a vecinos por WhatsApp. En el primer mes ya cobré comisiones para los primeros mates del fin de semana.",
   },
 ];
 
@@ -299,7 +270,7 @@ const faqTabs = [
         id: "g1",
         title: "¿Mercado Nuestro es seguro?",
         content:
-          "Sí. Operamos desde Uruguay, con local físico en Paysandú. Los pagos pasan por Mercado Pago y todo dinero del marketplace queda retenido hasta que confirmás recepción.",
+          "Sí. Operamos desde Uruguay, con local físico en Paysandú. Los pagos pasan por Mercado Pago y el dinero del marketplace queda retenido hasta que confirmás recepción.",
       },
       {
         id: "g2",
@@ -397,29 +368,32 @@ export default async function HomePage() {
   return (
     <>
       {/* ====================== HERO ====================== */}
-      <section className="relative isolate overflow-hidden">
-        <div aria-hidden className="absolute inset-0 -z-10 bg-grain" />
-        <BlobDivider variant="top-right" shape={1} />
+      <section className="relative isolate overflow-hidden bg-background">
+        <BlobDivider
+          variant="top-right"
+          shape={1}
+          className="fill-primary/20"
+        />
         <BlobDivider
           variant="bottom-left"
           shape={2}
+          className="fill-primary/15"
           float
-          className="fill-accent/40"
         />
 
-        <Container className="py-16 sm:py-24 lg:py-28">
-          <div className="grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16">
+        <Container className="py-20 sm:py-28 lg:py-32">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
             <div>
               <Reveal>
-                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-soft">
-                  <Sparkles className="size-3.5 text-primary" aria-hidden />
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-accent-foreground">
+                  <Sparkles className="size-3.5" aria-hidden />
                   Importación grupal · Uruguay
                 </div>
               </Reveal>
 
-              <Reveal delay={0.1} className="mt-8">
-                <h1 className="text-5xl font-semibold tracking-tight sm:text-6xl lg:text-[4.5rem] lg:leading-[1.05]">
-                  <span className="text-gradient">Importá en grupo.</span>
+              <Reveal delay={0.1} className="mt-7">
+                <h1 className="text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-6xl lg:text-[5rem]">
+                  Importá <span className="text-highlight">en grupo</span>.
                   <br />
                   Pagá precio mayorista.
                 </h1>
@@ -436,30 +410,56 @@ export default async function HomePage() {
               <Reveal delay={0.3} className="mt-10">
                 <div className="flex flex-col items-start gap-3 sm:flex-row">
                   <Link
-                    href="/campanas"
+                    href="#precios"
                     className={cn(
                       buttonVariants({ size: "lg" }),
                       "h-12 px-7 text-base shadow-glow",
                     )}
                   >
-                    Ver campañas activas
+                    Ver precios
                     <ArrowRight className="size-4" aria-hidden />
                   </Link>
                   <Link
-                    href="#lineas"
+                    href="#reservar"
                     className={cn(
                       buttonVariants({ variant: "outline", size: "lg" }),
                       "h-12 px-7 text-base",
                     )}
                   >
-                    Cómo trabajamos
+                    Empezar ahora
                   </Link>
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.4} className="mt-10 flex items-center gap-3">
+                <div className="flex items-center -space-x-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <span
+                      key={i}
+                      className="inline-flex size-9 items-center justify-center rounded-full border-2 border-background bg-accent text-xs font-bold text-accent-foreground"
+                    >
+                      {["M", "C", "D", "S"][i - 1]}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className="size-4 fill-primary text-primary"
+                      aria-hidden
+                    />
+                  ))}
+                  <span className="ml-1 text-sm font-semibold">4.9/5</span>
+                  <span className="text-xs text-muted-foreground">
+                    · +200 reseñas
+                  </span>
                 </div>
               </Reveal>
             </div>
 
             <Reveal delay={0.15} className="relative">
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-border bg-muted shadow-soft">
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] border border-border bg-muted shadow-soft">
                 <Image
                   src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80"
                   alt="Cajas de importación apiladas listas para entrega"
@@ -468,211 +468,177 @@ export default async function HomePage() {
                   className="object-cover"
                   priority
                 />
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/40 via-transparent"
-                />
               </div>
-              {/* Tarjeta flotante con un highlight, da textura editorial */}
-              <div className="absolute -bottom-6 -left-4 hidden max-w-[260px] rounded-2xl border border-border bg-card p-5 shadow-soft animate-float-slower sm:block">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary">
-                  Precio escalonado
+              {/* Card flotante con el escalón actual */}
+              <div className="absolute -bottom-6 -left-4 hidden max-w-[280px] rounded-2xl border border-border bg-card p-5 shadow-soft animate-float-slower sm:block">
+                <p className="text-xs font-bold uppercase tracking-wider text-primary-foreground/90">
+                  <span className="rounded-full bg-primary px-2 py-0.5">
+                    Precio escalonado
+                  </span>
                 </p>
-                <p className="mt-2 text-sm leading-snug">
-                  Cuanto más se reserva, menos pagamos.{" "}
-                  <span className="font-medium">Todos al mismo precio</span>{" "}
-                  al cerrar la campaña.
+                <p className="mt-3 text-sm leading-snug">
+                  Cuanto más reservamos entre todos,{" "}
+                  <span className="font-bold">menos paga cada uno</span>. El
+                  mejor precio aplica para todos.
+                </p>
+              </div>
+              {/* Card flotante con "Llega rápido" */}
+              <div className="absolute -top-4 -right-2 hidden rounded-2xl border border-border bg-card px-4 py-3 shadow-soft animate-float-slow sm:block">
+                <p className="flex items-center gap-2 text-xs font-bold">
+                  <Truck className="size-4 text-primary" aria-hidden />
+                  Envío a todo Uruguay
                 </p>
               </div>
             </Reveal>
           </div>
+        </Container>
+      </section>
 
-          {/* Stats row */}
-          <Stagger
-            stagger={0.1}
-            delay={0.5}
-            className="mt-20 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border/60 lg:grid-cols-4"
-          >
-            {stats.map((stat) => (
-              <StaggerItem
-                key={stat.label}
-                className="bg-background px-6 py-8"
-              >
-                <p className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {stat.label}
-                </p>
+      {/* ====================== HORARIO / OPERACIÓN ====================== */}
+      <section className="border-y border-border bg-secondary/40">
+        <Container className="py-6">
+          <div className="grid items-center gap-4 sm:grid-cols-[auto_1fr_auto] sm:gap-8">
+            <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-primary-foreground/90">
+              <Calendar className="size-4 text-primary" aria-hidden />
+              Operación 2026
+            </div>
+            <div className="grid gap-2 text-sm sm:grid-cols-2">
+              <p>
+                <span className="font-semibold">Verano</span> (oct-mar) ·
+                Campañas abiertas todos los días
+              </p>
+              <p>
+                <span className="font-semibold">Local físico</span> ·
+                Lun-Vie 9:00-18:00 · Sáb 9:00-13:00
+              </p>
+            </div>
+            <Link
+              href="/contacto"
+              className="text-sm font-semibold text-primary-foreground/90 underline-offset-4 hover:underline"
+            >
+              Cómo llegar →
+            </Link>
+          </div>
+        </Container>
+      </section>
+
+      {/* ====================== SOBRE ====================== */}
+      <section id="sobre" className="relative isolate overflow-hidden">
+        <BlobDivider
+          variant="bottom-right"
+          shape={3}
+          className="fill-primary/12"
+        />
+        <Container className="py-24 sm:py-32">
+          <div className="grid items-center gap-16 lg:grid-cols-2">
+            <Reveal>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
+                <span className="rounded-full bg-primary px-3 py-1">
+                  Quiénes somos
+                </span>
+              </p>
+              <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
+                La primera plataforma uruguaya de{" "}
+                <span className="text-highlight">compra colaborativa</span>
+              </h2>
+              <p className="mt-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
+                Nacimos en Paysandú con la idea de que el acceso a precios de
+                importación al por mayor no debería ser un privilegio de las
+                grandes empresas. Funcionamos juntando demanda real: cada vez
+                que abrimos una campaña, los usuarios reservan unidades con
+                seña y, al cruzar el MOQ, todos pagan el mejor precio.
+              </p>
+              <div className="mt-8 grid grid-cols-3 gap-4">
+                {[
+                  { value: "Hasta 60%", label: "menos" },
+                  { value: "30%", label: "seña" },
+                  { value: "+200", label: "compradores" },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="rounded-2xl bg-secondary/60 px-4 py-5"
+                  >
+                    <p className="text-2xl font-extrabold tracking-tight">
+                      {stat.value}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-border shadow-soft">
+                <Image
+                  src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1200&q=80"
+                  alt="Mercado uruguayo"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+            </Reveal>
+          </div>
+        </Container>
+      </section>
+
+      {/* ====================== ATIVIDADES / LÍNEAS ====================== */}
+      <section
+        id="lineas"
+        className="relative isolate overflow-hidden border-t border-border bg-dots"
+      >
+        <BlobDivider
+          variant="top-left"
+          shape={2}
+          className="fill-primary/15"
+        />
+        <Container className="py-24 sm:py-32">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
+              <span className="rounded-full bg-primary px-3 py-1">
+                Nuestras 4 líneas
+              </span>
+            </p>
+            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
+              Una plataforma,{" "}
+              <span className="text-highlight">cuatro formas</span> de moverte
+            </h2>
+            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+              Comprás, vendés o ganás comisión. Elegís cómo participar.
+            </p>
+          </Reveal>
+
+          <Stagger className="mt-16 grid gap-6 sm:grid-cols-2">
+            {activities.map((activity) => (
+              <StaggerItem key={activity.id}>
+                <div id={activity.id} className="scroll-mt-24">
+                  <ActivityCard data={activity} />
+                </div>
               </StaggerItem>
             ))}
           </Stagger>
         </Container>
       </section>
 
-      {/* ====================== 4 LÍNEAS DE NEGOCIO ====================== */}
-      <section
-        id="lineas"
-        className="relative isolate overflow-hidden border-y border-border bg-secondary/40 py-24 sm:py-32"
-      >
-        <BlobDivider variant="top-left" shape={3} />
-        <Container>
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              Nuestras 4 líneas
-            </p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-              Una plataforma, cuatro formas de moverte
-            </h2>
-            <p className="mt-5 text-base text-muted-foreground">
-              Compras, vendés o ganás comisión. Elegís cómo participar según el
-              momento.
-            </p>
-          </Reveal>
-
-          <div className="mt-20 space-y-20 sm:space-y-28">
-            {businessLines.map((line, idx) => {
-              const reverse = idx % 2 === 1;
-              return (
-                <article
-                  key={line.id}
-                  id={line.id}
-                  className="grid scroll-mt-24 gap-12 lg:grid-cols-2 lg:items-center lg:gap-20"
-                >
-                  <Reveal
-                    className={cn(
-                      "relative",
-                      reverse ? "lg:order-2" : "lg:order-1",
-                    )}
-                  >
-                    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-border bg-muted shadow-soft">
-                      <Image
-                        src={line.image}
-                        alt={line.title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="object-cover transition-transform duration-[1200ms] ease-out hover:scale-105"
-                      />
-                    </div>
-                    <div className="absolute -bottom-5 -right-4 hidden rounded-2xl border border-border bg-card px-4 py-3 shadow-soft animate-float-slower sm:block">
-                      <p className="text-xs font-medium uppercase tracking-wider text-primary">
-                        {line.eyebrow}
-                      </p>
-                    </div>
-                  </Reveal>
-
-                  <Reveal
-                    delay={0.1}
-                    className={cn(reverse ? "lg:order-1" : "lg:order-2")}
-                  >
-                    <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary lg:hidden">
-                      {line.eyebrow}
-                    </p>
-                    <h3 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl lg:mt-0">
-                      {line.title}
-                    </h3>
-                    <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                      {line.short}
-                    </p>
-
-                    <div className="mt-8">
-                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        Cómo funciona
-                      </p>
-                      <Accordion items={line.details} className="mt-3" />
-                    </div>
-
-                    <Link
-                      href={line.href}
-                      className={cn(
-                        buttonVariants({ size: "lg" }),
-                        "mt-8 h-12 px-7 text-base",
-                      )}
-                    >
-                      Explorar {line.title.split(" ")[0].toLowerCase()}
-                      <ArrowRight className="size-4" aria-hidden />
-                    </Link>
-                  </Reveal>
-                </article>
-              );
-            })}
-          </div>
-        </Container>
-      </section>
-
-      {/* ====================== CÓMO FUNCIONA (campaña) ====================== */}
-      <section className="py-24 sm:py-32">
-        <Container>
-          <div className="grid gap-14 lg:grid-cols-[1fr_1.2fr] lg:items-center lg:gap-20">
-            <Reveal className="order-2 lg:order-1">
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-muted shadow-soft">
-                <Image
-                  src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1200&q=80"
-                  alt="Personas en un mercado uruguayo eligiendo productos"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 45vw"
-                  className="object-cover"
-                />
-              </div>
-            </Reveal>
-
-            <div className="order-1 lg:order-2">
-              <Reveal>
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-                  El método
-                </p>
-                <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                  Tres pasos para comprar mayorista
-                </h2>
-                <p className="mt-5 text-base text-muted-foreground">
-                  Lo que antes sólo veían las grandes importadoras, ahora
-                  también podés acceder vos.
-                </p>
-              </Reveal>
-
-              <Stagger className="mt-10 space-y-px overflow-hidden rounded-2xl border border-border bg-border/60">
-                {howItWorksSteps.map((step) => (
-                  <StaggerItem
-                    key={step.n}
-                    className="relative bg-background p-6"
-                  >
-                    <div className="flex items-start gap-5">
-                      <p className="font-mono text-2xl font-semibold tracking-tight text-primary">
-                        {step.n}
-                      </p>
-                      <div>
-                        <h3 className="text-lg font-semibold tracking-tight">
-                          {step.title}
-                        </h3>
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                          {step.description}
-                        </p>
-                      </div>
-                    </div>
-                  </StaggerItem>
-                ))}
-              </Stagger>
-            </div>
-          </div>
-        </Container>
-      </section>
-
       {/* ====================== CAMPAÑAS DESTACADAS ====================== */}
-      <section className="relative isolate overflow-hidden border-t border-border py-24 sm:py-32">
-        <BlobDivider variant="top-right" shape={2} />
+      <section className="py-24 sm:py-32">
         <Container>
           <Reveal className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-                Activas ahora
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
+                <span className="rounded-full bg-primary px-3 py-1">
+                  Activas ahora
+                </span>
               </p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+              <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
                 Campañas en curso
               </h2>
             </div>
             <Link
               href="/campanas"
-              className="group inline-flex items-center gap-1.5 text-sm font-medium text-foreground/90 transition-colors hover:text-foreground"
+              className="group inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold transition-colors hover:border-primary/40"
             >
               Ver todas
               <ArrowUpRight
@@ -685,7 +651,7 @@ export default async function HomePage() {
           {featuredCampaigns.length === 0 ? (
             <Reveal delay={0.1} className="mt-12">
               <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
-                <p className="text-lg font-medium">
+                <p className="text-lg font-bold">
                   Estamos preparando las primeras campañas
                 </p>
                 <p className="mt-3 text-sm text-muted-foreground">
@@ -693,11 +659,11 @@ export default async function HomePage() {
                   leer{" "}
                   <Link
                     href="/como-funciona"
-                    className="font-medium text-primary underline-offset-4 hover:underline"
+                    className="font-semibold text-primary-foreground/90 underline underline-offset-4"
                   >
                     cómo funciona el sistema
-                  </Link>{" "}
-                  para llegar listo.
+                  </Link>
+                  .
                 </p>
               </div>
             </Reveal>
@@ -713,23 +679,118 @@ export default async function HomePage() {
         </Container>
       </section>
 
+      {/* ====================== EVENTOS DE GRUPO ====================== */}
+      <section
+        id="grupos"
+        className="relative isolate overflow-hidden border-t border-border bg-secondary/40"
+      >
+        <BlobDivider
+          variant="top-right"
+          shape={1}
+          className="fill-primary/15"
+        />
+        <Container className="py-24 sm:py-32">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
+              <span className="rounded-full bg-primary px-3 py-1">
+                Compras en grupo
+              </span>
+            </p>
+            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
+              Empresas, instituciones e importadores
+            </h2>
+            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+              ¿Necesitás un volumen mayor o tenés tu propia red de compradores?
+              Acá tenés opciones a medida.
+            </p>
+          </Reveal>
+
+          <Stagger className="mt-16 grid gap-6 sm:grid-cols-3">
+            {events.map((event) => (
+              <StaggerItem key={event.title}>
+                <Link
+                  href={event.href}
+                  className="hover-lift group block h-full rounded-3xl border border-border bg-card p-8 shadow-soft transition-colors hover:border-primary/40"
+                >
+                  <div className="flex size-12 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
+                    <event.icon className="size-5" aria-hidden />
+                  </div>
+                  <h3 className="mt-6 text-xl font-extrabold tracking-tight">
+                    {event.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {event.description}
+                  </p>
+                  <p className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-primary-foreground/90 transition-transform group-hover:translate-x-0.5">
+                    Saber más
+                    <ArrowRight className="size-3.5" aria-hidden />
+                  </p>
+                </Link>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </Container>
+      </section>
+
+      {/* ====================== FAQs ====================== */}
+      <section
+        id="faqs"
+        className="relative isolate overflow-hidden border-t border-border"
+      >
+        <BlobDivider
+          variant="bottom-left"
+          shape={3}
+          className="fill-primary/15"
+        />
+        <Container className="py-24 sm:py-32">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
+              <span className="rounded-full bg-primary px-3 py-1">
+                Preguntas frecuentes
+              </span>
+            </p>
+            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
+              ¿Te queda alguna duda?
+            </h2>
+            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+              Las respuestas a lo que más nos preguntan, agrupadas por tema.
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.15} className="mx-auto mt-12 max-w-3xl">
+            <Tabs
+              tabs={faqTabs.map((t) => ({
+                id: t.id,
+                label: t.label,
+                content: <Accordion items={t.items} />,
+              }))}
+            />
+          </Reveal>
+        </Container>
+      </section>
+
       {/* ====================== TESTIMONIOS ====================== */}
       <section
         id="testimonios"
-        className="relative isolate overflow-hidden border-y border-border bg-card/40 py-24 sm:py-32"
+        className="relative isolate overflow-hidden border-t border-border bg-secondary/30"
       >
-        <BlobDivider variant="bottom-right" shape={3} className="fill-accent/50" />
-        <Container>
+        <BlobDivider
+          variant="top-right"
+          shape={2}
+          className="fill-primary/15"
+        />
+        <Container className="py-24 sm:py-32">
           <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              Lo que dicen los nuestros
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
+              <span className="rounded-full bg-primary px-3 py-1">
+                Testimonios
+              </span>
             </p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-              Compradores y vendedores reales
+            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
+              Lo que dicen los nuestros
             </h2>
-            <p className="mt-5 text-base text-muted-foreground">
-              Personas comunes de Paysandú, Montevideo, Salto y todo el país
-              que ya viven el modelo.
+            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+              Compradores y vendedores reales de todo Uruguay.
             </p>
           </Reveal>
 
@@ -748,206 +809,94 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* ====================== POR QUÉ ====================== */}
-      <section className="relative isolate overflow-hidden py-24 sm:py-32">
-        <BlobDivider variant="top-left" shape={1} />
-        <Container>
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              Por qué Mercado Nuestro
-            </p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-              La primera plataforma uruguaya de compra colaborativa
-            </h2>
-          </Reveal>
-
-          <Stagger className="mx-auto mt-16 grid max-w-5xl gap-5 sm:grid-cols-2">
-            {valueProps.map((item) => (
-              <StaggerItem key={item.title}>
-                <div className="hover-lift group relative h-full overflow-hidden rounded-2xl border border-border bg-card p-8 transition-colors hover:border-primary/30">
-                  <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-inset ring-primary/20">
-                    <item.icon className="size-5" aria-hidden />
-                  </div>
-                  <h3 className="mt-6 text-lg font-semibold tracking-tight">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {item.description}
-                  </p>
-                </div>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </Container>
-      </section>
-
-      {/* ====================== FAQ TABBED ====================== */}
+      {/* ====================== PRECIOS (Preçário) ====================== */}
       <section
-        id="faqs"
-        className="border-t border-border bg-secondary/40 py-24 sm:py-32"
+        id="precios"
+        className="relative isolate overflow-hidden border-t border-border"
       >
-        <Container>
+        <BlobDivider
+          variant="bottom-right"
+          shape={1}
+          className="fill-primary/15"
+        />
+        <Container className="py-24 sm:py-32">
           <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              Preguntas frecuentes
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
+              <span className="rounded-full bg-primary px-3 py-1">
+                Precios
+              </span>
             </p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-              ¿Te queda alguna duda?
+            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
+              Cuanto más reservamos,{" "}
+              <span className="text-highlight">menos pagamos</span>
             </h2>
-            <p className="mt-5 text-base text-muted-foreground">
-              Las respuestas a lo que más nos preguntan, agrupadas por tema.
+            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+              Ejemplos reales de escalones de precio según categoría. Los
+              precios finales dependen del proveedor y del volumen efectivo.
             </p>
           </Reveal>
 
-          <Reveal delay={0.15} className="mx-auto mt-12 max-w-3xl">
-            <Tabs
-              tabs={faqTabs.map((t) => ({
-                id: t.id,
-                label: t.label,
-                content: <Accordion items={t.items} />,
-              }))}
-            />
+          <Reveal delay={0.15} className="mx-auto mt-14 max-w-5xl">
+            <PricingTabs />
           </Reveal>
         </Container>
       </section>
 
-      {/* ====================== VISITANOS PAYSANDÚ ====================== */}
-      <section className="relative isolate overflow-hidden py-24 sm:py-32">
-        <BlobDivider variant="bottom-left" shape={2} />
-        <Container>
-          <div className="grid gap-12 rounded-3xl border border-border bg-card p-10 shadow-soft sm:p-14 lg:grid-cols-[1fr_1.2fr] lg:items-center lg:gap-20 lg:p-20">
+      {/* ====================== RESERVAR (form inline) ====================== */}
+      <section
+        id="reservar"
+        className="relative isolate overflow-hidden border-y border-border bg-primary/8"
+      >
+        <BlobDivider
+          variant="top-left"
+          shape={2}
+          className="fill-primary/30"
+        />
+        <BlobDivider
+          variant="bottom-right"
+          shape={3}
+          className="fill-primary/20"
+        />
+        <Container className="py-24 sm:py-32">
+          <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
             <Reveal>
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-                Local físico
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
+                <span className="rounded-full bg-primary px-3 py-1">
+                  Empezar
+                </span>
               </p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                Visitanos en Paysandú
+              <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
+                Sumate a la primera campaña
               </h2>
-              <p className="mt-5 text-base text-muted-foreground">
-                Mercado Nuestro no es solo una web: tenemos local abierto al
-                público para retirar pedidos, probar productos y conocer al
-                equipo.
+              <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+                Crear cuenta es gratis, lleva menos de un minuto y no te
+                compromete a nada. Mirá todo antes de reservar.
               </p>
 
-              <dl className="mt-10 space-y-5">
-                <div className="flex items-start gap-3">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <MapPin className="size-4" aria-hidden />
+              <div className="mt-10 space-y-4 text-sm">
+                {[
+                  { icon: MapPin, label: "Leandro Gómez 1076, Paysandú" },
+                  { icon: Clock, label: "Lun-Vie 9:00-18:00 · Sáb 9:00-13:00" },
+                  { icon: Phone, label: "hola@mercadonuestro.uy" },
+                  {
+                    icon: ShoppingBasket,
+                    label: "Pago seguro vía Mercado Pago",
+                  },
+                ].map((line) => (
+                  <div key={line.label} className="flex items-center gap-3">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+                      <line.icon className="size-4" aria-hidden />
+                    </div>
+                    {line.label}
                   </div>
-                  <div>
-                    <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Dirección
-                    </dt>
-                    <dd className="mt-0.5 text-sm">
-                      Leandro Gómez 1076, Paysandú
-                    </dd>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Clock className="size-4" aria-hidden />
-                  </div>
-                  <div>
-                    <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Horarios
-                    </dt>
-                    <dd className="mt-0.5 text-sm">
-                      Lun a vie · 9:00 a 18:00
-                    </dd>
-                    <dd className="text-sm">Sábados · 9:00 a 13:00</dd>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Phone className="size-4" aria-hidden />
-                  </div>
-                  <div>
-                    <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Contacto
-                    </dt>
-                    <dd className="mt-0.5 text-sm">
-                      hola@mercadonuestro.uy
-                    </dd>
-                  </div>
-                </div>
-              </dl>
-
-              <div className="mt-10 flex flex-wrap gap-3">
-                <Link
-                  href="/contacto"
-                  className={cn(buttonVariants({ size: "lg" }), "h-12 px-7")}
-                >
-                  Cómo llegar
-                  <ArrowRight className="size-4" aria-hidden />
-                </Link>
-                <Link
-                  href="/disponible"
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "lg" }),
-                    "h-12 px-7",
-                  )}
-                >
-                  Ver stock en local
-                </Link>
+                ))}
               </div>
             </Reveal>
 
-            <Reveal delay={0.1}>
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-border bg-muted shadow-soft">
-                <Image
-                  src="https://images.unsplash.com/photo-1604754742629-3e5728249d73?auto=format&fit=crop&w=1200&q=80"
-                  alt="Local físico de Mercado Nuestro en Paysandú"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 45vw"
-                  className="object-cover transition-transform duration-[1200ms] ease-out hover:scale-105"
-                />
-              </div>
+            <Reveal delay={0.15}>
+              <QuickStartForm />
             </Reveal>
           </div>
-        </Container>
-      </section>
-
-      {/* ====================== CTA FINAL ====================== */}
-      <section className="py-24 sm:py-32">
-        <Container>
-          <Reveal>
-            <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
-              <div className="grid lg:grid-cols-[1.1fr_1fr]">
-                <div className="relative order-2 aspect-[5/4] lg:order-1 lg:aspect-auto">
-                  <Image
-                    src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&q=80"
-                    alt="Persona vendiendo desde su celular"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="order-1 flex flex-col justify-center p-10 sm:p-14 lg:order-2">
-                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-                    Programa de vendedores
-                  </p>
-                  <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                    ¿Querés generar ingresos vendiendo desde tu celular?
-                  </h2>
-                  <p className="mt-5 text-base text-muted-foreground">
-                    Sumate al programa de vendedores por catálogo. Compartís
-                    tu link y ganás comisión por cada venta, sin tener stock
-                    propio.
-                  </p>
-                  <Link
-                    href="/perfil/vendedor"
-                    className={cn(
-                      buttonVariants({ size: "lg" }),
-                      "mt-8 h-12 px-7 text-base self-start shadow-glow",
-                    )}
-                  >
-                    Conocer el programa
-                    <ArrowRight className="size-4" aria-hidden />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </Reveal>
         </Container>
       </section>
     </>

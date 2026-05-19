@@ -95,7 +95,7 @@ export default function ComoFuncionaPage() {
               </p>
               <h1 className="mt-6 text-5xl font-semibold tracking-tight sm:text-6xl">
                 Cómo funciona{" "}
-                <span className="text-gradient">Mercado Nuestro</span>
+                <span className="text-highlight">Mercado Nuestro</span>
               </h1>
               <p className="mt-8 text-lg text-muted-foreground sm:text-xl">
                 Nos juntamos entre muchas personas para importar productos al

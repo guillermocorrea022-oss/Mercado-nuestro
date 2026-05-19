@@ -49,72 +49,76 @@
 }
 
 :root {
-  /* Paleta light editorial inspirada en gluwz.be: blanco cálido + crema +
-     verde sage. Estética minimalista escandinava, mucho aire visual, sin
-     sombras agresivas. */
-  --background: oklch(0.985 0.006 85);
-  --foreground: oklch(0.22 0.01 60);
+  /* Paleta playful-action inspirada en funparquesaojoao.pt:
+     - Blanco puro como fondo (sin tinte cream)
+     - Lime green saturado y vibrante como primary (energía, deals, valor)
+     - Headings negros, alto contraste
+     - Border radius mayor para feel amigable
+     Adaptada a Mercado Nuestro (ventas + importación grupal):
+     verde brillante = "buen precio", confianza, frescura. */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0.01 240);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.01 60);
+  --card-foreground: oklch(0.18 0.01 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.01 60);
-  --primary: oklch(0.5 0.08 150);
-  --primary-foreground: oklch(0.99 0.005 90);
-  --secondary: oklch(0.96 0.02 80);
-  --secondary-foreground: oklch(0.3 0.02 60);
-  --muted: oklch(0.94 0.01 75);
-  --muted-foreground: oklch(0.5 0.01 60);
-  --accent: oklch(0.95 0.03 80);
-  --accent-foreground: oklch(0.35 0.06 150);
-  --destructive: oklch(0.55 0.2 25);
-  --border: oklch(0.9 0.01 75);
-  --input: oklch(0.93 0.01 75);
-  --ring: oklch(0.5 0.08 150);
-  --chart-1: oklch(0.5 0.08 150);
-  --chart-2: oklch(0.65 0.02 80);
-  --chart-3: oklch(0.75 0.05 75);
-  --chart-4: oklch(0.85 0.04 80);
-  --chart-5: oklch(0.92 0.02 80);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.98 0.008 85);
-  --sidebar-foreground: oklch(0.22 0.01 60);
-  --sidebar-primary: oklch(0.5 0.08 150);
-  --sidebar-primary-foreground: oklch(0.99 0.005 90);
-  --sidebar-accent: oklch(0.95 0.02 80);
-  --sidebar-accent-foreground: oklch(0.3 0.02 60);
-  --sidebar-border: oklch(0.9 0.01 75);
-  --sidebar-ring: oklch(0.5 0.08 150);
+  --popover-foreground: oklch(0.18 0.01 240);
+  --primary: oklch(0.78 0.2 140);
+  --primary-foreground: oklch(0.16 0.05 145);
+  --secondary: oklch(0.97 0.01 145);
+  --secondary-foreground: oklch(0.25 0.04 145);
+  --muted: oklch(0.97 0.005 240);
+  --muted-foreground: oklch(0.5 0.01 240);
+  --accent: oklch(0.95 0.06 140);
+  --accent-foreground: oklch(0.2 0.07 145);
+  --destructive: oklch(0.6 0.22 25);
+  --border: oklch(0.93 0.005 240);
+  --input: oklch(0.95 0.005 240);
+  --ring: oklch(0.78 0.2 140);
+  --chart-1: oklch(0.78 0.2 140);
+  --chart-2: oklch(0.86 0.15 140);
+  --chart-3: oklch(0.92 0.08 140);
+  --chart-4: oklch(0.7 0.13 195);
+  --chart-5: oklch(0.95 0.03 140);
+  --radius: 0.875rem;
+  --sidebar: oklch(0.99 0 0);
+  --sidebar-foreground: oklch(0.18 0.01 240);
+  --sidebar-primary: oklch(0.78 0.2 140);
+  --sidebar-primary-foreground: oklch(0.16 0.05 145);
+  --sidebar-accent: oklch(0.95 0.06 140);
+  --sidebar-accent-foreground: oklch(0.2 0.07 145);
+  --sidebar-border: oklch(0.93 0.005 240);
+  --sidebar-ring: oklch(0.78 0.2 140);
 }
 
 /* Dark mode mantenido por compatibilidad pero no se activa
    (el root layout fuerza light). */
 .dark {
-  --background: oklch(0.985 0.006 85);
-  --foreground: oklch(0.22 0.01 60);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0.01 240);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.01 60);
+  --card-foreground: oklch(0.18 0.01 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.01 60);
-  --primary: oklch(0.5 0.08 150);
-  --primary-foreground: oklch(0.99 0.005 90);
-  --secondary: oklch(0.96 0.02 80);
-  --secondary-foreground: oklch(0.3 0.02 60);
-  --muted: oklch(0.94 0.01 75);
-  --muted-foreground: oklch(0.5 0.01 60);
-  --accent: oklch(0.95 0.03 80);
-  --accent-foreground: oklch(0.35 0.06 150);
-  --destructive: oklch(0.55 0.2 25);
-  --border: oklch(0.9 0.01 75);
-  --input: oklch(0.93 0.01 75);
-  --ring: oklch(0.5 0.08 150);
-  --sidebar: oklch(0.98 0.008 85);
-  --sidebar-foreground: oklch(0.22 0.01 60);
-  --sidebar-primary: oklch(0.5 0.08 150);
-  --sidebar-primary-foreground: oklch(0.99 0.005 90);
-  --sidebar-accent: oklch(0.95 0.02 80);
-  --sidebar-accent-foreground: oklch(0.3 0.02 60);
-  --sidebar-border: oklch(0.9 0.01 75);
-  --sidebar-ring: oklch(0.5 0.08 150);
+  --popover-foreground: oklch(0.18 0.01 240);
+  --primary: oklch(0.78 0.2 140);
+  --primary-foreground: oklch(0.16 0.05 145);
+  --secondary: oklch(0.97 0.01 145);
+  --secondary-foreground: oklch(0.25 0.04 145);
+  --muted: oklch(0.97 0.005 240);
+  --muted-foreground: oklch(0.5 0.01 240);
+  --accent: oklch(0.95 0.06 140);
+  --accent-foreground: oklch(0.2 0.07 145);
+  --destructive: oklch(0.6 0.22 25);
+  --border: oklch(0.93 0.005 240);
+  --input: oklch(0.95 0.005 240);
+  --ring: oklch(0.78 0.2 140);
+  --sidebar: oklch(0.99 0 0);
+  --sidebar-foreground: oklch(0.18 0.01 240);
+  --sidebar-primary: oklch(0.78 0.2 140);
+  --sidebar-primary-foreground: oklch(0.16 0.05 145);
+  --sidebar-accent: oklch(0.95 0.06 140);
+  --sidebar-accent-foreground: oklch(0.2 0.07 145);
+  --sidebar-border: oklch(0.93 0.005 240);
+  --sidebar-ring: oklch(0.78 0.2 140);
 }
 
 @layer base {
@@ -132,55 +136,75 @@
   /* Headings con tracking ajustado para el feel premium. */
   h1, h2, h3 {
     letter-spacing: -0.025em;
+    font-weight: 800;
   }
   h1 {
-    letter-spacing: -0.04em;
+    letter-spacing: -0.035em;
   }
 }
 
 @layer utilities {
-  /* Texto con gradiente sutil para acentos del hero (en light). */
-  .text-gradient {
-    background: linear-gradient(
-      180deg,
-      oklch(0.22 0.01 60) 0%,
-      oklch(0.5 0.08 150) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+  /* Highlight de texto con marca verde para acentos puntuales en h1.
+     Estilo FUN Parque: la palabra clave queda subrayada con verde
+     fuerte (no gradient sutil). */
+  .text-highlight {
+    color: oklch(0.4 0.15 145);
+    position: relative;
+    white-space: nowrap;
+  }
+  .text-highlight::after {
+    content: "";
+    position: absolute;
+    left: -0.05em;
+    right: -0.05em;
+    bottom: 0.05em;
+    height: 0.45em;
+    background: var(--primary);
+    z-index: -1;
+    border-radius: 0.25em;
+    opacity: 0.55;
   }
 
-  /* Overlay sutil de grano para fondos editoriales. Casi imperceptible. */
+  /* Pattern repetitivo sutil tipo Patern.png del FUN Parque — puntitos
+     verdes muy claros sobre fondo blanco. */
+  .bg-dots {
+    background-image:
+      radial-gradient(
+        oklch(0.78 0.2 140 / 0.18) 1.2px,
+        transparent 1.2px
+      );
+    background-size: 18px 18px;
+  }
+
+  /* Overlay sutil de grano para fondos (mantenido para compat). */
   .bg-grain {
     background-image:
       radial-gradient(
-        oklch(0 0 0 / 0.025) 1px,
+        oklch(0 0 0 / 0.018) 1px,
         transparent 1px
       );
     background-size: 4px 4px;
   }
 
-  /* Sombra suave estilo papel para CTAs (sin glow agresivo). */
+  /* Sombra colorida estilo "lift" (para CTAs primarios). */
   .shadow-glow {
     box-shadow:
-      0 1px 2px oklch(0.22 0.01 60 / 0.06),
-      0 8px 24px oklch(0.5 0.08 150 / 0.08);
+      0 8px 24px oklch(0.78 0.2 140 / 0.35);
   }
 
-  /* Border luminoso muy sutil (tipo Apple). */
+  /* Border luminoso muy sutil. */
   .border-glow {
     box-shadow:
       inset 0 1px 0 0 oklch(1 0 0 / 0.7),
-      0 1px 2px oklch(0.22 0.01 60 / 0.04);
+      0 1px 2px oklch(0.18 0.01 240 / 0.04);
   }
 
-  /* Sombra suave para cards (editorial). */
+  /* Sombra para cards — un poco más visible que antes para el feel
+     playful. */
   .shadow-soft {
     box-shadow:
-      0 1px 2px oklch(0.22 0.01 60 / 0.04),
-      0 4px 12px oklch(0.22 0.01 60 / 0.04);
+      0 1px 2px oklch(0.18 0.01 240 / 0.05),
+      0 8px 24px oklch(0.18 0.01 240 / 0.06);
   }
 
   /* Animación lenta de flotación para blob decorations (FUN Parque feel). */
@@ -218,10 +242,10 @@
                 box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .hover-lift:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
     box-shadow:
-      0 2px 4px oklch(0.22 0.01 60 / 0.05),
-      0 16px 40px oklch(0.5 0.08 150 / 0.1);
+      0 4px 8px oklch(0.18 0.01 240 / 0.06),
+      0 24px 48px oklch(0.78 0.2 140 / 0.18);
   }
 
   /* Reduced motion: matar todas las animaciones de adorno. */

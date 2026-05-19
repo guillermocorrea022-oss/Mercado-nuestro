@@ -9,12 +9,11 @@ import { cn } from "@/lib/utils";
 import { Container } from "./Container";
 
 const navLinks = [
-  { href: "/campanas", label: "Campañas" },
-  { href: "/disponible", label: "Disponible" },
-  { href: "/marketplace", label: "Marketplace" },
-  { href: "/#lineas", label: "Cómo trabajamos" },
-  { href: "/#testimonios", label: "Testimonios" },
+  { href: "/#sobre", label: "Sobre" },
+  { href: "/#lineas", label: "Líneas" },
+  { href: "/#grupos", label: "Grupos" },
   { href: "/#faqs", label: "FAQs" },
+  { href: "/#testimonios", label: "Testimonios" },
 ];
 
 export async function Header() {
@@ -111,22 +110,22 @@ export async function Header() {
             ) : (
               <>
                 <Link
-                  href="/login"
+                  href="/#precios"
                   className={cn(
-                    buttonVariants({ variant: "ghost", size: "sm" }),
-                    "hidden sm:inline-flex",
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    "hidden font-semibold sm:inline-flex",
                   )}
                 >
-                  Entrar
+                  Precios
                 </Link>
                 <Link
-                  href="/registro"
+                  href="/#reservar"
                   className={cn(
                     buttonVariants({ size: "sm" }),
-                    "shadow-glow",
+                    "font-semibold shadow-glow",
                   )}
                 >
-                  Crear cuenta
+                  Reservar
                 </Link>
               </>
             )}
