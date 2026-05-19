@@ -391,24 +391,25 @@ export default async function HomePage() {
         />
 
         <Container className="flex min-h-[92vh] flex-col justify-between pt-10 pb-12 sm:pt-14 sm:pb-16">
-          {/* Headline central gigante */}
+          {/* Headline gigante en 2 lineas — exactamente como el FUN Parque
+              ("EXPLORA A ESSENCIA DA NATUREZA / EM SAO JOAO DA CAPARICA"). */}
           <Reveal
             delay={0.15}
-            className="mx-auto mt-24 max-w-6xl text-center sm:mt-32"
+            className="mt-24 w-full text-center sm:mt-28"
           >
-            <h1 className="font-extrabold uppercase leading-[0.92] tracking-tight text-white text-[2.75rem] sm:text-[5rem] lg:text-[7rem]">
-              Importá en grupo,
-              <br />
-              pagá{" "}
-              <span className="text-primary">precio mayorista</span>
+            <h1 className="font-extrabold uppercase leading-[0.95] tracking-tight text-white whitespace-nowrap text-[clamp(2.25rem,8vw,8rem)]">
+              <span className="block">Importá en grupo,</span>
+              <span className="block">
+                pagá <span className="text-primary">precio mayorista</span>
+              </span>
             </h1>
 
-            <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
               Sumate a campañas de importación con otros uruguayos y conseguí
               productos al precio que paga un importador grande.
             </p>
 
-            <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
                 href="#precios"
                 className={cn(
@@ -617,38 +618,35 @@ export default async function HomePage() {
       </section>
 
       {/* ====================== ATIVIDADES / LÍNEAS ======================
-          Stacked cards: cada card queda sticky en su lugar mientras la
-          siguiente sube desde abajo y la cubre. Las cards mas viejas se
-          van apagando suavemente. Es la señal visual del FUN Parque. */}
+          Headline GIGANTE arriba sobre fondo oscuro (estilo FUN Parque
+          "DIVIRTA-SE COM AS NOSSAS EXPERIENCIAS EXCLUSIVAS").
+          Despues, stacked cards FULL-WIDTH 3 columnas. */}
       <section
         id="lineas"
-        className="relative isolate overflow-hidden border-t border-border bg-dots"
+        className="relative isolate overflow-hidden bg-foreground text-white"
       >
         <BlobDivider
-          variant="top-left"
+          variant="top-right"
           shape={2}
-          className="fill-primary/15"
+          className="fill-primary/20"
         />
-        <Container className="pt-24 pb-12 sm:pt-32 sm:pb-16">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
-              <span className="rounded-full bg-primary px-3 py-1">
-                Nuestras 4 líneas
+        <Container className="pt-24 pb-16 sm:pt-32 sm:pb-20">
+          <Reveal className="mx-auto max-w-6xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em]">
+              <span className="rounded-full bg-primary px-3 py-1 text-primary-foreground">
+                Atividades
               </span>
             </p>
-            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Una plataforma,{" "}
-              <span className="text-highlight">cuatro formas</span> de moverte
+            <h2 className="mt-6 font-extrabold uppercase leading-[0.92] tracking-tight text-white text-[clamp(2rem,7vw,6.5rem)]">
+              Sumate a nuestras{" "}
+              <span className="text-primary">cuatro líneas</span> de negocio
             </h2>
-            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-              Comprás, vendés o ganás comisión. Cada card se queda mientras
-              scrolleás — mirá las 4 antes de elegir.
-            </p>
           </Reveal>
         </Container>
 
-        <Container className="pb-32 sm:pb-40">
-          <StackedCards>
+        {/* Stack de cards full width contra el fondo oscuro */}
+        <div className="px-4 pb-40 sm:px-8 sm:pb-48">
+          <StackedCards cardSpacing={90}>
             {activities.map((activity) => (
               <div
                 id={activity.id}
@@ -659,7 +657,7 @@ export default async function HomePage() {
               </div>
             ))}
           </StackedCards>
-        </Container>
+        </div>
       </section>
 
       {/* Marquee entre secciones */}
