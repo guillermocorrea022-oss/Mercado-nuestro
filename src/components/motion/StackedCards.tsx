@@ -49,7 +49,15 @@ export function StackedCards({
   const total = children.length;
 
   return (
-    <div ref={containerRef} className="relative">
+    // display: flow-root crea un nuevo block formatting context, lo cual
+    // EVITA que la marginBottom de la ultima card colapse hacia afuera del
+    // contenedor. Sin esto, el margin de la ultima card se escapaba y el
+    // contenedor no crecia, dejando sin runway de scroll a la ultima card.
+    <div
+      ref={containerRef}
+      className="relative"
+      style={{ display: "flow-root" }}
+    >
       {children.map((child, i) => (
         <StackCard
           key={i}
