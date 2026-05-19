@@ -33,12 +33,14 @@ export function ActivityCard({ data }: { data: ActivityCardData }) {
   return (
     <article
       className={cn(
-        "grid gap-0 overflow-hidden rounded-3xl border border-border bg-card shadow-soft",
+        // text-foreground reset para que no herede el text-white del bg-foreground
+        // padre (la seccion oscura en la que viven las cards apiladas).
+        "grid gap-0 overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-soft",
         "lg:grid-cols-[1.1fr_1fr_0.95fr]",
       )}
     >
       {/* LEFT — cream bg con titulo y descripcion */}
-      <div className="flex flex-col gap-6 bg-secondary/70 p-8 sm:p-12 lg:p-14 lg:min-h-[640px]">
+      <div className="flex flex-col gap-6 bg-secondary/70 p-8 text-foreground sm:p-12 lg:p-14 lg:min-h-[640px]">
         <span className="inline-flex w-fit items-center rounded-full bg-primary px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-primary-foreground shadow-glow">
           {data.badge}
         </span>
@@ -88,7 +90,7 @@ export function ActivityCard({ data }: { data: ActivityCardData }) {
       </div>
 
       {/* RIGHT — Como funciona con bullets, bg accent */}
-      <div className="flex flex-col gap-5 bg-accent p-8 sm:p-12 lg:p-14 lg:min-h-[640px]">
+      <div className="flex flex-col gap-5 bg-accent p-8 text-accent-foreground sm:p-12 lg:p-14 lg:min-h-[640px]">
         <h4 className="text-2xl font-extrabold uppercase leading-[0.95] tracking-tight text-accent-foreground sm:text-3xl">
           Cómo funciona
         </h4>

@@ -616,45 +616,55 @@ export default async function HomePage() {
       </section>
 
       {/* ====================== ATIVIDADES / LÍNEAS ======================
-          Headline GIGANTE arriba sobre fondo oscuro (estilo FUN Parque
-          "DIVIRTA-SE COM AS NOSSAS EXPERIENCIAS EXCLUSIVAS").
-          Despues, stacked cards FULL-WIDTH 3 columnas. */}
+          IMPORTANTE: overflow-visible en el section para que `sticky`
+          funcione (overflow-hidden en cualquier ancestro rompe sticky).
+          La blob decoration vive en un wrapper con overflow-hidden
+          INTERNO que NO contiene los stacked cards. */}
       <section
         id="lineas"
-        className="relative isolate overflow-hidden bg-foreground text-white"
+        className="relative bg-foreground text-white"
       >
-        <BlobDivider
-          variant="top-right"
-          shape={2}
-          className="fill-primary/20"
-        />
-        <Container className="pt-24 pb-16 sm:pt-32 sm:pb-20">
-          <Reveal className="mx-auto max-w-6xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em]">
-              <span className="rounded-full bg-primary px-3 py-1 text-primary-foreground">
-                Atividades
-              </span>
-            </p>
-            <h2 className="mt-6 font-extrabold uppercase leading-[0.92] tracking-tight text-white text-[clamp(2rem,7vw,6.5rem)]">
-              Sumate a nuestras{" "}
-              <span className="text-primary">cuatro líneas</span> de negocio
-            </h2>
-          </Reveal>
-        </Container>
+        {/* Wrapper de blob — overflow-hidden propio, NO envuelve las cards */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[600px] overflow-hidden"
+        >
+          <BlobDivider
+            variant="top-right"
+            shape={2}
+            className="fill-primary/20"
+          />
+        </div>
 
-        {/* Stack de cards full width contra el fondo oscuro */}
-        <div className="px-4 pb-40 sm:px-8 sm:pb-48">
-          <StackedCards spacing="40vh">
-            {activities.map((activity) => (
-              <div
-                id={activity.id}
-                key={activity.id}
-                className="scroll-mt-24"
-              >
-                <ActivityCard data={activity} />
-              </div>
-            ))}
-          </StackedCards>
+        <div className="relative z-10">
+          <Container className="pt-24 pb-16 sm:pt-32 sm:pb-20">
+            <Reveal className="mx-auto max-w-6xl text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.2em]">
+                <span className="rounded-full bg-primary px-3 py-1 text-primary-foreground">
+                  Líneas
+                </span>
+              </p>
+              <h2 className="mt-6 font-extrabold uppercase leading-[0.92] tracking-tight text-white text-[clamp(2rem,7vw,6.5rem)]">
+                Sumate a nuestras{" "}
+                <span className="text-primary">cuatro líneas</span> de negocio
+              </h2>
+            </Reveal>
+          </Container>
+
+          {/* Stack de cards full width contra el fondo oscuro */}
+          <div className="px-4 pb-40 sm:px-8 sm:pb-48">
+            <StackedCards spacing="40vh">
+              {activities.map((activity) => (
+                <div
+                  id={activity.id}
+                  key={activity.id}
+                  className="scroll-mt-24"
+                >
+                  <ActivityCard data={activity} />
+                </div>
+              ))}
+            </StackedCards>
+          </div>
         </div>
       </section>
 
