@@ -10,9 +10,6 @@ import {
   MapPin,
   Phone,
   ShoppingBasket,
-  Sparkles,
-  Star,
-  Truck,
   Users,
 } from "lucide-react";
 
@@ -29,7 +26,9 @@ import { QuickStartForm } from "@/components/home/QuickStartForm";
 import { TestimonialCard } from "@/components/home/TestimonialCard";
 import { Container } from "@/components/layout/Container";
 import { BlobDivider } from "@/components/motion/BlobDivider";
+import { Marquee } from "@/components/motion/Marquee";
 import { Reveal } from "@/components/motion/Reveal";
+import { StackedCards } from "@/components/motion/StackedCards";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Accordion } from "@/components/ui/accordion";
 import { buttonVariants } from "@/components/ui/button";
@@ -530,7 +529,9 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* ====================== SOBRE ====================== */}
+      {/* ====================== SOBRE — layout sticky asimétrico ======
+          Imagen del lado izquierdo se queda fija mientras el texto del
+          derecho scrollea. Cada bloque de texto entra con Reveal. */}
       <section id="sobre" className="relative isolate overflow-hidden">
         <BlobDivider
           variant="bottom-right"
@@ -538,46 +539,8 @@ export default async function HomePage() {
           className="fill-primary/12"
         />
         <Container className="py-24 sm:py-32">
-          <div className="grid items-center gap-16 lg:grid-cols-2">
-            <Reveal>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
-                <span className="rounded-full bg-primary px-3 py-1">
-                  Quiénes somos
-                </span>
-              </p>
-              <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
-                La primera plataforma uruguaya de{" "}
-                <span className="text-highlight">compra colaborativa</span>
-              </h2>
-              <p className="mt-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Nacimos en Paysandú con la idea de que el acceso a precios de
-                importación al por mayor no debería ser un privilegio de las
-                grandes empresas. Funcionamos juntando demanda real: cada vez
-                que abrimos una campaña, los usuarios reservan unidades con
-                seña y, al cruzar el MOQ, todos pagan el mejor precio.
-              </p>
-              <div className="mt-8 grid grid-cols-3 gap-4">
-                {[
-                  { value: "Hasta 60%", label: "menos" },
-                  { value: "30%", label: "seña" },
-                  { value: "+200", label: "compradores" },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="rounded-2xl bg-secondary/60 px-4 py-5"
-                  >
-                    <p className="text-2xl font-extrabold tracking-tight">
-                      {stat.value}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.15}>
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
+            <div className="lg:sticky lg:top-28 lg:self-start">
               <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-border shadow-soft">
                 <Image
                   src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1200&q=80"
@@ -586,13 +549,77 @@ export default async function HomePage() {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover"
                 />
+                {/* Sticker rotado tipo FUN Parque */}
+                <div className="absolute -right-4 -top-4 rotate-12 rounded-full bg-primary px-4 py-2 text-xs font-extrabold uppercase tracking-wider text-primary-foreground shadow-glow">
+                  Made in Uruguay 🇺🇾
+                </div>
               </div>
-            </Reveal>
+            </div>
+
+            <div className="space-y-16">
+              <Reveal>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
+                  <span className="rounded-full bg-primary px-3 py-1">
+                    Quiénes somos
+                  </span>
+                </p>
+                <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+                  La primera plataforma uruguaya de{" "}
+                  <span className="text-highlight">compra colaborativa</span>
+                </h2>
+              </Reveal>
+
+              <Reveal delay={0.1}>
+                <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
+                  Nacimos en Paysandú con la idea de que el acceso a precios
+                  de importación al por mayor no debería ser un privilegio de
+                  las grandes empresas. Funcionamos juntando demanda real:
+                  cada vez que abrimos una campaña, los usuarios reservan
+                  unidades con seña y, al cruzar el MOQ, todos pagan el mejor
+                  precio.
+                </p>
+              </Reveal>
+
+              <Reveal delay={0.15}>
+                <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
+                  Operamos desde un local físico en Leandro Gómez 1076, con
+                  soporte en español, métodos de pago locales y entrega a
+                  todo Uruguay. Sumamos un marketplace de reventa entre
+                  vecinos y un programa de vendedores por catálogo para
+                  multiplicar nuestra red.
+                </p>
+              </Reveal>
+
+              <Reveal delay={0.2}>
+                <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                  {[
+                    { value: "Hasta 60%", label: "menos que tienda" },
+                    { value: "30%", label: "seña al reservar" },
+                    { value: "+200", label: "compradores activos" },
+                  ].map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="rounded-2xl bg-secondary px-4 py-5"
+                    >
+                      <p className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                        {stat.value}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {stat.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
           </div>
         </Container>
       </section>
 
-      {/* ====================== ATIVIDADES / LÍNEAS ====================== */}
+      {/* ====================== ATIVIDADES / LÍNEAS ======================
+          Stacked cards: cada card queda sticky en su lugar mientras la
+          siguiente sube desde abajo y la cubre. Las cards mas viejas se
+          van apagando suavemente. Es la señal visual del FUN Parque. */}
       <section
         id="lineas"
         className="relative isolate overflow-hidden border-t border-border bg-dots"
@@ -602,7 +629,7 @@ export default async function HomePage() {
           shape={2}
           className="fill-primary/15"
         />
-        <Container className="py-24 sm:py-32">
+        <Container className="pt-24 pb-12 sm:pt-32 sm:pb-16">
           <Reveal className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
               <span className="rounded-full bg-primary px-3 py-1">
@@ -614,21 +641,40 @@ export default async function HomePage() {
               <span className="text-highlight">cuatro formas</span> de moverte
             </h2>
             <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-              Comprás, vendés o ganás comisión. Elegís cómo participar.
+              Comprás, vendés o ganás comisión. Cada card se queda mientras
+              scrolleás — mirá las 4 antes de elegir.
             </p>
           </Reveal>
+        </Container>
 
-          <Stagger className="mt-16 grid gap-6 sm:grid-cols-2">
+        <Container className="pb-32 sm:pb-40">
+          <StackedCards>
             {activities.map((activity) => (
-              <StaggerItem key={activity.id}>
-                <div id={activity.id} className="scroll-mt-24">
-                  <ActivityCard data={activity} />
-                </div>
-              </StaggerItem>
+              <div
+                id={activity.id}
+                key={activity.id}
+                className="scroll-mt-24"
+              >
+                <ActivityCard data={activity} />
+              </div>
             ))}
-          </Stagger>
+          </StackedCards>
         </Container>
       </section>
+
+      {/* Marquee entre secciones */}
+      <Marquee
+        items={[
+          "Próxima campaña abre el 25 de mayo",
+          "Hasta 60% menos que tienda",
+          "Retiro gratis en Paysandú",
+          "Pago seguro Mercado Pago",
+          "Envío a todo Uruguay",
+        ]}
+        duration={45}
+        background="bg-accent"
+        textColor="text-accent-foreground"
+      />
 
       {/* ====================== CAMPAÑAS DESTACADAS ====================== */}
       <section className="py-24 sm:py-32">
