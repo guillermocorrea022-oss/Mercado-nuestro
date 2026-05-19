@@ -94,8 +94,10 @@ function StackCard({
     [1, targetScale],
   );
 
-  const isLast = index === total - 1;
-
+  // Todas las cards (incluida la ultima) reciben marginBottom para que
+  // tengan su propio "runway" de scroll donde quedan apiladas al frente.
+  // Sin esto, la ultima nunca se llega a pinnar porque el contenedor se
+  // termina justo donde termina su contenido.
   return (
     <motion.div
       style={{
@@ -104,7 +106,7 @@ function StackCard({
         zIndex: index + 1,
         scale,
         transformOrigin: "top center",
-        marginBottom: isLast ? undefined : spacing,
+        marginBottom: spacing,
       }}
     >
       {children}
