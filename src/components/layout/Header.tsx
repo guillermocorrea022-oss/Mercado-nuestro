@@ -11,8 +11,10 @@ import { Container } from "./Container";
 const navLinks = [
   { href: "/campanas", label: "Campañas" },
   { href: "/disponible", label: "Disponible" },
-  { href: "/como-funciona", label: "Cómo funciona" },
-  { href: "/ser-vendedor", label: "Ser vendedor" },
+  { href: "/marketplace", label: "Marketplace" },
+  { href: "/#lineas", label: "Cómo trabajamos" },
+  { href: "/#testimonios", label: "Testimonios" },
+  { href: "/#faqs", label: "FAQs" },
 ];
 
 export async function Header() {
