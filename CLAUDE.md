@@ -269,22 +269,79 @@ La plataforma opera bajo el nombre comercial **Mercado Nuestro** con local físi
   - **Tipos DB** extendidos: `commission_payouts`, `support_tickets`, `notification_preferences` agregados a Tables; `claims.appealed_at|appeal_reason`; 2 vistas nuevas; 10 RPCs en Functions.
   - **Build verde con 57 rutas** (era 47 antes).
 
+- **Fase 5: revamp visual completo al estilo funparquesaojoao.pt** (sesión actual):
+  - **Paleta nueva**: blanco puro `oklch(1 0 0)` + **lime green saturado** `oklch(0.78 0.2 140)` como primary (antes sage muteado). Acento verde claro. Foreground azul carbon. Border radius global subido a 0.875rem para feel playful. Sombras coloridas verdes en CTAs y hover-lift.
+  - **Tipografía**: cambio de Geist → **Plus Jakarta Sans** (humanist, rounded, friendly). Headings forzados a `font-weight: 800`.
+  - **Utilidades nuevas en globals.css**: `.text-highlight` (palabra subrayada en verde fuerte), `.bg-dots` (pattern Patern.png-like), `.hover-lift`, `animate-marquee`, `animate-float-slow`, `animate-float-slower`. Removida `.text-gradient`.
+  - **Componentes UI nuevos**:
+    - [BlobDivider](src/components/motion/BlobDivider.tsx) — 3 SVG blob shapes orgánicos × 5 posiciones, opcional float.
+    - [Accordion](src/components/ui/accordion.tsx) — con icono `+` que rota a `×`, animación motion.
+    - [Tabs](src/components/ui/tabs.tsx) — pill activo con `motion.layoutId` (magic-line).
+    - [StarRating](src/components/ui/star-rating.tsx) — 5 estrellas con fill parcial.
+    - [Marquee](src/components/motion/Marquee.tsx) — ticker horizontal infinito con items duplicados.
+    - [StackedCards](src/components/motion/StackedCards.tsx) — cards apiladas tipo Apple/Linear. Usa `display: flow-root` para prevenir margin collapse de la última card.
+  - **Componentes home**:
+    - [ActivityCard](src/components/home/ActivityCard.tsx) — layout horizontal full-width 3 columnas: LEFT (cream bg + título uppercase gigante + descripción + dual CTA) / CENTER (imagen) / RIGHT (accent bg + "Cómo funciona" + Incluye/No incluye). Estructura exacta del FUN Parque.
+    - [PricingTabs](src/components/home/PricingTabs.tsx) — Preçário tabbed con 4 categorías (Electrónica, Hogar, Indumentaria, Empresas) × tabla de 3 escalones con "MEJOR PRECIO" en el último.
+    - [QuickStartForm](src/components/home/QuickStartForm.tsx) — form Reservar inline con nombre + email + radio buttons de interés que redirige a `/registro` con params prefill.
+    - [TestimonialCard](src/components/home/TestimonialCard.tsx) — figure con quote, estrellas, blockquote.
+  - **Header isla flotante scroll-aware** ([FloatingHeaderShell](src/components/layout/FloatingHeaderShell.tsx) + [Header](src/components/layout/Header.tsx)):
+    - `position: fixed` centrado max-w-1100px, rounded-full, backdrop-blur.
+    - Scroll abajo > 80px → se oculta (`y: -130%`). Scroll arriba → reaparece.
+    - Cerca del top siempre visible. Sombra suave en top, sombra verde al separarse.
+    - CTAs: Precios outline + Reservar filled (estilo Preçário/Reservar del FUN Parque).
+  - **Home rediseñado** (`src/app/(public)/page.tsx`):
+    1. **HERO full-viewport oscuro** con imagen de contenedores, headline en 2 líneas con `clamp(2.25rem, 7vw, 7rem)`, "precio mayorista" en lime green, 2 CTAs centrados (Precios dark / Reservar outline).
+    2. **MARQUEE verde** corriendo al pie del hero (próxima campaña / 60% menos / retiro gratis / etc.).
+    3. **SOBRE** con imagen sticky-left + texto right en bloques escalonados con Reveal. Sticker "Made in Uruguay 🇺🇾" rotado 12°.
+    4. **LÍNEAS** (bg oscuro) con headline gigante "Sumate a nuestras cuatro líneas" + **StackedCards** (4 ActivityCards apiladas con deck-stack scroll). Cada card es 3-col horizontal: izquierda cream con título / imagen / accent verde con "Cómo funciona".
+    5. **MARQUEE accent** entre secciones.
+    6. **CAMPAÑAS DESTACADAS** (real data de Supabase).
+    7. **GRUPOS** — 3 cards (Empresas / Instituciones / Importadores avanzados).
+    8. **FAQs** tabbed (General / Campañas / Marketplace / Vendedores) × accordion.
+    9. **TESTIMONIOS** 3 cards.
+    10. **PRECIOS** (Preçário) — `PricingTabs` con tabla de escalones.
+    11. **RESERVAR** — form inline `QuickStartForm`.
+  - **Bug fixes importantes**:
+    - **Margin collapse en StackedCards**: la última card no se apilaba porque su `marginBottom` colapsaba hacia afuera del contenedor padre. Fix: `display: flow-root` en el container = nuevo block formatting context que impide el collapse.
+    - **Sticky positioning roto por overflow-hidden**: cualquier ancestro con `overflow: hidden` rompe `position: sticky`. Movido el `<BlobDivider>` a un wrapper aparte que no contiene los stacked cards.
+    - **Texto blanco invisible en cards**: la sección padre tenía `text-white` (bg oscuro) y eso heredaba hasta los hijos. Fix: `text-foreground` explícito en `<article>` y cada columna del ActivityCard.
+    - **Hero text overflow**: `Container` con `max-w-6xl` limitaba el ancho. Cambiado a div full-bleed con `max-w-[1500px]` en el h1 y `clamp` font-size.
+
 **Pendiente en cimientos técnicos:**
 - Conectar las features clave de Supabase Auth desde el dashboard: redirect URLs (`http://localhost:3000/auth/callback` para dev), Google OAuth provider (cuando se tengan client_id/secret), confirmar email habilitado.
 - Migraciones siguientes: marketplace (listings, orders, messages), orders unificadora + order_items + payments, vendedores por catálogo (catalog_links, attributions, sales, commission_tiers, payouts), reviews/ratings, wishlists, support_tickets/claims, notifications, settings, admin_actions_log.
 - Layout principal de `src/app/layout.tsx` con header/footer y tipografía del proyecto (preliminar: Inter o Geist; sin definir aún).
 - Smoke test: una página que lea `categories` (vacía) o `campaigns` para validar el cliente en ejecución.
 
-**Próxima funcionalidad a implementar:** Activar pagos reales con credenciales de Mercado Pago y emails reales con Resend. El código ya está estructurado en stubs ([src/lib/mercadopago/client.ts](src/lib/mercadopago/client.ts), [src/lib/email/send.ts](src/lib/email/send.ts)). Cuando lleguen las claves:
-1. Completar en `.env.local`: `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`, `RESEND_API_KEY`.
+**Estamos trabajando en (sesión actual):** Revamp visual del home completo siguiendo el estilo del FUN Parque (https://www.funparquesaojoao.pt/) — hero full-viewport oscuro, cards apiladas tipo Apple/Linear, navbar flotante scroll-aware, marquees, tabbed pricing, testimonios con estrellas. Funcionalmente todo el backend ya está; lo que se está iterando es **la capa visual del home** para que se parezca al referente.
+
+**Lo que falta en el revamp visual (siguiente paso):**
+- Aplicar las decisiones visuales (paleta lime, headings extra-bold, blob dividers, hover-lift) al RESTO de las páginas (`/campanas`, `/marketplace`, `/disponible`, `/producto/[slug]`, `/perfil/*`). Hoy solo el home tiene el nuevo lenguaje completo.
+- Refinar las tipografías y tamaños en mobile (revisar el clamp del headline en viewports angostos).
+- Reemplazar las fotos genéricas de Unsplash por fotos reales del local de Paysandú cuando estén disponibles.
+- Agregar imágenes finales de productos a Supabase Storage en lugar de placeholders.
+
+**Próxima funcionalidad de producto:** Activar pagos reales con credenciales de Mercado Pago y emails reales con Resend. El código ya está estructurado en stubs ([src/lib/mercadopago/client.ts](src/lib/mercadopago/client.ts), [src/lib/email/send.ts](src/lib/email/send.ts)). Cuando lleguen las claves:
+1. Completar en `.env.local`: `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`, `RESEND_API_KEY`, `CRON_SECRET`.
 2. Buscar los comentarios `TODO(MP)` y `TODO(resend)` y reemplazar las llamadas mock con SDK real.
 3. Hacer un signup + reserva real para validar end-to-end.
 
-**Pendientes Fase 2 que quedan**: panel revendedor (`/perfil/revendedor` con form para crear `marketplace_listings`, ver mis publicaciones y pedidos a despachar); compra real en marketplace con escrow (`createMarketplaceOrderAction` + flujo de despacho + liberación a 3 días sin reclamo); chat interno comprador-vendedor (`marketplace_messages`); WhatsApp via Twilio; verificación de teléfono SMS; promotor automático a `revendedor` cuando recibe 5+ unidades de una campaña (regla §2.5).
+**Pendientes operacionales para producción:**
+- Aplicar la migración SQL `20260518190000_phase4_full_cycle.sql` en el SQL Editor de Supabase (incluye las 10 RPCs nuevas: `pay_campaign_balance`, `refund_failed_campaign_reservation`, `extend_campaign`, `appeal_claim`, `auto_close_expired_campaigns`, `process_monthly_seller_payouts`, `purchase_inventory_item`, `compute_seller_monthly_bonus_pct`, `reservation_balance_cents`, y la columna `claims.appealed_at|appeal_reason` + 2 vistas).
+- Aplicar la migración `20260518180000_phase3_extras.sql` (sub-roles admin, phone verification, referidos) — había quedado en duda si se aplicó por crash del browser MCP.
+- Configurar Vercel Cron y settear `CRON_SECRET` en env vars de Vercel para que los crons `/api/cron/{close-expired-campaigns,release-escrow,process-payouts}` se autentiquen.
+- Conectar Supabase Auth desde el dashboard: redirect URLs (`http://localhost:3000/auth/callback` para dev), Google OAuth provider (cuando se tengan client_id/secret).
+- Generar tipos TypeScript de Supabase con `npx supabase gen types` cuando Docker esté disponible, para reemplazar los `cast as never` en queries.
 
-**Pendientes técnicos menores:** Google OAuth provider (cuando tengas client_id/secret de Google Cloud Console). Reemplazar los `cast as never` en queries de Supabase por tipos reales generados via `npx supabase gen types` cuando Docker esté disponible. Confirmar email opcional en Supabase Auth (hoy es obligatorio por default).
+**Pendientes técnicos menores:**
+- Subir cédulas a Supabase Storage en lugar del URL externo actual (decisión en docs/DECISIONS.md).
+- Confirmar email opcional en Supabase Auth (hoy es obligatorio por default).
+- Sentry para monitoreo de errores en producción.
+- CI/CD via GitHub Actions (workflows/ está vacío).
+- Carrito multi-item (decisión registrada en docs/DECISIONS.md: postergado para Fase 4 grande, los checkouts directos cubren el MVP).
 
-**Última decisión técnica tomada:** Para que el flujo monetario funcione end-to-end sin credenciales reales, se construyó un **modo stub completo** que reproduce el contrato de MP (checkout page + webhook handler) sin tocar el SDK real. Esto permite probar registro → reserva → "pago" → confirmación → notification → email de la app en local hoy mismo. Cuando lleguen las credenciales, el código que cambia está aislado en `src/lib/mercadopago/client.ts` (1 función) y `src/lib/email/send.ts` (1 función). Riesgo controlado: el resto del sistema no se entera de que el pago era mock.
+**Última decisión técnica tomada (sesión actual):** Para resolver que la última card no se apilaba en `StackedCards`, descubrí que el `marginBottom` de la última card estaba colapsando hacia afuera del contenedor padre (regla CSS de margin collapse). Sin runway de scroll, la sticky de la última card no se activaba. Fix: `display: flow-root` en el contenedor padre crea un block formatting context que impide el collapse. Alternativas descartadas: `overflow: hidden` rompe sticky, `padding-bottom` interfiere con `useScroll` offset, agregar border es un hack.
 
 ---
 

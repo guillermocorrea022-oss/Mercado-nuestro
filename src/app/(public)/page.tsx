@@ -372,7 +372,6 @@ export default async function HomePage() {
           - Headline gigante blanco encima, ultimas palabras en lime green
           - Dos CTAs centrados (Precios dark / Reservar outline blanco)
           - Marquee de notice corriendo abajo
-          - Card flotante "Operación 2026" abajo-derecha
       ============================================================== */}
       <section className="relative isolate min-h-[92vh] overflow-hidden bg-foreground text-white">
         {/* Imagen de fondo full-bleed */}
@@ -390,10 +389,8 @@ export default async function HomePage() {
           className="absolute inset-0 -z-10 bg-gradient-to-b from-foreground/55 via-foreground/40 to-foreground/65"
         />
 
-        {/* Hero full-bleed — sin Container para que el headline pueda
-            ocupar todo el ancho de la viewport como el FUN Parque. */}
-        <div className="flex min-h-[92vh] w-full flex-col justify-between px-6 pt-24 pb-12 sm:px-10 sm:pt-28 sm:pb-16">
-          {/* Headline gigante en 2 lineas — escala con vw. */}
+        {/* Contenido del hero — flex centrado vertical y horizontalmente */}
+        <div className="flex min-h-[92vh] w-full flex-col items-center justify-center px-6 pt-24 pb-16 sm:px-10 sm:pt-28">
           <Reveal delay={0.15} className="w-full text-center">
             <h1 className="mx-auto max-w-[1500px] font-extrabold uppercase leading-[0.92] tracking-tight text-white text-[clamp(2.25rem,7vw,7rem)]">
               <span className="block">Importá en grupo,</span>
@@ -402,70 +399,24 @@ export default async function HomePage() {
               </span>
             </h1>
 
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
+            <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
               Sumate a campañas de importación con otros uruguayos y conseguí
               productos al precio que paga un importador grande.
             </p>
 
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="#precios"
-                className={cn(
-                  "inline-flex h-12 items-center gap-2 rounded-full bg-foreground px-7 text-sm font-bold uppercase tracking-wide text-white transition-transform hover:-translate-y-0.5",
-                )}
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-foreground px-7 text-sm font-bold uppercase tracking-wide text-white transition-transform hover:-translate-y-0.5"
               >
                 Precios
               </Link>
               <Link
                 href="#reservar"
-                className={cn(
-                  "inline-flex h-12 items-center gap-2 rounded-full border-2 border-white bg-transparent px-7 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-foreground",
-                )}
+                className="inline-flex h-12 items-center gap-2 rounded-full border-2 border-white bg-transparent px-7 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-foreground"
               >
                 Reservar
               </Link>
-            </div>
-          </Reveal>
-
-          {/* Card flotante "Operación 2026" — esquina inferior derecha,
-              estilo "Horario 2026" del FUN Parque */}
-          <Reveal delay={0.3} className="ml-auto max-w-md">
-            <div className="grid gap-4 rounded-3xl bg-white/95 p-5 text-foreground shadow-soft backdrop-blur sm:grid-cols-[auto_1fr_1fr] sm:gap-6 sm:p-7">
-              <div className="flex items-center justify-center sm:justify-start">
-                <p className="font-extrabold uppercase leading-none tracking-tight text-foreground sm:text-2xl">
-                  Operación
-                  <br />
-                  <span className="text-3xl sm:text-4xl">2026</span>
-                </p>
-              </div>
-              <div className="border-l-0 border-t border-border pt-4 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
-                <p className="text-xs font-extrabold uppercase tracking-wider text-primary-foreground">
-                  <span className="rounded-full bg-primary px-2.5 py-1">
-                    Campañas
-                  </span>
-                </p>
-                <p className="mt-3 text-sm">
-                  <span className="font-bold">Todos los días</span>
-                  <br />
-                  <span className="text-muted-foreground">
-                    Reservás online 24/7
-                  </span>
-                </p>
-              </div>
-              <div className="border-l-0 border-t border-border pt-4 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
-                <p className="text-xs font-extrabold uppercase tracking-wider text-accent-foreground">
-                  <span className="rounded-full bg-accent px-2.5 py-1">
-                    Local
-                  </span>
-                </p>
-                <p className="mt-3 text-sm">
-                  <span className="font-bold">Lun-Vie 9-18 · Sáb 9-13</span>
-                  <br />
-                  <span className="text-muted-foreground">
-                    Paysandú, Uruguay
-                  </span>
-                </p>
-              </div>
             </div>
           </Reveal>
         </div>
