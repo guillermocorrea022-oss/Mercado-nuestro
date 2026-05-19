@@ -367,135 +367,143 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* ====================== HERO ====================== */}
-      <section className="relative isolate overflow-hidden bg-background">
-        <BlobDivider
-          variant="top-right"
-          shape={1}
-          className="fill-primary/20"
+      {/* ====================== HERO FULL-VIEWPORT ======================
+          Imitando funparquesaojoao.pt:
+          - Imagen oscura full-screen como fondo
+          - Headline gigante blanco encima, ultimas palabras en lime green
+          - Dos CTAs centrados (Precios dark / Reservar outline blanco)
+          - Marquee de notice corriendo abajo
+          - Card flotante "Operación 2026" abajo-derecha
+      ============================================================== */}
+      <section className="relative isolate min-h-[92vh] overflow-hidden bg-foreground text-white">
+        {/* Imagen de fondo full-bleed */}
+        <Image
+          src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=2400&q=80"
+          alt="Contenedores y cajas de importación llegando al puerto"
+          fill
+          sizes="100vw"
+          className="absolute inset-0 -z-10 object-cover"
+          priority
         />
-        <BlobDivider
-          variant="bottom-left"
-          shape={2}
-          className="fill-primary/15"
-          float
+        {/* Overlay para legibilidad */}
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-gradient-to-b from-foreground/55 via-foreground/40 to-foreground/65"
         />
 
-        <Container className="py-20 sm:py-28 lg:py-32">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
-            <div>
-              <Reveal>
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-accent-foreground">
-                  <Sparkles className="size-3.5" aria-hidden />
-                  Importación grupal · Uruguay
-                </div>
-              </Reveal>
+        <Container className="flex min-h-[92vh] flex-col justify-between pt-10 pb-12 sm:pt-14 sm:pb-16">
+          {/* Headline central gigante */}
+          <Reveal
+            delay={0.15}
+            className="mx-auto mt-24 max-w-6xl text-center sm:mt-32"
+          >
+            <h1 className="font-extrabold uppercase leading-[0.92] tracking-tight text-white text-[2.75rem] sm:text-[5rem] lg:text-[7rem]">
+              Importá en grupo,
+              <br />
+              pagá{" "}
+              <span className="text-primary">precio mayorista</span>
+            </h1>
 
-              <Reveal delay={0.1} className="mt-7">
-                <h1 className="text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-6xl lg:text-[5rem]">
-                  Importá <span className="text-highlight">en grupo</span>.
-                  <br />
-                  Pagá precio mayorista.
-                </h1>
-              </Reveal>
+            <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
+              Sumate a campañas de importación con otros uruguayos y conseguí
+              productos al precio que paga un importador grande.
+            </p>
 
-              <Reveal delay={0.2} className="mt-7">
-                <p className="max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-                  Sumate a campañas de importación con otros uruguayos y
-                  conseguí productos al precio que paga un importador grande.
-                  Sin trámites, sin viajes, con soporte local.
-                </p>
-              </Reveal>
-
-              <Reveal delay={0.3} className="mt-10">
-                <div className="flex flex-col items-start gap-3 sm:flex-row">
-                  <Link
-                    href="#precios"
-                    className={cn(
-                      buttonVariants({ size: "lg" }),
-                      "h-12 px-7 text-base shadow-glow",
-                    )}
-                  >
-                    Ver precios
-                    <ArrowRight className="size-4" aria-hidden />
-                  </Link>
-                  <Link
-                    href="#reservar"
-                    className={cn(
-                      buttonVariants({ variant: "outline", size: "lg" }),
-                      "h-12 px-7 text-base",
-                    )}
-                  >
-                    Empezar ahora
-                  </Link>
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.4} className="mt-10 flex items-center gap-3">
-                <div className="flex items-center -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <span
-                      key={i}
-                      className="inline-flex size-9 items-center justify-center rounded-full border-2 border-background bg-accent text-xs font-bold text-accent-foreground"
-                    >
-                      {["M", "C", "D", "S"][i - 1]}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-1.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className="size-4 fill-primary text-primary"
-                      aria-hidden
-                    />
-                  ))}
-                  <span className="ml-1 text-sm font-semibold">4.9/5</span>
-                  <span className="text-xs text-muted-foreground">
-                    · +200 reseñas
-                  </span>
-                </div>
-              </Reveal>
+            <div className="mt-10 flex flex-wrap justify-center gap-3">
+              <Link
+                href="#precios"
+                className={cn(
+                  "inline-flex h-12 items-center gap-2 rounded-full bg-foreground px-7 text-sm font-bold uppercase tracking-wide text-white transition-transform hover:-translate-y-0.5",
+                )}
+              >
+                Precios
+              </Link>
+              <Link
+                href="#reservar"
+                className={cn(
+                  "inline-flex h-12 items-center gap-2 rounded-full border-2 border-white bg-transparent px-7 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-foreground",
+                )}
+              >
+                Reservar
+              </Link>
             </div>
+          </Reveal>
 
-            <Reveal delay={0.15} className="relative">
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] border border-border bg-muted shadow-soft">
-                <Image
-                  src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80"
-                  alt="Cajas de importación apiladas listas para entrega"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                  priority
-                />
+          {/* Card flotante "Operación 2026" — esquina inferior derecha,
+              estilo "Horario 2026" del FUN Parque */}
+          <Reveal delay={0.3} className="ml-auto max-w-md">
+            <div className="grid gap-4 rounded-3xl bg-white/95 p-5 text-foreground shadow-soft backdrop-blur sm:grid-cols-[auto_1fr_1fr] sm:gap-6 sm:p-7">
+              <div className="flex items-center justify-center sm:justify-start">
+                <p className="font-extrabold uppercase leading-none tracking-tight text-foreground sm:text-2xl">
+                  Operación
+                  <br />
+                  <span className="text-3xl sm:text-4xl">2026</span>
+                </p>
               </div>
-              {/* Card flotante con el escalón actual */}
-              <div className="absolute -bottom-6 -left-4 hidden max-w-[280px] rounded-2xl border border-border bg-card p-5 shadow-soft animate-float-slower sm:block">
-                <p className="text-xs font-bold uppercase tracking-wider text-primary-foreground/90">
-                  <span className="rounded-full bg-primary px-2 py-0.5">
-                    Precio escalonado
+              <div className="border-l-0 border-t border-border pt-4 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+                <p className="text-xs font-extrabold uppercase tracking-wider text-primary-foreground">
+                  <span className="rounded-full bg-primary px-2.5 py-1">
+                    Campañas
                   </span>
                 </p>
-                <p className="mt-3 text-sm leading-snug">
-                  Cuanto más reservamos entre todos,{" "}
-                  <span className="font-bold">menos paga cada uno</span>. El
-                  mejor precio aplica para todos.
+                <p className="mt-3 text-sm">
+                  <span className="font-bold">Todos los días</span>
+                  <br />
+                  <span className="text-muted-foreground">
+                    Reservás online 24/7
+                  </span>
                 </p>
               </div>
-              {/* Card flotante con "Llega rápido" */}
-              <div className="absolute -top-4 -right-2 hidden rounded-2xl border border-border bg-card px-4 py-3 shadow-soft animate-float-slow sm:block">
-                <p className="flex items-center gap-2 text-xs font-bold">
-                  <Truck className="size-4 text-primary" aria-hidden />
-                  Envío a todo Uruguay
+              <div className="border-l-0 border-t border-border pt-4 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+                <p className="text-xs font-extrabold uppercase tracking-wider text-accent-foreground">
+                  <span className="rounded-full bg-accent px-2.5 py-1">
+                    Local
+                  </span>
+                </p>
+                <p className="mt-3 text-sm">
+                  <span className="font-bold">Lun-Vie 9-18 · Sáb 9-13</span>
+                  <br />
+                  <span className="text-muted-foreground">
+                    Paysandú, Uruguay
+                  </span>
                 </p>
               </div>
-            </Reveal>
-          </div>
+            </div>
+          </Reveal>
         </Container>
+
+        {/* Marquee scrolling abajo del hero — estilo "Encerrado" del FUN Parque */}
+        <div className="relative z-10 overflow-hidden border-y-2 border-primary bg-primary py-3 text-foreground">
+          <div className="flex whitespace-nowrap animate-marquee">
+            {Array.from({ length: 2 }).map((_, dup) => (
+              <div key={dup} className="flex shrink-0 items-center gap-12 pr-12">
+                {[
+                  "Próxima campaña abre el 25 de mayo",
+                  "★",
+                  "Hasta 60% menos que precio de tienda",
+                  "★",
+                  "Retiro gratis en Paysandú",
+                  "★",
+                  "Pago seguro con Mercado Pago",
+                  "★",
+                  "Envío a todo Uruguay",
+                  "★",
+                ].map((item, i) => (
+                  <span
+                    key={`${dup}-${i}`}
+                    className="text-sm font-extrabold uppercase tracking-wider"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ====================== HORARIO / OPERACIÓN ====================== */}
-      <section className="border-y border-border bg-secondary/40">
+      <section className="hidden border-y border-border bg-secondary/40">
         <Container className="py-6">
           <div className="grid items-center gap-4 sm:grid-cols-[auto_1fr_auto] sm:gap-8">
             <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-primary-foreground/90">
