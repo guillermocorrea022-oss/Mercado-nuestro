@@ -390,14 +390,12 @@ export default async function HomePage() {
           className="absolute inset-0 -z-10 bg-gradient-to-b from-foreground/55 via-foreground/40 to-foreground/65"
         />
 
-        <Container className="flex min-h-[92vh] flex-col justify-between pt-10 pb-12 sm:pt-14 sm:pb-16">
-          {/* Headline gigante en 2 lineas — exactamente como el FUN Parque
-              ("EXPLORA A ESSENCIA DA NATUREZA / EM SAO JOAO DA CAPARICA"). */}
-          <Reveal
-            delay={0.15}
-            className="mt-24 w-full text-center sm:mt-28"
-          >
-            <h1 className="font-extrabold uppercase leading-[0.95] tracking-tight text-white whitespace-nowrap text-[clamp(2.25rem,8vw,8rem)]">
+        {/* Hero full-bleed — sin Container para que el headline pueda
+            ocupar todo el ancho de la viewport como el FUN Parque. */}
+        <div className="flex min-h-[92vh] w-full flex-col justify-between px-6 pt-24 pb-12 sm:px-10 sm:pt-28 sm:pb-16">
+          {/* Headline gigante en 2 lineas — escala con vw. */}
+          <Reveal delay={0.15} className="w-full text-center">
+            <h1 className="mx-auto max-w-[1500px] font-extrabold uppercase leading-[0.92] tracking-tight text-white text-[clamp(2.25rem,7vw,7rem)]">
               <span className="block">Importá en grupo,</span>
               <span className="block">
                 pagá <span className="text-primary">precio mayorista</span>
@@ -470,7 +468,7 @@ export default async function HomePage() {
               </div>
             </div>
           </Reveal>
-        </Container>
+        </div>
 
         {/* Marquee scrolling abajo del hero — estilo "Encerrado" del FUN Parque */}
         <div className="relative z-10 overflow-hidden border-y-2 border-primary bg-primary py-3 text-foreground">
@@ -646,7 +644,7 @@ export default async function HomePage() {
 
         {/* Stack de cards full width contra el fondo oscuro */}
         <div className="px-4 pb-40 sm:px-8 sm:pb-48">
-          <StackedCards cardSpacing={90}>
+          <StackedCards spacing="40vh">
             {activities.map((activity) => (
               <div
                 id={activity.id}

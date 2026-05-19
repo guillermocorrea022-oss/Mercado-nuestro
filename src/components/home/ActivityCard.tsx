@@ -38,7 +38,7 @@ export function ActivityCard({ data }: { data: ActivityCardData }) {
       )}
     >
       {/* LEFT — cream bg con titulo y descripcion */}
-      <div className="flex flex-col gap-5 bg-secondary/70 p-8 sm:p-10">
+      <div className="flex flex-col gap-6 bg-secondary/70 p-8 sm:p-12 lg:p-14 lg:min-h-[640px]">
         <span className="inline-flex w-fit items-center rounded-full bg-primary px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-primary-foreground shadow-glow">
           {data.badge}
         </span>
@@ -77,7 +77,7 @@ export function ActivityCard({ data }: { data: ActivityCardData }) {
       </div>
 
       {/* CENTER — imagen */}
-      <div className="relative h-64 w-full overflow-hidden lg:h-auto lg:min-h-[450px]">
+      <div className="relative h-72 w-full overflow-hidden sm:h-96 lg:h-auto lg:min-h-[640px]">
         <Image
           src={data.image}
           alt={data.title}
@@ -88,7 +88,7 @@ export function ActivityCard({ data }: { data: ActivityCardData }) {
       </div>
 
       {/* RIGHT — Como funciona con bullets, bg accent */}
-      <div className="flex flex-col gap-5 bg-accent p-8 sm:p-10">
+      <div className="flex flex-col gap-5 bg-accent p-8 sm:p-12 lg:p-14 lg:min-h-[640px]">
         <h4 className="text-2xl font-extrabold uppercase leading-[0.95] tracking-tight text-accent-foreground sm:text-3xl">
           Cómo funciona
         </h4>
