@@ -9,7 +9,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +40,25 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* Tokens oficiales de marca Mercado Nuestro (ver COLORES.md):
+     - --navy = Azul Oscuro #072A6B (hover, footer)
+     - --blue = Azul Principal #0D47B6 (botones primarios, headings, hero)
+     - --blue-light = Azul Secundario #3D7BFF (acentos digitales, hover claros)
+     - --yellow = Amarillo Acento #FFC107 (CTAs prioritarios, badges)
+     - --cream = sinónimo de blanco/gris muy claro, alias semántico
+     - --gold se mantiene como alias del amarillo por compatibilidad. */
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
+  --color-blue: var(--blue);
+  --color-blue-foreground: var(--blue-foreground);
+  --color-blue-light: var(--blue-light);
+  --color-blue-light-foreground: var(--blue-light-foreground);
+  --color-yellow: var(--yellow);
+  --color-yellow-foreground: var(--yellow-foreground);
+  --color-gold: var(--yellow);
+  --color-gold-foreground: var(--yellow-foreground);
+  --color-cream: var(--cream);
+  --color-cream-foreground: var(--cream-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,76 +69,99 @@
 }
 
 :root {
-  /* Paleta playful-action inspirada en funparquesaojoao.pt:
-     - Blanco puro como fondo (sin tinte cream)
-     - Lime green saturado y vibrante como primary (energía, deals, valor)
-     - Headings negros, alto contraste
-     - Border radius mayor para feel amigable
-     Adaptada a Mercado Nuestro (ventas + importación grupal):
-     verde brillante = "buen precio", confianza, frescura. */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.18 0.01 240);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.01 240);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.01 240);
-  --primary: oklch(0.78 0.2 140);
-  --primary-foreground: oklch(0.16 0.05 145);
-  --secondary: oklch(0.97 0.01 145);
-  --secondary-foreground: oklch(0.25 0.04 145);
-  --muted: oklch(0.97 0.005 240);
-  --muted-foreground: oklch(0.5 0.01 240);
-  --accent: oklch(0.95 0.06 140);
-  --accent-foreground: oklch(0.2 0.07 145);
-  --destructive: oklch(0.6 0.22 25);
-  --border: oklch(0.93 0.005 240);
-  --input: oklch(0.95 0.005 240);
-  --ring: oklch(0.78 0.2 140);
-  --chart-1: oklch(0.78 0.2 140);
-  --chart-2: oklch(0.86 0.15 140);
-  --chart-3: oklch(0.92 0.08 140);
-  --chart-4: oklch(0.7 0.13 195);
-  --chart-5: oklch(0.95 0.03 140);
+  /* Paleta OFICIAL Mercado Nuestro (ver COLORES.md). Fuente de verdad:
+     - Azul Principal #0D47B6 → primary, headings, links, botones primarios
+     - Azul Oscuro #072A6B → hover, footer, sombras profundas
+     - Azul Secundario #3D7BFF → highlights, hover claros, info
+     - Amarillo Acento #FFC107 → CTAs prioritarios, badges, estrellas
+     - Blanco #FFFFFF → fondo principal
+     - Gris Muy Claro #F5F7FA → fondo alternativo de secciones
+     - Gris Medio #D1D5DB → bordes
+     - Gris Texto #374151 → texto del cuerpo (NO negro puro). */
+  --background: #ffffff;
+  --foreground: #374151;
+  --card: #ffffff;
+  --card-foreground: #374151;
+  --popover: #ffffff;
+  --popover-foreground: #374151;
+  --primary: #0d47b6;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f7fa;
+  --secondary-foreground: #374151;
+  --muted: #f5f7fa;
+  --muted-foreground: #6b7280;
+  /* Accent = amarillo de marca, usar con moderación (CTAs prioritarios). */
+  --accent: #ffc107;
+  --accent-foreground: #374151;
+  --destructive: #ef4444;
+  --border: #d1d5db;
+  --input: #f5f7fa;
+  --ring: #0d47b6;
+  --chart-1: #0d47b6;
+  --chart-2: #3d7bff;
+  --chart-3: #ffc107;
+  --chart-4: #072a6b;
+  --chart-5: #d1d5db;
   --radius: 0.875rem;
-  --sidebar: oklch(0.99 0 0);
-  --sidebar-foreground: oklch(0.18 0.01 240);
+  /* Tokens semánticos de marca. */
+  --navy: #072a6b;
+  --navy-foreground: #ffffff;
+  --blue: #0d47b6;
+  --blue-foreground: #ffffff;
+  --blue-light: #3d7bff;
+  --blue-light-foreground: #ffffff;
+  --yellow: #ffc107;
+  --yellow-foreground: #374151;
+  --cream: #f5f7fa;
+  --cream-foreground: #374151;
+  --sidebar: oklch(0.985 0.012 78);
+  --sidebar-foreground: oklch(0.22 0.06 245);
   --sidebar-primary: oklch(0.78 0.2 140);
-  --sidebar-primary-foreground: oklch(0.16 0.05 145);
-  --sidebar-accent: oklch(0.95 0.06 140);
-  --sidebar-accent-foreground: oklch(0.2 0.07 145);
-  --sidebar-border: oklch(0.93 0.005 240);
+  --sidebar-primary-foreground: oklch(0.18 0.05 245);
+  --sidebar-accent: oklch(0.945 0.02 75);
+  --sidebar-accent-foreground: oklch(0.22 0.06 245);
+  --sidebar-border: oklch(0.88 0.018 75);
   --sidebar-ring: oklch(0.78 0.2 140);
 }
 
-/* Dark mode mantenido por compatibilidad pero no se activa
-   (el root layout fuerza light). */
+/* Dark mode mantenido por compatibilidad — el root layout fuerza light. */
 .dark {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.18 0.01 240);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.01 240);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.01 240);
-  --primary: oklch(0.78 0.2 140);
-  --primary-foreground: oklch(0.16 0.05 145);
-  --secondary: oklch(0.97 0.01 145);
-  --secondary-foreground: oklch(0.25 0.04 145);
-  --muted: oklch(0.97 0.005 240);
-  --muted-foreground: oklch(0.5 0.01 240);
-  --accent: oklch(0.95 0.06 140);
-  --accent-foreground: oklch(0.2 0.07 145);
-  --destructive: oklch(0.6 0.22 25);
-  --border: oklch(0.93 0.005 240);
-  --input: oklch(0.95 0.005 240);
-  --ring: oklch(0.78 0.2 140);
-  --sidebar: oklch(0.99 0 0);
-  --sidebar-foreground: oklch(0.18 0.01 240);
-  --sidebar-primary: oklch(0.78 0.2 140);
-  --sidebar-primary-foreground: oklch(0.16 0.05 145);
-  --sidebar-accent: oklch(0.95 0.06 140);
-  --sidebar-accent-foreground: oklch(0.2 0.07 145);
-  --sidebar-border: oklch(0.93 0.005 240);
-  --sidebar-ring: oklch(0.78 0.2 140);
+  --background: #ffffff;
+  --foreground: #374151;
+  --card: #ffffff;
+  --card-foreground: #374151;
+  --popover: #ffffff;
+  --popover-foreground: #374151;
+  --primary: #0d47b6;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f7fa;
+  --secondary-foreground: #374151;
+  --muted: #f5f7fa;
+  --muted-foreground: #6b7280;
+  --accent: #ffc107;
+  --accent-foreground: #374151;
+  --destructive: #ef4444;
+  --border: #d1d5db;
+  --input: #f5f7fa;
+  --ring: #0d47b6;
+  --navy: #072a6b;
+  --navy-foreground: #ffffff;
+  --blue: #0d47b6;
+  --blue-foreground: #ffffff;
+  --blue-light: #3d7bff;
+  --blue-light-foreground: #ffffff;
+  --yellow: #ffc107;
+  --yellow-foreground: #374151;
+  --cream: #f5f7fa;
+  --cream-foreground: #374151;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #374151;
+  --sidebar-primary: #0d47b6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f7fa;
+  --sidebar-accent-foreground: #374151;
+  --sidebar-border: #d1d5db;
+  --sidebar-ring: #0d47b6;
 }
 
 @layer base {
@@ -144,36 +187,89 @@
 }
 
 @layer utilities {
-  /* Highlight de texto con marca verde para acentos puntuales en h1.
-     Estilo FUN Parque: la palabra clave queda subrayada con verde
-     fuerte (no gradient sutil). */
+  /* Highlight de palabras clave en headings — subrayado tipo marcador con
+     amarillo de marca para usar SOBRE FONDOS CLAROS.
+
+     Implementación con linear-gradient como background-image (en vez de
+     ::after con z-index negativo). Ventaja: NO depende de stacking context,
+     así que funciona aunque el padre tenga `transform` (como cuando motion
+     anima un Reveal y luego limpia el transform). El gradient pinta una
+     franja amarilla en la zona inferior del texto que se mantiene siempre
+     visible. */
   .text-highlight {
-    color: oklch(0.4 0.15 145);
-    position: relative;
-    white-space: nowrap;
-  }
-  .text-highlight::after {
-    content: "";
-    position: absolute;
-    left: -0.05em;
-    right: -0.05em;
-    bottom: 0.05em;
-    height: 0.45em;
-    background: var(--primary);
-    z-index: -1;
-    border-radius: 0.25em;
-    opacity: 0.55;
+    color: var(--blue);
+    background-image: linear-gradient(
+      to top,
+      transparent 0,
+      transparent 0.1em,
+      rgb(255 193 7 / 0.85) 0.1em,
+      rgb(255 193 7 / 0.85) 0.5em,
+      transparent 0.5em
+    );
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 100%;
+    padding-inline: 0.05em;
+    border-radius: 0.15em;
+    /* Box-decoration-break: clone hace que cada línea (cuando el texto
+       wrappea en 2 líneas) reciba su propio subrayado. */
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
-  /* Pattern repetitivo sutil tipo Patern.png del FUN Parque — puntitos
-     verdes muy claros sobre fondo blanco. */
+  /* Pattern repetitivo sutil — puntitos azules muy claros sobre blanco. */
   .bg-dots {
     background-image:
       radial-gradient(
-        oklch(0.78 0.2 140 / 0.18) 1.2px,
+        rgb(13 71 182 / 0.08) 1.2px,
         transparent 1.2px
       );
     background-size: 18px 18px;
+  }
+
+  /* Pattern topográfico/wavy estilo FUN Parque para bloques de color.
+     SVG inline data-uri con líneas onduladas; sirve como textura en
+     bloques naranja o gold de las activity cards. */
+  .bg-topo {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><g fill='none' stroke='%23000' stroke-width='1' stroke-opacity='0.08'><path d='M0 30 Q30 10 60 30 T120 30'/><path d='M0 50 Q30 30 60 50 T120 50'/><path d='M0 70 Q30 50 60 70 T120 70'/><path d='M0 90 Q30 70 60 90 T120 90'/><path d='M0 110 Q30 90 60 110 T120 110'/></g></svg>");
+    background-size: 240px 240px;
+    background-repeat: repeat;
+  }
+
+  /* Faja diagonal tricolor estilo FUN Parque — bordes superiores
+     o inferiores de secciones (verde lime + naranja + dorado). */
+  .border-tricolor-top {
+    position: relative;
+  }
+  .border-tricolor-top::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 8px;
+    background:
+      linear-gradient(
+        135deg,
+        var(--blue) 0 33.33%,
+        var(--yellow) 33.33% 66.66%,
+        var(--navy) 66.66% 100%
+      );
+    z-index: 1;
+  }
+  .border-tricolor-bottom {
+    position: relative;
+  }
+  .border-tricolor-bottom::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 8px;
+    background:
+      linear-gradient(
+        135deg,
+        var(--blue) 0 33.33%,
+        var(--yellow) 33.33% 66.66%,
+        var(--navy) 66.66% 100%
+      );
   }
 
   /* Overlay sutil de grano para fondos (mantenido para compat). */
@@ -186,25 +282,24 @@
     background-size: 4px 4px;
   }
 
-  /* Sombra colorida estilo "lift" (para CTAs primarios). */
+  /* Sombra colorida estilo "lift" (para CTAs primarios) — azul de marca. */
   .shadow-glow {
     box-shadow:
-      0 8px 24px oklch(0.78 0.2 140 / 0.35);
+      0 8px 24px rgb(13 71 182 / 0.28);
   }
 
   /* Border luminoso muy sutil. */
   .border-glow {
     box-shadow:
-      inset 0 1px 0 0 oklch(1 0 0 / 0.7),
-      0 1px 2px oklch(0.18 0.01 240 / 0.04);
+      inset 0 1px 0 0 rgb(255 255 255 / 0.7),
+      0 1px 2px rgb(7 42 107 / 0.06);
   }
 
-  /* Sombra para cards — un poco más visible que antes para el feel
-     playful. */
+  /* Sombra para cards. */
   .shadow-soft {
     box-shadow:
-      0 1px 2px oklch(0.18 0.01 240 / 0.05),
-      0 8px 24px oklch(0.18 0.01 240 / 0.06);
+      0 1px 2px rgb(7 42 107 / 0.05),
+      0 8px 24px rgb(7 42 107 / 0.07);
   }
 
   /* Animación lenta de flotación para blob decorations (FUN Parque feel). */
@@ -244,8 +339,8 @@
   .hover-lift:hover {
     transform: translateY(-6px);
     box-shadow:
-      0 4px 8px oklch(0.18 0.01 240 / 0.06),
-      0 24px 48px oklch(0.78 0.2 140 / 0.18);
+      0 4px 8px rgb(7 42 107 / 0.06),
+      0 24px 48px rgb(13 71 182 / 0.16);
   }
 
   /* Reduced motion: matar todas las animaciones de adorno. */

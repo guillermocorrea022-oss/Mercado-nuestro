@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 
+import { PricingTabs } from "@/components/home/PricingTabs";
 import { Container } from "@/components/layout/Container";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
@@ -161,50 +162,23 @@ export default function ComoFuncionaPage() {
 
       <section className="border-y border-border bg-card/30 py-24 sm:py-32">
         <Container>
-          <Reveal className="mx-auto max-w-3xl">
+          <Reveal className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
               Precio escalonado
             </p>
             <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-              Cuanto más se suma, más baja el precio
+              Cuanto más reservamos,{" "}
+              <span className="text-highlight">menos pagamos</span>
             </h2>
             <p className="mt-5 text-muted-foreground">
-              Cada campaña tiene escalones definidos antes de abrirla. Al
-              cerrar, todos pagan el mejor escalón alcanzado. Ejemplo:
+              Cada campaña define sus escalones antes de abrirse. Ejemplos
+              reales por categoría — los precios finales dependen del
+              proveedor y del volumen efectivo.
             </p>
           </Reveal>
 
-          <Reveal delay={0.1} className="mx-auto mt-10 max-w-3xl">
-            <div className="overflow-hidden rounded-2xl border border-border bg-background">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
-                  <tr>
-                    <th className="px-6 py-4 font-medium">Unidades</th>
-                    <th className="px-6 py-4 font-medium">Precio por unidad</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  <tr>
-                    <td className="px-6 py-4 text-foreground/80">1 – 10</td>
-                    <td className="px-6 py-4 font-semibold">USD 120</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-foreground/80">11 – 30</td>
-                    <td className="px-6 py-4 font-semibold">USD 105</td>
-                  </tr>
-                  <tr className="bg-primary/5">
-                    <td className="px-6 py-4 text-foreground/80">31 – 100</td>
-                    <td className="px-6 py-4 text-base font-semibold text-primary">
-                      USD 92
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
-              Si reservaste cuando estaba en USD 120 y la campaña llegó a 35
-              unidades, terminás pagando USD 92 igual que quien reservó último.
-            </p>
+          <Reveal delay={0.15} className="mx-auto mt-12 max-w-5xl">
+            <PricingTabs />
           </Reveal>
         </Container>
       </section>

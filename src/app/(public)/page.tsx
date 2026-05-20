@@ -1,17 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Building2,
-  Calendar,
-  Clock,
-  GraduationCap,
-  MapPin,
-  Phone,
-  ShoppingBasket,
-  Users,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import {
   CampaignCard,
@@ -21,9 +10,7 @@ import {
   ActivityCard,
   type ActivityCardData,
 } from "@/components/home/ActivityCard";
-import { PricingTabs } from "@/components/home/PricingTabs";
 import { QuickStartForm } from "@/components/home/QuickStartForm";
-import { TestimonialCard } from "@/components/home/TestimonialCard";
 import { Container } from "@/components/layout/Container";
 import { BlobDivider } from "@/components/motion/BlobDivider";
 import { Marquee } from "@/components/motion/Marquee";
@@ -31,10 +18,9 @@ import { Reveal } from "@/components/motion/Reveal";
 import { StackedCards } from "@/components/motion/StackedCards";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Accordion } from "@/components/ui/accordion";
-import { buttonVariants } from "@/components/ui/button";
-import { Tabs } from "@/components/ui/tabs";
+import { IconMN } from "@/components/ui/IconMN";
+import { StarRating } from "@/components/ui/star-rating";
 import { createClient } from "@/lib/supabase/server";
-import { cn } from "@/lib/utils";
 import type { Database } from "@/types/database";
 
 type FeaturedCampaignRow = {
@@ -128,6 +114,7 @@ const activities: ActivityCardData[] = [
     excluded: ["Stock inmediato", "Entrega en menos de 30 días"],
     primaryCta: { label: "Ver campañas", href: "/campanas" },
     secondaryCta: { label: "Cómo funciona", href: "/como-funciona" },
+    rightVariant: "blue",
   },
   {
     id: "disponible",
@@ -156,6 +143,7 @@ const activities: ActivityCardData[] = [
     excluded: ["Precios de campaña"],
     primaryCta: { label: "Ver stock", href: "/disponible" },
     secondaryCta: { label: "Garantía", href: "/devoluciones" },
+    rightVariant: "navy",
   },
   {
     id: "marketplace",
@@ -184,6 +172,7 @@ const activities: ActivityCardData[] = [
     excluded: ["Pago directo al vendedor", "Trato por fuera"],
     primaryCta: { label: "Ver marketplace", href: "/marketplace" },
     secondaryCta: { label: "Vender", href: "/perfil/revendedor" },
+    rightVariant: "blue-light",
   },
   {
     id: "vendedores",
@@ -212,30 +201,29 @@ const activities: ActivityCardData[] = [
     excluded: ["Stock propio", "Trámites con cliente final"],
     primaryCta: { label: "Activar mi catálogo", href: "/perfil/vendedor" },
     secondaryCta: { label: "Más info", href: "/perfil/vendedor" },
+    rightVariant: "yellow",
   },
 ];
 
-const events = [
+// Bloques grandes con foto — estilo "PARA CELEBRAR JUNTOS" del FUN Parque.
+// Importadores avanzados se separa como bloque chico debajo (es B2B-pro,
+// no encaja con la lógica de compra B2B genérica de las primeras dos).
+const groupHighlights = [
   {
-    icon: Building2,
     title: "Empresas",
     description:
       "Pedidos al por mayor con facturación. RUT, logística dedicada y precios a medida.",
     href: "/contacto",
+    image:
+      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&q=80",
   },
   {
-    icon: GraduationCap,
     title: "Instituciones",
     description:
       "Clubes, sindicatos o cooperativas que quieran usar Mercado Nuestro como canal de compras grupales.",
     href: "/contacto",
-  },
-  {
-    icon: Users,
-    title: "Importadores avanzados",
-    description:
-      "¿Ya importás y querés abrir tus propias campañas en la plataforma? Postulate al programa.",
-    href: "/ser-importador",
+    image:
+      "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1200&q=80",
   },
 ];
 
@@ -367,13 +355,15 @@ export default async function HomePage() {
   return (
     <>
       {/* ====================== HERO FULL-VIEWPORT ======================
-          Imitando funparquesaojoao.pt:
-          - Imagen oscura full-screen como fondo
-          - Headline gigante blanco encima, ultimas palabras en lime green
-          - Dos CTAs centrados (Precios dark / Reservar outline blanco)
-          - Marquee de notice corriendo abajo
+          Estructura FUN Parque adaptada:
+          - Imagen aérea full-bleed (sin overlay pesado, leve para legibilidad)
+          - Headline centrado, segunda línea casi entera en lime
+          - SIN párrafo descriptivo — directo a los CTAs
+          - PRECIOS (navy fill) + RESERVAR (cream outline)
+          - Franja diagonal tricolor arriba del marquee
+          - Marquee naranja contenedor scrolleando abajo
       ============================================================== */}
-      <section className="relative isolate min-h-[92vh] overflow-hidden bg-foreground text-white">
+      <section className="relative isolate min-h-[92vh] overflow-hidden bg-navy text-navy-foreground">
         {/* Imagen de fondo full-bleed */}
         <Image
           src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=2400&q=80"
@@ -383,46 +373,50 @@ export default async function HomePage() {
           className="absolute inset-0 -z-10 object-cover"
           priority
         />
-        {/* Overlay para legibilidad */}
+        {/* Overlay sutil para legibilidad — más liviano que antes (FUN Parque
+            casi no usa overlay, deja la foto pura). */}
         <div
           aria-hidden
-          className="absolute inset-0 -z-10 bg-gradient-to-b from-foreground/55 via-foreground/40 to-foreground/65"
+          className="absolute inset-0 -z-10 bg-gradient-to-b from-navy/40 via-navy/25 to-navy/55"
         />
 
         {/* Contenido del hero — flex centrado vertical y horizontalmente */}
-        <div className="flex min-h-[92vh] w-full flex-col items-center justify-center px-6 pt-24 pb-16 sm:px-10 sm:pt-28">
+        <div className="flex min-h-[92vh] w-full flex-col items-center justify-center px-6 pt-24 pb-24 sm:px-10 sm:pt-28">
           <Reveal delay={0.15} className="w-full text-center">
-            <h1 className="mx-auto max-w-[1500px] font-extrabold uppercase leading-[0.92] tracking-tight text-white text-[clamp(2.25rem,7vw,7rem)]">
-              <span className="block">Importá en grupo,</span>
-              <span className="block">
-                pagá <span className="text-primary">precio mayorista</span>
-              </span>
+            <h1 className="mx-auto max-w-[1500px] font-extrabold uppercase leading-[0.9] tracking-tight text-white text-[clamp(2.5rem,7.5vw,7.5rem)]">
+              <span className="block">Importá en grupo</span>
+              <span className="block text-yellow">a precio mayorista</span>
             </h1>
 
-            <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
-              Sumate a campañas de importación con otros uruguayos y conseguí
-              productos al precio que paga un importador grande.
-            </p>
-
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
               <Link
-                href="#precios"
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-foreground px-7 text-sm font-bold uppercase tracking-wide text-white transition-transform hover:-translate-y-0.5"
+                href="/como-funciona"
+                className="inline-flex h-12 items-center gap-2 rounded-full border-2 border-white bg-transparent px-8 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-blue"
               >
-                Precios
+                Cómo funciona
               </Link>
               <Link
-                href="#reservar"
-                className="inline-flex h-12 items-center gap-2 rounded-full border-2 border-white bg-transparent px-7 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-foreground"
+                href="/campanas"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-yellow px-8 text-sm font-bold uppercase tracking-wider text-yellow-foreground transition-transform hover:-translate-y-0.5 shadow-glow"
               >
-                Reservar
+                Ver campañas
               </Link>
             </div>
           </Reveal>
         </div>
 
-        {/* Marquee scrolling abajo del hero — estilo "Encerrado" del FUN Parque */}
-        <div className="relative z-10 overflow-hidden border-y-2 border-primary bg-primary py-3 text-foreground">
+        {/* Faja diagonal tricolor — azul + amarillo + navy. */}
+        <div
+          aria-hidden
+          className="relative z-10 h-3 w-full"
+          style={{
+            background:
+              "linear-gradient(105deg, var(--blue) 0 33.33%, var(--yellow) 33.33% 66.66%, var(--navy) 66.66% 100%)",
+          }}
+        />
+
+        {/* Marquee azul de marca, transición hacia el resto del home. */}
+        <div className="relative z-10 overflow-hidden bg-blue py-3.5 text-blue-foreground">
           <div className="flex whitespace-nowrap animate-marquee">
             {Array.from({ length: 2 }).map((_, dup) => (
               <div key={dup} className="flex shrink-0 items-center gap-12 pr-12">
@@ -451,131 +445,112 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ====================== HORARIO / OPERACIÓN ====================== */}
-      <section className="hidden border-y border-border bg-secondary/40">
-        <Container className="py-6">
-          <div className="grid items-center gap-4 sm:grid-cols-[auto_1fr_auto] sm:gap-8">
-            <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-primary-foreground/90">
-              <Calendar className="size-4 text-primary" aria-hidden />
-              Operación 2026
-            </div>
-            <div className="grid gap-2 text-sm sm:grid-cols-2">
-              <p>
-                <span className="font-semibold">Verano</span> (oct-mar) ·
-                Campañas abiertas todos los días
-              </p>
-              <p>
-                <span className="font-semibold">Local físico</span> ·
-                Lun-Vie 9:00-18:00 · Sáb 9:00-13:00
-              </p>
-            </div>
-            <Link
-              href="/contacto"
-              className="text-sm font-semibold text-primary-foreground/90 underline-offset-4 hover:underline"
-            >
-              Cómo llegar →
-            </Link>
-          </div>
-        </Container>
-      </section>
+      {/* ====================== QUIÉNES SOMOS — 3 bloques color-block ======
+          Paleta oficial Mercado Nuestro:
+          - LEFT: bloque BLUE (azul de marca) con pattern topográfico,
+            badge yellow, icon, texto descriptivo y stats
+          - RIGHT TOP: bloque NAVY (azul oscuro) con headline gigante blanco
+            + palabra highlight con underline amarillo
+          - RIGHT BOTTOM: foto rectangular con sticker yellow rotado */}
+      <section id="sobre" className="relative isolate overflow-hidden bg-background">
+        <Container className="py-20 sm:py-28">
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+            {/* LEFT — bloque azul de marca con pattern topo + texto */}
+            <Reveal className="lg:col-span-1">
+              <div className="relative flex h-full flex-col gap-8 overflow-hidden rounded-[2rem] bg-blue p-8 text-blue-foreground bg-topo sm:p-12 lg:p-14 lg:min-h-[640px]">
+                <span className="inline-flex w-fit items-center rounded-full bg-yellow px-4 py-1.5 text-xs font-extrabold uppercase tracking-wider text-yellow-foreground">
+                  Quiénes somos
+                </span>
 
-      {/* ====================== SOBRE — layout sticky asimétrico ======
-          Imagen del lado izquierdo se queda fija mientras el texto del
-          derecho scrollea. Cada bloque de texto entra con Reveal. */}
-      <section id="sobre" className="relative isolate overflow-hidden">
-        <BlobDivider
-          variant="bottom-right"
-          shape={3}
-          className="fill-primary/12"
-        />
-        <Container className="py-24 sm:py-32">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
-            <div className="lg:sticky lg:top-28 lg:self-start">
-              <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] border border-border shadow-soft">
-                <Image
-                  src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1200&q=80"
-                  alt="Mercado uruguayo"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
-                {/* Sticker rotado tipo FUN Parque */}
-                <div className="absolute -right-4 -top-4 rotate-12 rounded-full bg-primary px-4 py-2 text-xs font-extrabold uppercase tracking-wider text-primary-foreground shadow-glow">
-                  Made in Uruguay 🇺🇾
+                <IconMN name="ubicacion" variant="blanco" size={44} alt="" />
+
+                <div className="space-y-5 text-base leading-relaxed sm:text-lg">
+                  <p>
+                    Nacimos en Paysandú con la idea de que el acceso a precios
+                    de importación al por mayor no debería ser un privilegio
+                    de las grandes empresas. Funcionamos juntando demanda
+                    real: cada vez que abrimos una campaña, los usuarios
+                    reservan unidades con seña y, al cruzar el MOQ, todos
+                    pagan el mejor precio.
+                  </p>
+                  <p>
+                    Operamos desde Leandro Gómez 1076 con soporte en español,
+                    métodos de pago locales y entrega a todo Uruguay. Sumamos
+                    un marketplace de reventa entre vecinos y un programa de
+                    vendedores por catálogo para multiplicar nuestra red.
+                  </p>
                 </div>
-              </div>
-            </div>
 
-            <div className="space-y-16">
-              <Reveal>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
-                  <span className="rounded-full bg-primary px-3 py-1">
-                    Quiénes somos
-                  </span>
-                </p>
-                <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-                  La primera plataforma uruguaya de{" "}
-                  <span className="text-highlight">compra colaborativa</span>
-                </h2>
-              </Reveal>
-
-              <Reveal delay={0.1}>
-                <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
-                  Nacimos en Paysandú con la idea de que el acceso a precios
-                  de importación al por mayor no debería ser un privilegio de
-                  las grandes empresas. Funcionamos juntando demanda real:
-                  cada vez que abrimos una campaña, los usuarios reservan
-                  unidades con seña y, al cruzar el MOQ, todos pagan el mejor
-                  precio.
-                </p>
-              </Reveal>
-
-              <Reveal delay={0.15}>
-                <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
-                  Operamos desde un local físico en Leandro Gómez 1076, con
-                  soporte en español, métodos de pago locales y entrega a
-                  todo Uruguay. Sumamos un marketplace de reventa entre
-                  vecinos y un programa de vendedores por catálogo para
-                  multiplicar nuestra red.
-                </p>
-              </Reveal>
-
-              <Reveal delay={0.2}>
-                <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                <div className="mt-auto grid grid-cols-3 gap-3 pt-4">
                   {[
                     { value: "Hasta 60%", label: "menos que tienda" },
                     { value: "30%", label: "seña al reservar" },
-                    { value: "+200", label: "compradores activos" },
+                    { value: "+200", label: "compradores" },
                   ].map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="rounded-2xl bg-secondary px-4 py-5"
-                    >
-                      <p className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                    <div key={stat.label} className="rounded-2xl bg-white/15 px-3 py-4 backdrop-blur-sm">
+                      <p className="text-xl font-extrabold tracking-tight sm:text-2xl">
                         {stat.value}
                       </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
+                      <p className="mt-1 text-[11px] uppercase tracking-wider text-white/75">
                         {stat.label}
                       </p>
                     </div>
                   ))}
                 </div>
+              </div>
+            </Reveal>
+
+            {/* RIGHT — stacked: bloque navy con headline + foto debajo */}
+            <div className="flex flex-col gap-4 sm:gap-6">
+              {/* RIGHT TOP — bloque navy con headline gigante. Sobre fondo
+                  azul el highlight va en AMARILLO (text-yellow)
+                  porque el azul-sobre-azul no contrasta. Bajamos el clamp
+                  max para que la frase entre completa. */}
+              <Reveal delay={0.1}>
+                <div className="relative overflow-hidden rounded-[2rem] bg-navy p-8 text-navy-foreground bg-topo sm:p-12 lg:p-14">
+                  <h2 className="font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(1.75rem,3.2vw,2.75rem)]">
+                    La primera plataforma uruguaya de{" "}
+                    <span className="text-yellow">
+                      compra colaborativa
+                    </span>
+                  </h2>
+                </div>
+              </Reveal>
+
+              {/* RIGHT BOTTOM — foto rectangular con sticker rotado */}
+              <Reveal delay={0.2} className="flex-1">
+                <div className="relative h-full min-h-[280px] overflow-hidden rounded-[2rem] sm:min-h-[360px]">
+                  <Image
+                    src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1200&q=80"
+                    alt="Mercado uruguayo"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute -right-3 -top-3 rotate-12 rounded-full bg-yellow px-4 py-2 text-xs font-extrabold uppercase tracking-wider text-yellow-foreground shadow-glow">
+                    Made in Uruguay 🇺🇾
+                  </div>
+                </div>
               </Reveal>
             </div>
           </div>
         </Container>
       </section>
 
-      {/* ====================== ATIVIDADES / LÍNEAS ======================
+      {/* ====================== LÍNEAS (StackedCards) ======================
+          Fondo cream cálido para que los color-blocks de las cards
+          (gold/blue/lime rotando) resalten. Las cards anteriores se ven
+          asomar al apilarse — como en el FUN Parque.
+
           IMPORTANTE: overflow-visible en el section para que `sticky`
           funcione (overflow-hidden en cualquier ancestro rompe sticky).
-          La blob decoration vive en un wrapper con overflow-hidden
-          INTERNO que NO contiene los stacked cards. */}
+          El blob decoration vive en un wrapper con overflow-hidden interno
+          que NO contiene los stacked cards. */}
       <section
         id="lineas"
-        className="relative bg-foreground text-white"
+        className="relative bg-background text-foreground"
       >
-        {/* Wrapper de blob — overflow-hidden propio, NO envuelve las cards */}
+        {/* Wrapper de blob decorativo — fuera del flujo de los stacked cards */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[600px] overflow-hidden"
@@ -583,7 +558,7 @@ export default async function HomePage() {
           <BlobDivider
             variant="top-right"
             shape={2}
-            className="fill-primary/20"
+            className="fill-blue/15"
           />
         </div>
 
@@ -595,14 +570,14 @@ export default async function HomePage() {
                   Líneas
                 </span>
               </p>
-              <h2 className="mt-6 font-extrabold uppercase leading-[0.92] tracking-tight text-white text-[clamp(2rem,7vw,6.5rem)]">
+              <h2 className="mt-6 font-extrabold uppercase leading-[0.92] tracking-tight text-foreground text-[clamp(2rem,7vw,6.5rem)]">
                 Sumate a nuestras{" "}
-                <span className="text-primary">cuatro líneas</span> de negocio
+                <span className="text-highlight">cuatro líneas</span> de negocio
               </h2>
             </Reveal>
           </Container>
 
-          {/* Stack de cards full width contra el fondo oscuro */}
+          {/* Stack de cards full width sobre cream */}
           <div className="px-4 pb-40 sm:px-8 sm:pb-48">
             <StackedCards spacing="40vh">
               {activities.map((activity) => (
@@ -619,7 +594,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Marquee entre secciones */}
+      {/* Marquee transición — azul + franja tricolor. */}
+      <div
+        aria-hidden
+        className="h-2 w-full"
+        style={{
+          background:
+            "linear-gradient(105deg, var(--primary) 0 33.33%, var(--blue) 33.33% 66.66%, var(--gold) 66.66% 100%)",
+        }}
+      />
       <Marquee
         items={[
           "Próxima campaña abre el 25 de mayo",
@@ -629,48 +612,42 @@ export default async function HomePage() {
           "Envío a todo Uruguay",
         ]}
         duration={45}
-        background="bg-accent"
-        textColor="text-accent-foreground"
+        background="bg-blue"
+        textColor="text-blue-foreground"
       />
 
-      {/* ====================== CAMPAÑAS DESTACADAS ====================== */}
-      <section className="py-24 sm:py-32">
+      {/* ====================== CAMPAÑAS EN CURSO ======================
+          Headline gigante uppercase + grid de cards + flecha gigante de
+          "Ver todas" estilo FUN Parque. Fondo cream. */}
+      <section className="bg-background py-24 sm:py-32">
         <Container>
-          <Reveal className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
-                <span className="rounded-full bg-primary px-3 py-1">
-                  Activas ahora
-                </span>
-              </p>
-              <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
-                Campañas en curso
-              </h2>
-            </div>
-            <Link
-              href="/campanas"
-              className="group inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold transition-colors hover:border-primary/40"
-            >
-              Ver todas
-              <ArrowUpRight
-                className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                aria-hidden
-              />
-            </Link>
+          <Reveal className="mx-auto max-w-4xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em]">
+              <span className="rounded-full bg-primary px-3 py-1 text-primary-foreground">
+                Activas ahora
+              </span>
+            </p>
+            <h2 className="mt-6 font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2rem,5vw,4.5rem)]">
+              Campañas <span className="text-highlight">en curso</span>
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
+              Reservá con seña, esperá el cierre y pagá el mejor precio
+              alcanzado. Todo con soporte local.
+            </p>
           </Reveal>
 
           {featuredCampaigns.length === 0 ? (
-            <Reveal delay={0.1} className="mt-12">
-              <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
-                <p className="text-lg font-bold">
+            <Reveal delay={0.1} className="mt-16">
+              <div className="rounded-3xl border border-dashed border-border bg-cream p-16 text-center">
+                <p className="text-xl font-extrabold uppercase tracking-tight">
                   Estamos preparando las primeras campañas
                 </p>
-                <p className="mt-3 text-sm text-muted-foreground">
+                <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
                   Muy pronto vas a poder reservar acá. Mientras tanto, podés
                   leer{" "}
                   <Link
                     href="/como-funciona"
-                    className="font-semibold text-primary-foreground/90 underline underline-offset-4"
+                    className="font-semibold text-foreground underline underline-offset-4"
                   >
                     cómo funciona el sistema
                   </Link>
@@ -679,224 +656,290 @@ export default async function HomePage() {
               </div>
             </Reveal>
           ) : (
-            <Stagger className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredCampaigns.map((campaign) => (
-                <StaggerItem key={campaign.id}>
-                  <CampaignCard campaign={campaign} />
-                </StaggerItem>
-              ))}
-            </Stagger>
+            <>
+              <Stagger className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {featuredCampaigns.map((campaign) => (
+                  <StaggerItem key={campaign.id}>
+                    <CampaignCard campaign={campaign} />
+                  </StaggerItem>
+                ))}
+              </Stagger>
+
+              {/* Big arrow link — "Ver todas" como CTA grande */}
+              <Reveal delay={0.2} className="mt-16 flex justify-center">
+                <Link
+                  href="/campanas"
+                  className="group inline-flex items-center gap-3 rounded-full bg-navy px-8 py-4 text-base font-bold uppercase tracking-wider text-navy-foreground transition-transform hover:-translate-y-0.5"
+                >
+                  Ver todas las campañas
+                  <ArrowUpRight
+                    className="size-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                    aria-hidden
+                  />
+                </Link>
+              </Reveal>
+            </>
           )}
         </Container>
       </section>
 
-      {/* ====================== EVENTOS DE GRUPO ====================== */}
-      <section
-        id="grupos"
-        className="relative isolate overflow-hidden border-t border-border bg-secondary/40"
-      >
-        <BlobDivider
-          variant="top-right"
-          shape={1}
-          className="fill-primary/15"
-        />
-        <Container className="py-24 sm:py-32">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
-              <span className="rounded-full bg-primary px-3 py-1">
-                Compras en grupo
-              </span>
-            </p>
-            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Empresas, instituciones e importadores
-            </h2>
-            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-              ¿Necesitás un volumen mayor o tenés tu propia red de compradores?
-              Acá tenés opciones a medida.
-            </p>
-          </Reveal>
-
-          <Stagger className="mt-16 grid gap-6 sm:grid-cols-3">
-            {events.map((event) => (
-              <StaggerItem key={event.title}>
-                <Link
-                  href={event.href}
-                  className="hover-lift group block h-full rounded-3xl border border-border bg-card p-8 shadow-soft transition-colors hover:border-primary/40"
-                >
-                  <div className="flex size-12 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
-                    <event.icon className="size-5" aria-hidden />
-                  </div>
-                  <h3 className="mt-6 text-xl font-extrabold tracking-tight">
-                    {event.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {event.description}
-                  </p>
-                  <p className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-primary-foreground/90 transition-transform group-hover:translate-x-0.5">
-                    Saber más
-                    <ArrowRight className="size-3.5" aria-hidden />
-                  </p>
-                </Link>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </Container>
-      </section>
-
-      {/* ====================== FAQs ====================== */}
-      <section
-        id="faqs"
-        className="relative isolate overflow-hidden border-t border-border"
-      >
-        <BlobDivider
-          variant="bottom-left"
-          shape={3}
-          className="fill-primary/15"
-        />
-        <Container className="py-24 sm:py-32">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
-              <span className="rounded-full bg-primary px-3 py-1">
-                Preguntas frecuentes
-              </span>
-            </p>
-            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
-              ¿Te queda alguna duda?
-            </h2>
-            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-              Las respuestas a lo que más nos preguntan, agrupadas por tema.
-            </p>
-          </Reveal>
-
-          <Reveal delay={0.15} className="mx-auto mt-12 max-w-3xl">
-            <Tabs
-              tabs={faqTabs.map((t) => ({
-                id: t.id,
-                label: t.label,
-                content: <Accordion items={t.items} />,
-              }))}
-            />
-          </Reveal>
-        </Container>
-      </section>
-
-      {/* ====================== TESTIMONIOS ====================== */}
+      {/* ====================== TESTIMONIOS ======================
+          Fondo navy oscuro estilo "O FEEDBACK NO TRIPADVISOR".
+          Splash lime decorativo alrededor del título + cards con border
+          dashed sobre el navy. */}
       <section
         id="testimonios"
-        className="relative isolate overflow-hidden border-t border-border bg-secondary/30"
+        className="relative isolate overflow-hidden bg-navy py-24 text-navy-foreground sm:py-32"
       >
-        <BlobDivider
-          variant="top-right"
-          shape={2}
-          className="fill-primary/15"
+        {/* Splash decorativo lime alrededor del título — efecto orgánico */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-12 -z-10 size-[420px] -translate-x-1/2 rounded-full bg-primary/25 blur-3xl"
         />
-        <Container className="py-24 sm:py-32">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
-              <span className="rounded-full bg-primary px-3 py-1">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-[20%] top-32 -z-10 size-[180px] rounded-full bg-primary/30 blur-2xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute right-[18%] top-20 -z-10 size-[220px] rounded-full bg-primary/20 blur-2xl"
+        />
+
+        <Container>
+          <Reveal className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em]">
+              <span className="rounded-full bg-gold px-3 py-1 text-gold-foreground">
                 Testimonios
               </span>
             </p>
-            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Lo que dicen los nuestros
+            <h2 className="mt-6 font-extrabold uppercase leading-[0.95] tracking-tight text-cream text-[clamp(2rem,5.5vw,5rem)]">
+              Lo que dicen <span className="text-yellow">los nuestros</span>
             </h2>
-            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-              Compradores y vendedores reales de todo Uruguay.
-            </p>
           </Reveal>
 
           <Stagger className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {testimonials.map((t, i) => (
               <StaggerItem key={i}>
-                <TestimonialCard
-                  author={t.author}
-                  role={t.role}
-                  rating={t.rating}
-                  body={t.body}
-                />
+                <figure className="flex h-full flex-col gap-5 rounded-3xl border border-dashed border-cream/25 bg-navy/40 p-7 backdrop-blur-sm">
+                  <StarRating value={t.rating} size="size-4" />
+                  <blockquote className="text-base leading-relaxed text-cream">
+                    “{t.body}”
+                  </blockquote>
+                  <figcaption className="mt-auto flex items-center gap-3 border-t border-cream/15 pt-4">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-yellow text-yellow-foreground text-sm font-extrabold">
+                      {t.author.charAt(0)}
+                    </span>
+                    <div>
+                      <p className="text-sm font-bold tracking-tight text-cream">
+                        {t.author}
+                      </p>
+                      {t.role ? (
+                        <p className="text-xs text-cream/65">{t.role}</p>
+                      ) : null}
+                    </div>
+                  </figcaption>
+                </figure>
               </StaggerItem>
             ))}
           </Stagger>
         </Container>
       </section>
 
-      {/* ====================== PRECIOS (Preçário) ====================== */}
-      <section
-        id="precios"
-        className="relative isolate overflow-hidden border-t border-border"
-      >
-        <BlobDivider
-          variant="bottom-right"
-          shape={1}
-          className="fill-primary/15"
-        />
-        <Container className="py-24 sm:py-32">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
-              <span className="rounded-full bg-primary px-3 py-1">
-                Precios
+      {/* ====================== FAQs ======================
+          Bloque gold/mostaza full-bleed estilo "PRONTO PARA AS SOAS DÚVIDAS"
+          del FUN Parque: foto a la izquierda + acordeón a la derecha. Sin
+          tabs — un solo accordion lineal. */}
+      <section id="faqs" className="relative isolate overflow-hidden bg-gold text-gold-foreground">
+        <Container className="py-20 sm:py-28">
+          <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+            {/* LEFT — badge + headline + foto */}
+            <Reveal className="flex flex-col gap-8">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em]">
+                  <span className="rounded-full bg-navy px-3 py-1 text-navy-foreground">
+                    Preguntas frecuentes
+                  </span>
+                </p>
+                {/* Sobre fondo amarillo (bg-gold), la palabra clave va en
+                    azul navy directo — el subrayado amarillo de
+                    .text-highlight se camuflaría con el fondo. */}
+                <h2 className="mt-6 font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2rem,4.5vw,4rem)]">
+                  ¿Te queda alguna <span className="text-navy">duda</span>?
+                </h2>
+              </div>
+
+              <div className="relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2rem] border border-navy/20 shadow-soft">
+                <Image
+                  src="https://images.unsplash.com/photo-1573164574572-cb89e39749b4?auto=format&fit=crop&w=900&q=80"
+                  alt="Local Mercado Nuestro Paysandú"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover"
+                />
+              </div>
+            </Reveal>
+
+            {/* RIGHT — accordion plano (las preguntas de los 4 grupos en uno) */}
+            <Reveal delay={0.15}>
+              <Accordion
+                items={faqTabs.flatMap((t) =>
+                  t.items.map((it) => ({
+                    id: `${t.id}-${it.id}`,
+                    title: it.title,
+                    content: it.content,
+                  })),
+                )}
+              />
+            </Reveal>
+          </div>
+        </Container>
+      </section>
+
+      {/* ====================== PARA GRUPOS ======================
+          2 cards foto grandes (Empresas + Instituciones) estilo
+          "PARA CELEBRAR JUNTOS" + bloque chiquito de Importadores avanzados
+          como CTA separado. */}
+      <section id="grupos" className="bg-background py-24 sm:py-32">
+        <Container>
+          <Reveal className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em]">
+              <span className="rounded-full bg-primary px-3 py-1 text-primary-foreground">
+                Compras en grupo
               </span>
             </p>
-            <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Cuanto más reservamos,{" "}
-              <span className="text-highlight">menos pagamos</span>
+            <h2 className="mt-6 font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2rem,5vw,4.5rem)]">
+              Para empresas e <span className="text-highlight">instituciones</span>
             </h2>
-            <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-              Ejemplos reales de escalones de precio según categoría. Los
-              precios finales dependen del proveedor y del volumen efectivo.
+            <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
+              Comprás un volumen mayor o representás a un grupo. Tenemos
+              modalidades a medida.
             </p>
           </Reveal>
 
-          <Reveal delay={0.15} className="mx-auto mt-14 max-w-5xl">
-            <PricingTabs />
+          {/* 2 cards foto lado a lado */}
+          <Stagger className="mt-16 grid gap-6 lg:grid-cols-2">
+            {groupHighlights.map((g) => (
+              <StaggerItem key={g.title}>
+                <Link
+                  href={g.href}
+                  className="group relative block aspect-[5/4] overflow-hidden rounded-[2rem]"
+                >
+                  <Image
+                    src={g.image}
+                    alt={g.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+                  />
+                  {/* Overlay para legibilidad */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 bg-gradient-to-t from-navy/85 via-navy/40 to-transparent"
+                  />
+                  {/* Texto abajo-izquierda */}
+                  <div className="absolute inset-x-0 bottom-0 p-8 sm:p-10">
+                    <h3 className="text-3xl font-extrabold uppercase tracking-tight text-cream sm:text-4xl">
+                      {g.title}
+                    </h3>
+                    <p className="mt-3 max-w-md text-sm leading-relaxed text-cream/85 sm:text-base">
+                      {g.description}
+                    </p>
+                    <p className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-cream">
+                      Hablemos
+                      <ArrowRight
+                        className="size-4 transition-transform group-hover:translate-x-1"
+                        aria-hidden
+                      />
+                    </p>
+                  </div>
+                </Link>
+              </StaggerItem>
+            ))}
+          </Stagger>
+
+          {/* Bloque chico: Importadores avanzados */}
+          <Reveal delay={0.25} className="mt-8">
+            <Link
+              href="/ser-importador"
+              className="hover-lift group block overflow-hidden rounded-3xl border border-border bg-cream p-8 transition-colors hover:border-primary/50 sm:p-10"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-navy">
+                    <IconMN name="vendedor" variant="blanco" size={32} alt="" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Para profesionales
+                    </p>
+                    <h3 className="mt-1 text-2xl font-extrabold uppercase tracking-tight sm:text-3xl">
+                      Importadores avanzados
+                    </h3>
+                  </div>
+                </div>
+                <p className="max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
+                  ¿Ya importás y querés abrir tus propias campañas en la
+                  plataforma? Postulate al programa y liderá tu propia
+                  importación.
+                </p>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-navy px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-navy-foreground transition-transform group-hover:-translate-y-0.5">
+                  Postularme
+                  <ArrowRight className="size-4" aria-hidden />
+                </span>
+              </div>
+            </Link>
           </Reveal>
         </Container>
       </section>
 
-      {/* ====================== RESERVAR (form inline) ====================== */}
+      {/* ====================== CTA RESERVAR ======================
+          Bloque navy full-bleed con headline gigante a la izquierda +
+          form sobre cream a la derecha. Es el cierre del home. */}
       <section
         id="reservar"
-        className="relative isolate overflow-hidden border-y border-border bg-primary/8"
+        className="relative isolate overflow-hidden bg-navy text-navy-foreground"
       >
-        <BlobDivider
-          variant="top-left"
-          shape={2}
-          className="fill-primary/30"
+        {/* Splash decorativo lime */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-32 top-0 -z-10 size-[420px] rounded-full bg-primary/15 blur-3xl"
         />
-        <BlobDivider
-          variant="bottom-right"
-          shape={3}
-          className="fill-primary/20"
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-20 bottom-0 -z-10 size-[280px] rounded-full bg-gold/20 blur-3xl"
         />
+
         <Container className="py-24 sm:py-32">
           <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
             <Reveal>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/90">
-                <span className="rounded-full bg-primary px-3 py-1">
+              <p className="text-xs font-bold uppercase tracking-[0.2em]">
+                <span className="rounded-full bg-yellow px-3 py-1 text-yellow-foreground">
                   Empezar
                 </span>
               </p>
-              <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
-                Sumate a la primera campaña
+              <h2 className="mt-6 font-extrabold uppercase leading-[0.95] tracking-tight text-white text-[clamp(2rem,5.5vw,5rem)]">
+                Sumate a la <span className="text-yellow">primera campaña</span>
               </h2>
-              <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+              <p className="mt-5 text-base text-cream/80 sm:text-lg">
                 Crear cuenta es gratis, lleva menos de un minuto y no te
                 compromete a nada. Mirá todo antes de reservar.
               </p>
 
-              <div className="mt-10 space-y-4 text-sm">
+              <div className="mt-10 space-y-4 text-sm text-white/90">
                 {[
-                  { icon: MapPin, label: "Leandro Gómez 1076, Paysandú" },
-                  { icon: Clock, label: "Lun-Vie 9:00-18:00 · Sáb 9:00-13:00" },
-                  { icon: Phone, label: "hola@mercadonuestro.uy" },
-                  {
-                    icon: ShoppingBasket,
-                    label: "Pago seguro vía Mercado Pago",
-                  },
+                  { icon: "ubicacion", label: "Leandro Gómez 1076, Paysandú" },
+                  { icon: "tienda", label: "Lun-Vie 9:00-18:00 · Sáb 9:00-13:00" },
+                  { icon: "soporte", label: "hola@mercadonuestro.uy" },
+                  { icon: "seguridad", label: "Pago seguro vía Mercado Pago" },
                 ].map((line) => (
                   <div key={line.label} className="flex items-center gap-3">
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-                      <line.icon className="size-4" aria-hidden />
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-white/10">
+                      <IconMN
+                        name={line.icon as "ubicacion" | "tienda" | "soporte" | "seguridad"}
+                        variant="blanco"
+                        size={22}
+                        alt=""
+                      />
                     </div>
                     {line.label}
                   </div>

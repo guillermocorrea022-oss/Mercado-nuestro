@@ -1,19 +1,23 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Bell, LogOut, UserRound } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 import { signOutAction } from "@/app/(auth)/actions";
-import { buttonVariants } from "@/components/ui/button";
+import { IconMN } from "@/components/ui/IconMN";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 import { FloatingHeaderShell } from "./FloatingHeaderShell";
 
+// Navbar como app-web: links directos a las páginas funcionales del sitio.
+// El home queda como landing explicativa pero el resto del sitio es la
+// app navegable propiamente dicha — el usuario que ya entendió la propuesta
+// puede saltar directo a explorar campañas, marketplace o stock.
 const navLinks = [
-  { href: "/#sobre", label: "Sobre" },
-  { href: "/#lineas", label: "Líneas" },
-  { href: "/#grupos", label: "Grupos" },
-  { href: "/#faqs", label: "FAQs" },
-  { href: "/#testimonios", label: "Testimonios" },
+  { href: "/campanas", label: "Campañas" },
+  { href: "/marketplace", label: "Marketplace" },
+  { href: "/disponible", label: "Disponible" },
+  { href: "/como-funciona", label: "Cómo funciona" },
 ];
 
 // Header isla flotante con scroll-aware behavior. Visible al cargar,
@@ -41,18 +45,26 @@ export async function Header() {
 
   return (
     <FloatingHeaderShell>
-      <div className="flex h-14 items-center justify-between gap-4 pl-5 pr-2 sm:pl-6 sm:pr-3">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-sm font-bold tracking-tight"
-        >
-          <span aria-hidden className="relative flex size-2.5">
-            <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-30" />
-            <span className="relative inline-block size-2.5 rounded-full bg-primary" />
-          </span>
-          <span>
-            Mercado <span className="text-muted-foreground">Nuestro</span>
-          </span>
+      <div className="flex h-14 items-center justify-between gap-4 pl-3 pr-2 sm:pl-4 sm:pr-3">
+        <Link href="/" className="flex items-center" aria-label="Mercado Nuestro — Inicio">
+          {/* Mobile: isotipo solo (espacio reducido). Desktop: logo horizontal. */}
+          <Image
+            src="/logos/07_isotipo-principal_color.png"
+            alt="Mercado Nuestro"
+            width={36}
+            height={36}
+            className="sm:hidden"
+            priority
+          />
+          <Image
+            src="/logos/01_principal.png"
+            alt="Mercado Nuestro"
+            width={160}
+            height={36}
+            className="hidden sm:block"
+            style={{ height: "auto", width: "auto", maxHeight: "36px" }}
+            priority
+          />
         </Link>
 
         <nav
@@ -75,26 +87,21 @@ export async function Header() {
             <>
               <Link
                 href="/perfil/notificaciones"
-                className={cn(
-                  buttonVariants({ variant: "ghost", size: "icon-sm" }),
-                  "relative rounded-full",
-                )}
+                className="relative inline-flex size-9 items-center justify-center rounded-full hover:bg-secondary"
                 aria-label={`Notificaciones${unread ? ` (${unread} sin leer)` : ""}`}
               >
-                <Bell className="size-4" aria-hidden />
+                <IconMN name="notificaciones" size={20} alt="" />
                 {unread > 0 ? (
-                  <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                  <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-yellow px-1 text-[10px] font-bold text-yellow-foreground">
                     {unread > 99 ? "99+" : unread}
                   </span>
                 ) : null}
               </Link>
               <Link
                 href="/perfil"
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium hover:bg-secondary",
-                )}
+                className="inline-flex items-center gap-1.5 rounded-full px-2 py-1.5 text-sm font-medium hover:bg-secondary"
               >
-                <UserRound className="size-4" aria-hidden />
+                <IconMN name="usuario" size={20} alt="" />
                 <span className="hidden sm:inline">Mi cuenta</span>
               </Link>
               <form action={signOutAction}>
@@ -111,16 +118,16 @@ export async function Header() {
           ) : (
             <>
               <Link
-                href="/#precios"
-                className="hidden h-9 items-center rounded-full border border-foreground px-4 text-xs font-bold uppercase tracking-wider text-foreground transition-colors hover:bg-foreground hover:text-white sm:inline-flex"
+                href="/login"
+                className="hidden h-9 items-center rounded-full border border-primary px-4 text-xs font-bold uppercase tracking-wider text-primary transition-colors hover:bg-primary hover:text-primary-foreground sm:inline-flex"
               >
-                Precios
+                Entrar
               </Link>
               <Link
-                href="/#reservar"
-                className="inline-flex h-9 items-center rounded-full bg-foreground px-4 text-xs font-bold uppercase tracking-wider text-white transition-transform hover:-translate-y-0.5"
+                href="/registro"
+                className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-xs font-bold uppercase tracking-wider text-primary-foreground transition-transform hover:-translate-y-0.5 shadow-glow"
               >
-                Reservar
+                Crear cuenta
               </Link>
             </>
           )}
