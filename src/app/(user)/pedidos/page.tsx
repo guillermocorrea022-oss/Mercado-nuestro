@@ -93,7 +93,7 @@ export default async function PedidosPage() {
             />
             <p className="mt-3 font-medium">Todavía no hiciste pedidos.</p>
             <Link
-              href="/disponible"
+              href="/app/marketplace"
               className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
             >
               Ver stock disponible →

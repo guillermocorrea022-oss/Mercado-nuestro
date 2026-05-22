@@ -145,7 +145,7 @@ export default async function MisComprasPage({
               Todavía no hiciste compras en marketplace
             </p>
             <Link
-              href="/marketplace"
+              href="/app/marketplace"
               className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
             >
               Ver publicaciones →

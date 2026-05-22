@@ -10,8 +10,8 @@ import {
 } from "@/components/auth/AuthFormHelpers";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { applyImporterAction } from "@/app/(public)/ser-importador/actions";
-import { initialImporterState } from "@/app/(public)/ser-importador/state";
+import { applyImporterAction } from "@/app/app/ser-importador/actions";
+import { initialImporterState } from "@/app/app/ser-importador/state";
 
 export function ImporterApplicationForm() {
   const [state, formAction] = useActionState(

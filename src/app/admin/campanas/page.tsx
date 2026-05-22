@@ -171,7 +171,7 @@ export default async function AdminCampanasPage() {
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap items-center justify-end gap-2">
                         <Link
-                          href={`/campanas/${c.slug}`}
+                          href={`/app/campanas/${c.slug}`}
                           target="_blank"
                           className={cn(
                             buttonVariants({ variant: "ghost", size: "sm" }),

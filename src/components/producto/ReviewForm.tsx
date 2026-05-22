@@ -10,7 +10,7 @@ import {
 } from "@/components/auth/AuthFormHelpers";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createReviewAction } from "@/app/(public)/producto/[slug]/actions";
+import { createReviewAction } from "@/app/app/producto/[slug]/actions";
 import { cn } from "@/lib/utils";
 
 const initialState = { status: "idle" as const };

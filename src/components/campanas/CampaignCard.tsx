@@ -42,7 +42,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
 
   return (
     <Link
-      href={`/campanas/${campaign.slug}`}
+      href={`/app/campanas/${campaign.slug}`}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:border-primary/30 hover:shadow-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">

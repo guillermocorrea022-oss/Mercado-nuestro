@@ -235,6 +235,6 @@ export async function createListingReviewAction(
   });
 
   revalidatePath("/perfil/mis-compras");
-  revalidatePath(`/marketplace/${order.listing_id}`);
+  revalidatePath(`/app/marketplace/${order.listing_id}`);
   return { status: "idle" };
 }

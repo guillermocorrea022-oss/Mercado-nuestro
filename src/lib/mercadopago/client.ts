@@ -45,7 +45,7 @@ export async function createCampaignDepositPreference(
     // checkout. Esto permite que el flujo se complete sin MP real.
     return {
       id: `stub_${input.reservationId}`,
-      initPoint: `/checkout/mercadopago-stub?reservation=${encodeURIComponent(
+      initPoint: `/app/checkout/mercadopago-stub?reservation=${encodeURIComponent(
         input.reservationId,
       )}`,
       isReal: false,

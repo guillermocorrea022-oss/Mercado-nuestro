@@ -127,7 +127,7 @@ export default async function MisReservasPage() {
               Mirá las campañas activas y sumate a la próxima importación.
             </p>
             <Link
-              href="/campanas"
+              href="/app/campanas"
               className={cn(
                 buttonVariants({ size: "lg" }),
                 "mt-6 h-11 px-6 text-base",
@@ -164,7 +164,7 @@ export default async function MisReservasPage() {
                 <li key={r.id}>
                   <div className="rounded-2xl border border-border bg-card p-5 transition-colors hover:bg-muted/10">
                     <Link
-                      href={`/campanas/${campaign.slug}`}
+                      href={`/app/campanas/${campaign.slug}`}
                       className="flex items-center justify-between gap-4"
                     >
                       <div className="min-w-0 flex-1">

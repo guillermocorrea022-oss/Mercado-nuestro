@@ -3,7 +3,7 @@
 import { useTransition, useState } from "react";
 import { X } from "lucide-react";
 
-import { cancelReservationAction } from "@/app/(public)/campanas/actions";
+import { cancelReservationAction } from "@/app/app/campanas/actions";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

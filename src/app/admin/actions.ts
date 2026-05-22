@@ -163,7 +163,7 @@ export async function createCampaignAction(
   } as never);
 
   revalidatePath("/admin/campanas");
-  revalidatePath("/campanas");
+  revalidatePath("/app/campanas");
   redirect(`/admin/campanas`);
 }
 
@@ -234,7 +234,7 @@ export async function createProductAction(
   } as never);
 
   revalidatePath("/admin/productos");
-  revalidatePath("/campanas");
+  revalidatePath("/app/campanas");
   redirect("/admin/productos");
 }
 
@@ -433,7 +433,7 @@ export async function createCampaignStatusUpdateAction(
     .maybeSingle()
     .returns<{ slug: string } | null>();
   if (c) {
-    revalidatePath(`/campanas/${c.slug}`);
+    revalidatePath(`/app/campanas/${c.slug}`);
   }
 
   return { status: "idle" };
@@ -470,7 +470,7 @@ export async function updateCampaignStatusAction(
   } as never);
 
   revalidatePath("/admin/campanas");
-  revalidatePath("/campanas");
+  revalidatePath("/app/campanas");
   return { status: "success" };
 }
 
@@ -491,7 +491,7 @@ export async function closeCampaignAction(
   }
 
   revalidatePath("/admin/campanas");
-  revalidatePath("/campanas");
+  revalidatePath("/app/campanas");
 
   return {
     status: "success",
@@ -529,7 +529,7 @@ export async function extendCampaignAction(
 
   revalidatePath("/admin/campanas");
   revalidatePath(`/admin/campanas/${campaignId}`);
-  revalidatePath("/campanas");
+  revalidatePath("/app/campanas");
 
   const result = (data as { new_closes_at?: string }) || {};
   return {

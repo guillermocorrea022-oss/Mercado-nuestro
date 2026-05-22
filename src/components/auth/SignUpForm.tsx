@@ -8,92 +8,118 @@ import {
   FormError,
   SubmitButton,
 } from "@/components/auth/AuthFormHelpers";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { signUpAction } from "@/app/(auth)/actions";
 import { initialState } from "@/app/(auth)/state";
+
+// Estilo branded — mismo lenguaje que SignInForm (inputs altos, labels en
+// bold uppercase chiquitas, focus ring brand-blue).
+const inputClass =
+  "block w-full rounded-xl border border-neutral-gray-300 bg-white px-4 py-3 text-sm text-neutral-gray-700 transition-colors placeholder:text-neutral-gray-300 focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20";
+const labelClass =
+  "text-xs font-bold uppercase tracking-wider text-neutral-gray-700/70";
 
 export function SignUpForm() {
   const [state, formAction] = useActionState(signUpAction, initialState);
 
   return (
-    <form action={formAction} className="space-y-4" noValidate>
+    <form action={formAction} className="space-y-5" noValidate>
       <FormError message={state.message} />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <Label htmlFor="firstName">Nombre</Label>
-          <Input
+          <label htmlFor="firstName" className={labelClass}>
+            Nombre
+          </label>
+          <input
             id="firstName"
             name="firstName"
             autoComplete="given-name"
             required
-            className="mt-1.5"
+            placeholder="Juan"
+            className={`${inputClass} mt-2`}
           />
           <FieldError errors={state.fieldErrors?.firstName} />
         </div>
         <div>
-          <Label htmlFor="lastName">Apellido</Label>
-          <Input
+          <label htmlFor="lastName" className={labelClass}>
+            Apellido
+          </label>
+          <input
             id="lastName"
             name="lastName"
             autoComplete="family-name"
             required
-            className="mt-1.5"
+            placeholder="Pérez"
+            className={`${inputClass} mt-2`}
           />
           <FieldError errors={state.fieldErrors?.lastName} />
         </div>
       </div>
 
       <div>
-        <Label htmlFor="email">Email</Label>
-        <Input
+        <label htmlFor="email" className={labelClass}>
+          Email
+        </label>
+        <input
           id="email"
           name="email"
           type="email"
           autoComplete="email"
           required
-          className="mt-1.5"
+          placeholder="vos@email.com"
+          className={`${inputClass} mt-2`}
         />
         <FieldError errors={state.fieldErrors?.email} />
       </div>
 
       <div>
-        <Label htmlFor="password">Contraseña</Label>
-        <Input
+        <label htmlFor="password" className={labelClass}>
+          Contraseña
+        </label>
+        <input
           id="password"
           name="password"
           type="password"
           autoComplete="new-password"
           minLength={8}
           required
-          className="mt-1.5"
+          placeholder="Mínimo 8 caracteres"
+          className={`${inputClass} mt-2`}
         />
         <FieldError errors={state.fieldErrors?.password} />
       </div>
 
       <div>
-        <Label htmlFor="passwordConfirm">Repetir contraseña</Label>
-        <Input
+        <label htmlFor="passwordConfirm" className={labelClass}>
+          Repetir contraseña
+        </label>
+        <input
           id="passwordConfirm"
           name="passwordConfirm"
           type="password"
           autoComplete="new-password"
           required
-          className="mt-1.5"
+          placeholder="••••••••"
+          className={`${inputClass} mt-2`}
         />
         <FieldError errors={state.fieldErrors?.passwordConfirm} />
       </div>
 
       <SubmitButton label="Crear cuenta" pendingLabel="Creando cuenta..." />
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-xs text-neutral-gray-700/60">
         Al crear una cuenta aceptás los{" "}
-        <Link href="/terminos" className="underline hover:text-foreground">
+        <Link
+          href="/terminos"
+          className="font-semibold text-neutral-gray-700/80 underline-offset-4 hover:text-brand-blue hover:underline"
+        >
           términos
         </Link>{" "}
         y la{" "}
-        <Link href="/privacidad" className="underline hover:text-foreground">
+        <Link
+          href="/privacidad"
+          className="font-semibold text-neutral-gray-700/80 underline-offset-4 hover:text-brand-blue hover:underline"
+        >
           política de privacidad
         </Link>
         .

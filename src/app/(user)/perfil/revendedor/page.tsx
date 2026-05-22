@@ -311,7 +311,7 @@ export default async function RevendedorPage() {
                       </p>
                     </div>
                     <Link
-                      href={`/marketplace/${l.id}`}
+                      href={`/app/marketplace/${l.id}`}
                       target="_blank"
                       className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                     >

@@ -81,7 +81,7 @@ export default async function DeseosPage() {
               return (
                 <li key={w.id}>
                   <Link
-                    href={`/producto/${product.slug}`}
+                    href={`/app/producto/${product.slug}`}
                     className="flex gap-4 rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/30"
                   >
                     <div className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-muted">

@@ -231,7 +231,7 @@ export default function ComoFuncionaPage() {
                   minutos.
                 </p>
                 <Link
-                  href="/campanas"
+                  href="/app/campanas"
                   className={cn(
                     buttonVariants({ size: "lg" }),
                     "mt-10 h-12 px-7 text-base shadow-glow",

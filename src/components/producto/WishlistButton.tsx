@@ -3,7 +3,7 @@
 import { useTransition, useState } from "react";
 import { Heart } from "lucide-react";
 
-import { toggleWishlistAction } from "@/app/(public)/producto/[slug]/actions";
+import { toggleWishlistAction } from "@/app/app/producto/[slug]/actions";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

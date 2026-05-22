@@ -93,7 +93,7 @@ export default async function AdminCampaignDetailPage({
           ) : null}
         </div>
         <Link
-          href={`/campanas/${campaign.slug}`}
+          href={`/app/campanas/${campaign.slug}`}
           target="_blank"
           className="text-sm font-medium text-primary hover:underline"
         >

@@ -20,8 +20,9 @@ export function StarRating({ value, size = "size-4", className }: Props) {
         const fill = Math.min(1, Math.max(0, value - (i - 1))) * 100;
         return (
           <span key={i} className={cn("relative", size)}>
+            {/* Estrella vacía — blanco/20 visible en fondos oscuros y sutil en claros */}
             <Star
-              className={cn("absolute inset-0 text-border", size)}
+              className={cn("absolute inset-0 text-white/30", size)}
               aria-hidden
             />
             <span
@@ -29,8 +30,9 @@ export function StarRating({ value, size = "size-4", className }: Props) {
               style={{ width: `${fill}%` }}
               aria-hidden
             >
+              {/* Estrella llena — Amarillo Acento #FFC107 (COLORES.md) */}
               <Star
-                className={cn("text-primary", size)}
+                className={cn("text-[#FFC107]", size)}
                 fill="currentColor"
                 aria-hidden
               />

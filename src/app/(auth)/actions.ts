@@ -124,7 +124,7 @@ export async function signInAction(
     return { status: "error", message: traduceErrorAuth(error.message) };
   }
 
-  // `next` permite volver a donde el usuario venía (ej: /campanas/x desde el
+  // `next` permite volver a donde el usuario venía (ej: /app/campanas/x desde el
   // botón de reservar). Validamos que sea un path interno por seguridad.
   const nextRaw = formData.get("next");
   const next =

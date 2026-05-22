@@ -87,7 +87,7 @@ export async function createListingAction(
   if (error) return { status: "error", message: error.message };
 
   revalidatePath("/perfil/revendedor");
-  revalidatePath("/marketplace");
+  revalidatePath("/app/marketplace");
   return { status: "idle" };
 }
 
@@ -111,7 +111,7 @@ export async function toggleListingStatusAction(
 
   if (error) return { status: "error", message: error.message };
   revalidatePath("/perfil/revendedor");
-  revalidatePath("/marketplace");
+  revalidatePath("/app/marketplace");
   return { status: "success" };
 }
 

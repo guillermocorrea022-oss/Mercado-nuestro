@@ -2,13 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SignUpForm } from "@/components/auth/SignUpForm";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Crear cuenta",
@@ -17,26 +10,32 @@ export const metadata: Metadata = {
 
 export default function RegistroPage() {
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle className="text-2xl">Crear cuenta</CardTitle>
-        <CardDescription>
-          Te toma menos de un minuto. Después podés reservar en cualquier
-          campaña activa.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div>
+      <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-blue">
+        Sumate a la comunidad
+      </p>
+
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-neutral-gray-700 sm:text-4xl">
+        Crear cuenta
+      </h1>
+      <p className="mt-2 text-sm text-neutral-gray-700/70 sm:text-base">
+        Te toma menos de un minuto. Después podés reservar en cualquier campaña
+        activa.
+      </p>
+
+      <div className="mt-8">
         <SignUpForm />
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          ¿Ya tenés cuenta?{" "}
-          <Link
-            href="/login"
-            className="font-medium text-primary hover:underline"
-          >
-            Iniciá sesión
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+      </div>
+
+      <p className="mt-8 text-sm text-neutral-gray-700/70">
+        ¿Ya tenés cuenta?{" "}
+        <Link
+          href="/login"
+          className="font-bold text-brand-blue underline-offset-4 hover:underline"
+        >
+          Iniciá sesión
+        </Link>
+      </p>
+    </div>
   );
 }

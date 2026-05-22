@@ -25,16 +25,16 @@ const items: NavItem[] = [
     match: (p) => p === "/",
   },
   {
-    href: "/campanas",
+    href: "/app/campanas",
     label: "Campañas",
     icon: "compra_grupal",
-    match: (p) => p.startsWith("/campanas"),
+    match: (p) => p.startsWith("/app/campanas"),
   },
   {
-    href: "/marketplace",
+    href: "/app/marketplace",
     label: "Buscar",
     icon: "buscar",
-    match: (p) => p.startsWith("/marketplace") || p.startsWith("/disponible"),
+    match: (p) => p.startsWith("/app/marketplace") || p.startsWith("/app/marketplace"),
   },
   {
     href: "/perfil/mis-compras",

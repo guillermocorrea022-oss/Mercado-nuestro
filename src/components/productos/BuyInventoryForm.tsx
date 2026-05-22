@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus } from "lucide-react";
 
-import { buyInventoryItemAction } from "@/app/(public)/producto/[slug]/buy-actions";
+import { buyInventoryItemAction } from "@/app/app/producto/[slug]/buy-actions";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

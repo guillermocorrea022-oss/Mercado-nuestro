@@ -9,7 +9,7 @@ import {
 } from "@/components/auth/AuthFormHelpers";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createProposalAction } from "@/app/(public)/propuestas/actions";
+import { createProposalAction } from "@/app/app/propuestas/actions";
 
 const initialState = { status: "idle" as const };
 

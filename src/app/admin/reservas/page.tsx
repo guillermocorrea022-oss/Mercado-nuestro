@@ -92,7 +92,7 @@ export default async function AdminReservasPage() {
                     <td className="px-4 py-3">
                       {campaign ? (
                         <Link
-                          href={`/campanas/${campaign.slug}`}
+                          href={`/app/campanas/${campaign.slug}`}
                           target="_blank"
                           className="font-medium hover:text-primary"
                         >

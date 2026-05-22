@@ -43,3 +43,11 @@ next-env.d.ts
 
 # Claude Code local settings
 .claude/
+
+# Editor configs locales
+.vscode/
+
+# Assets fuente (los archivos finales viven en public/)
+/img/
+/iconos_mercado_nuestro/
+/logo/

@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom";
 import { Minus, Plus } from "lucide-react";
 
 import { FormError } from "@/components/auth/AuthFormHelpers";
-import { createMarketplaceOrderAction } from "@/app/(public)/marketplace/actions";
+import { createMarketplaceOrderAction } from "@/app/app/marketplace/actions";
 import { buttonVariants } from "@/components/ui/button";
 import { formatUsdFromCents } from "@/lib/campaigns";
 import { cn } from "@/lib/utils";

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 
-import { payCampaignBalanceAction } from "@/app/(public)/campanas/actions";
+import { payCampaignBalanceAction } from "@/app/app/campanas/actions";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

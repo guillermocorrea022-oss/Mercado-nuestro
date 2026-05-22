@@ -9,9 +9,9 @@ const footerSections = [
   {
     title: "Comprar",
     links: [
-      { href: "/campanas", label: "Campañas activas" },
-      { href: "/disponible", label: "Stock disponible" },
-      { href: "/marketplace", label: "Marketplace" },
+      { href: "/app/campanas", label: "Campañas activas" },
+      { href: "/app/marketplace", label: "Stock disponible" },
+      { href: "/app/marketplace", label: "Marketplace" },
       { href: "/como-funciona", label: "Cómo funciona" },
     ],
   },
@@ -19,9 +19,9 @@ const footerSections = [
     title: "Vender",
     links: [
       { href: "/ser-vendedor", label: "Programa de vendedores" },
-      { href: "/marketplace/publicar", label: "Publicar en marketplace" },
-      { href: "/proponer-producto", label: "Proponer producto" },
-      { href: "/ser-importador", label: "Ser importador avanzado" },
+      { href: "/app/marketplace/publicar", label: "Publicar en marketplace" },
+      { href: "/app/propuestas/nueva", label: "Proponer producto" },
+      { href: "/app/ser-importador", label: "Ser importador avanzado" },
     ],
   },
   {
@@ -51,7 +51,7 @@ const contactLines: { icon: "ubicacion" | "soporte" | "tienda"; label: string }[
 
 export function Footer() {
   return (
-    <footer className="relative mt-24 overflow-hidden bg-navy text-navy-foreground">
+    <footer className="relative overflow-hidden bg-navy text-navy-foreground">
       {/* Faja diagonal tricolor arriba — refuerza la entrada al footer. */}
       <div
         aria-hidden
@@ -70,9 +70,9 @@ export function Footer() {
               <Image
                 src="/logos/05_horizontal_blanco.png"
                 alt="Mercado Nuestro"
-                width={200}
-                height={48}
-                style={{ height: "auto", width: "auto", maxHeight: "56px" }}
+                width={240}
+                height={56}
+                style={{ height: "auto", width: "auto", maxHeight: "64px" }}
               />
             </Link>
             <p className="mt-6 max-w-sm text-sm leading-relaxed text-white/75">

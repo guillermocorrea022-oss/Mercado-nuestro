@@ -115,7 +115,7 @@ export default async function AdminProductosPage() {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link
-                        href={`/producto/${p.slug}`}
+                        href={`/app/producto/${p.slug}`}
                         target="_blank"
                         className={cn(
                           buttonVariants({ variant: "ghost", size: "sm" }),

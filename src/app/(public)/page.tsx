@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ShieldCheck, Star, Store } from "lucide-react";
 
 import {
   CampaignCard,
@@ -20,6 +20,7 @@ import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Accordion } from "@/components/ui/accordion";
 import { IconMN } from "@/components/ui/IconMN";
 import { StarRating } from "@/components/ui/star-rating";
+import { formatUsdFromCents } from "@/lib/campaigns";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -78,6 +79,74 @@ async function getFeaturedCampaigns(): Promise<CampaignCardData[]> {
   }));
 }
 
+// ─── Featured marketplace listings ───────────────────────────────────────────
+// Mismo patrón two-query que /app/marketplace porque listings.seller_id apunta a
+// profiles.id, no a seller_profiles.user_id (PostgREST no resuelve el join).
+type FeaturedListingRaw = {
+  id: string;
+  seller_id: string;
+  price_cents_usd: number;
+  quantity_available: number;
+  product:
+    | { name: string; brand: string | null; main_image_url: string | null }
+    | { name: string; brand: string | null; main_image_url: string | null }[]
+    | null;
+};
+
+type FeaturedListing = {
+  id: string;
+  priceCentsUsd: number;
+  quantity: number;
+  productName: string;
+  brand: string | null;
+  imageUrl: string | null;
+  sellerName: string | null;
+  sellerRating: number;
+};
+
+async function getFeaturedListings(): Promise<FeaturedListing[]> {
+  const supabase = await createClient();
+
+  const { data: raw } = await supabase
+    .from("marketplace_listings")
+    .select(
+      "id, seller_id, price_cents_usd, quantity_available, product:products(name, brand, main_image_url)",
+    )
+    .eq("status", "activa")
+    .gt("quantity_available", 0)
+    .order("created_at", { ascending: false })
+    .limit(4)
+    .returns<FeaturedListingRaw[]>();
+
+  if (!raw || raw.length === 0) return [];
+
+  const sellerIds = [...new Set(raw.map((l) => l.seller_id))];
+  const { data: sellers } = await supabase
+    .from("seller_profiles")
+    .select("user_id, display_name, rating_avg")
+    .in("user_id", sellerIds)
+    .returns<{ user_id: string; display_name: string; rating_avg: number }[]>();
+
+  const sellerMap = Object.fromEntries(
+    (sellers ?? []).map((s) => [s.user_id, s]),
+  );
+
+  return raw.map((l) => {
+    const product = Array.isArray(l.product) ? l.product[0] : l.product;
+    const seller = sellerMap[l.seller_id];
+    return {
+      id: l.id,
+      priceCentsUsd: l.price_cents_usd,
+      quantity: l.quantity_available,
+      productName: product?.name ?? "Producto",
+      brand: product?.brand ?? null,
+      imageUrl: product?.main_image_url ?? null,
+      sellerName: seller?.display_name ?? null,
+      sellerRating: seller?.rating_avg ?? 0,
+    };
+  });
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Contenido estático del home — copy rioplatense.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -112,57 +181,34 @@ const activities: ActivityCardData[] = [
       "Soporte en español",
     ],
     excluded: ["Stock inmediato", "Entrega en menos de 30 días"],
-    primaryCta: { label: "Ver campañas", href: "/campanas" },
+    primaryCta: { label: "Ver campañas", href: "/app/campanas" },
     secondaryCta: { label: "Cómo funciona", href: "/como-funciona" },
     rightVariant: "blue",
   },
   {
-    id: "disponible",
-    badge: "Línea 02",
-    title: "Stock disponible",
-    requirements: "Entrega 2 a 5 días hábiles · Retiro gratis en Paysandú",
-    description:
-      "Productos que ya están en nuestro local de Paysandú o en depósito. Comprás y te llegan rapidísimo, como cualquier eCommerce.",
-    image:
-      "https://images.unsplash.com/photo-1556909211-d5b0bb0e6f6d?auto=format&fit=crop&w=1200&q=80",
-    details: [
-      {
-        id: "d-1",
-        title: "Cómo es la entrega",
-        content:
-          "Despacho a todo Uruguay en 2 a 5 días hábiles. Si vivís en Paysandú, retiro gratis en Leandro Gómez 1076.",
-      },
-      {
-        id: "d-2",
-        title: "Métodos de pago",
-        content:
-          "Mercado Pago, transferencia, Abitab, Redpagos o crédito en cuenta. Sin recargos por elegir uno u otro.",
-      },
-    ],
-    included: ["Garantía local 6 meses", "Cambios sin cargo", "Factura"],
-    excluded: ["Precios de campaña"],
-    primaryCta: { label: "Ver stock", href: "/disponible" },
-    secondaryCta: { label: "Garantía", href: "/devoluciones" },
-    rightVariant: "navy",
-  },
-  {
     id: "marketplace",
-    badge: "Línea 03",
-    title: "Marketplace de reventa",
-    requirements: "Pago protegido · Vendedores verificados",
+    badge: "Línea 02",
+    title: "Mercado Nuestro",
+    requirements: "Stock disponible · Pago protegido · Vendedores verificados",
     description:
-      "Quien importó publica el sobrante con precios competitivos. El dinero queda retenido hasta que confirmás que recibiste.",
+      "La tienda con stock listo para entregar: lo que ya importamos al local de Paysandú + reventas de importadores verificados. Pagás a Mercado Nuestro y liberamos cuando confirmás recepción.",
     image:
       "https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=80",
     details: [
       {
         id: "m-1",
-        title: "Cómo funciona el escrow",
+        title: "Cómo es la entrega",
+        content:
+          "Despacho a todo Uruguay en 2 a 5 días hábiles. Si vivís en Paysandú, retiro gratis en Leandro Gómez 1076.",
+      },
+      {
+        id: "m-2",
+        title: "Pago protegido (escrow)",
         content:
           "Pagás a Mercado Nuestro, no al vendedor. Liberamos cuando confirmás recepción o pasados 3 días desde el despacho sin reclamo.",
       },
       {
-        id: "m-2",
+        id: "m-3",
         title: "Si algo sale mal",
         content:
           "Abrís un reclamo dentro de los 7 días. Lo resolvemos en 5 días hábiles, con derecho a apelación.",
@@ -170,13 +216,13 @@ const activities: ActivityCardData[] = [
     ],
     included: ["Pago protegido (escrow)", "Reseñas reales", "Chat interno"],
     excluded: ["Pago directo al vendedor", "Trato por fuera"],
-    primaryCta: { label: "Ver marketplace", href: "/marketplace" },
+    primaryCta: { label: "Ir a Mercado Nuestro", href: "/app/marketplace" },
     secondaryCta: { label: "Vender", href: "/perfil/revendedor" },
     rightVariant: "blue-light",
   },
   {
     id: "vendedores",
-    badge: "Línea 04",
+    badge: "Línea 03",
     title: "Vendedores por catálogo",
     requirements: "Sin stock propio · Pago mensual de comisiones",
     description:
@@ -202,28 +248,6 @@ const activities: ActivityCardData[] = [
     primaryCta: { label: "Activar mi catálogo", href: "/perfil/vendedor" },
     secondaryCta: { label: "Más info", href: "/perfil/vendedor" },
     rightVariant: "yellow",
-  },
-];
-
-// Bloques grandes con foto — estilo "PARA CELEBRAR JUNTOS" del FUN Parque.
-// Importadores avanzados se separa como bloque chico debajo (es B2B-pro,
-// no encaja con la lógica de compra B2B genérica de las primeras dos).
-const groupHighlights = [
-  {
-    title: "Empresas",
-    description:
-      "Pedidos al por mayor con facturación. RUT, logística dedicada y precios a medida.",
-    href: "/contacto",
-    image:
-      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Instituciones",
-    description:
-      "Clubes, sindicatos o cooperativas que quieran usar Mercado Nuestro como canal de compras grupales.",
-    href: "/contacto",
-    image:
-      "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1200&q=80",
   },
 ];
 
@@ -299,7 +323,7 @@ const faqTabs = [
   },
   {
     id: "marketplace",
-    label: "Marketplace",
+    label: "Mercado Nuestro",
     items: [
       {
         id: "m1",
@@ -350,7 +374,10 @@ const faqTabs = [
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const featuredCampaigns = await getFeaturedCampaigns();
+  const [featuredCampaigns, featuredListings] = await Promise.all([
+    getFeaturedCampaigns(),
+    getFeaturedListings(),
+  ]);
 
   return (
     <>
@@ -366,8 +393,8 @@ export default async function HomePage() {
       <section className="relative isolate min-h-[92vh] overflow-hidden bg-navy text-navy-foreground">
         {/* Imagen de fondo full-bleed */}
         <Image
-          src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=2400&q=80"
-          alt="Contenedores y cajas de importación llegando al puerto"
+          src="/hero.png"
+          alt="Mercado Nuestro — compra colaborativa"
           fill
           sizes="100vw"
           className="absolute inset-0 -z-10 object-cover"
@@ -385,7 +412,7 @@ export default async function HomePage() {
           <Reveal delay={0.15} className="w-full text-center">
             <h1 className="mx-auto max-w-[1500px] font-extrabold uppercase leading-[0.9] tracking-tight text-white text-[clamp(2.5rem,7.5vw,7.5rem)]">
               <span className="block">Importá en grupo</span>
-              <span className="block text-yellow">a precio mayorista</span>
+              <span className="block text-blue text-highlight" style={{ paddingBottom: '0.15em' }}>A PRECIOS INCREIBLES</span>
             </h1>
 
             <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
@@ -396,7 +423,7 @@ export default async function HomePage() {
                 Cómo funciona
               </Link>
               <Link
-                href="/campanas"
+                href="/app/campanas"
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-yellow px-8 text-sm font-bold uppercase tracking-wider text-yellow-foreground transition-transform hover:-translate-y-0.5 shadow-glow"
               >
                 Ver campañas
@@ -572,13 +599,13 @@ export default async function HomePage() {
               </p>
               <h2 className="mt-6 font-extrabold uppercase leading-[0.92] tracking-tight text-foreground text-[clamp(2rem,7vw,6.5rem)]">
                 Sumate a nuestras{" "}
-                <span className="text-highlight">cuatro líneas</span> de negocio
+                <span className="text-highlight">tres líneas</span> de negocio
               </h2>
             </Reveal>
           </Container>
 
           {/* Stack de cards full width sobre cream */}
-          <div className="px-4 pb-40 sm:px-8 sm:pb-48">
+          <div className="px-4 pb-0 sm:px-8">
             <StackedCards spacing="40vh">
               {activities.map((activity) => (
                 <div
@@ -616,10 +643,145 @@ export default async function HomePage() {
         textColor="text-blue-foreground"
       />
 
+      {/* ====================== PARA GRUPOS ======================
+          Rediseñado: PARA TODOS — sin mínimo de compra.
+          1 unidad o 1000: todos pueden participar.
+          Cuanto más nos juntamos, más barato para todos. */}
+      <section id="grupos" className="bg-background py-24 sm:py-32">
+        <Container>
+          <Reveal className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em]">
+              <span className="rounded-full bg-primary px-3 py-1 text-primary-foreground">
+                Para todos
+              </span>
+            </p>
+            <h2 className="mt-6 font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2rem,5vw,4.5rem)]">
+              Sin mínimo de <span className="text-highlight">compra</span>
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
+              Tanto si querés una sola unidad como si necesitás cien, podés
+              sumarte. Cuanta más gente participa, más barato nos sale
+              a todos.
+            </p>
+          </Reveal>
+
+          {/* 4 perfiles de comprador */}
+          <Stagger className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                icon: "usuario" as const,
+                title: "Particulares",
+                desc: "Querés una sola unidad para uso personal. Entrás a la campaña igual que todos y pagás el mismo precio mayorista.",
+              },
+              {
+                icon: "vendedor" as const,
+                title: "Revendedores",
+                desc: "Importás varias unidades para revender. Mejor precio por volumen y podés publicar el sobrante en el marketplace.",
+              },
+              {
+                icon: "tienda" as const,
+                title: "Empresas",
+                desc: "Pedidos al por mayor con facturación. RUT, logística dedicada y precios a medida para tu negocio.",
+              },
+              {
+                icon: "compra_grupal" as const,
+                title: "Instituciones",
+                desc: "Clubes, sindicatos y cooperativas que quieran usar Mercado Nuestro como canal de compras grupales.",
+              },
+            ].map((p) => (
+              <StaggerItem key={p.title}>
+                <div className="hover-lift flex h-full flex-col gap-4 rounded-3xl border border-border bg-card p-6 sm:p-7">
+                  <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-primary">
+                    <IconMN name={p.icon} variant="blanco" size={36} alt="" />
+                  </div>
+                  <h3 className="text-lg font-extrabold uppercase tracking-tight text-foreground">
+                    {p.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {p.desc}
+                  </p>
+                </div>
+              </StaggerItem>
+            ))}
+          </Stagger>
+
+          {/* Banner del mecanismo de precio grupal */}
+          <Reveal delay={0.2} className="mt-8">
+            <div className="flex flex-wrap items-center gap-8 rounded-3xl bg-blue p-8 text-blue-foreground sm:p-10">
+              {/* Container amarillo cuadradito con el barco más grande adentro.
+                  El amarillo destaca contra el azul del card y el ícono color
+                  (azul+amarillo brand) calza visualmente con el cuadradito. */}
+              <div className="flex size-24 shrink-0 items-center justify-center rounded-2xl bg-yellow shadow-sm">
+                <IconMN
+                  name="campana_importacion"
+                  variant="color"
+                  size={64}
+                  alt=""
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xl font-extrabold uppercase tracking-tight sm:text-2xl">
+                  Más gente = mejor precio para todos
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-blue-foreground/85 sm:text-base">
+                  El precio final lo define la cantidad total reservada entre
+                  todos. No importa si reservaste 1 o 50 unidades: al cerrar
+                  la campaña, todos pagan el precio del mejor escalón
+                  alcanzado.
+                </p>
+              </div>
+              <Link
+                href="/app/campanas"
+                className="inline-flex items-center gap-2 rounded-full bg-yellow px-6 py-3 text-sm font-bold uppercase tracking-wider text-yellow-foreground transition-transform hover:-translate-y-0.5 shrink-0"
+              >
+                Ir a la app
+                <ArrowRight className="size-4" aria-hidden />
+              </Link>
+            </div>
+          </Reveal>
+
+          {/* Bloque chico: Importadores avanzados */}
+          <Reveal delay={0.3} className="mt-6">
+            <Link
+              href="/app/ser-importador"
+              className="hover-lift group block overflow-hidden rounded-3xl border border-border bg-cream p-8 transition-colors hover:border-primary/50 sm:p-10"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  {/* Container azul cuadradito agrandado, ícono importar más
+                      grande. Mismo formato que el banner de arriba para que
+                      ambas piezas tengan jerarquía visual consistente. */}
+                  <div className="flex size-24 shrink-0 items-center justify-center rounded-2xl bg-primary shadow-sm">
+                    <IconMN name="importar" variant="blanco" size={64} alt="" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Para profesionales
+                    </p>
+                    <h3 className="mt-1 text-2xl font-extrabold uppercase tracking-tight text-foreground sm:text-3xl">
+                      Importadores avanzados
+                    </h3>
+                  </div>
+                </div>
+                <p className="max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
+                  ¿Ya importás y querés abrir tus propias campañas en la
+                  plataforma? Postulate al programa y liderá tu propia
+                  importación.
+                </p>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-navy px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-navy-foreground transition-transform group-hover:-translate-y-0.5">
+                  Postularme
+                  <ArrowRight className="size-4" aria-hidden />
+                </span>
+              </div>
+            </Link>
+          </Reveal>
+        </Container>
+      </section>
+
       {/* ====================== CAMPAÑAS EN CURSO ======================
           Headline gigante uppercase + grid de cards + flecha gigante de
           "Ver todas" estilo FUN Parque. Fondo cream. */}
-      <section className="bg-background py-24 sm:py-32">
+      <section id="campanas" className="bg-background py-24 sm:py-32">
         <Container>
           <Reveal className="mx-auto max-w-4xl text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em]">
@@ -668,7 +830,7 @@ export default async function HomePage() {
               {/* Big arrow link — "Ver todas" como CTA grande */}
               <Reveal delay={0.2} className="mt-16 flex justify-center">
                 <Link
-                  href="/campanas"
+                  href="/app/campanas"
                   className="group inline-flex items-center gap-3 rounded-full bg-navy px-8 py-4 text-base font-bold uppercase tracking-wider text-navy-foreground transition-transform hover:-translate-y-0.5"
                 >
                   Ver todas las campañas
@@ -682,6 +844,126 @@ export default async function HomePage() {
           )}
         </Container>
       </section>
+
+      {/* ====================== NUESTRO BAZAR ======================
+          Productos destacados del marketplace de reventa con CTA a /app/marketplace.
+          Cards de productos con precio, marca, vendedor y rating.
+          Solo se renderiza si hay listings activos. */}
+      {featuredListings.length > 0 && (
+        <section id="mercado-nuestro" className="bg-cream py-24 sm:py-32">
+          <Container>
+            <Reveal className="mx-auto max-w-4xl text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.2em]">
+                <span className="rounded-full bg-blue px-3 py-1 text-blue-foreground">
+                  <Store className="inline-block size-3 -mt-0.5 mr-1" aria-hidden />
+                  Mercado Nuestro
+                </span>
+              </p>
+              <h2 className="mt-6 font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2rem,5vw,4.5rem)]">
+                Lo que importamos,{" "}
+                <span className="text-highlight">lo compartimos</span>
+              </h2>
+              <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
+                Stock real de importadores uruguayos. Precio de importación,
+                sin intermediarios, compra 100% protegida.
+              </p>
+            </Reveal>
+
+            {/* Grid de productos destacados */}
+            <Stagger className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {featuredListings.map((l) => (
+                <StaggerItem key={l.id}>
+                  <Link
+                    href={`/app/marketplace/${l.id}`}
+                    className="hover-lift group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card transition-all hover:border-blue/40"
+                  >
+                    {/* Imagen */}
+                    <div className="relative aspect-square w-full overflow-hidden bg-muted">
+                      {l.imageUrl ? (
+                        <Image
+                          src={l.imageUrl}
+                          alt={l.productName}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center">
+                          <IconMN
+                            name="paquete"
+                            variant="color"
+                            size={48}
+                            alt=""
+                            className="opacity-30"
+                          />
+                        </div>
+                      )}
+                      {/* Badge escrow */}
+                      <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-blue/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                        <ShieldCheck className="size-3" aria-hidden />
+                        Escrow
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex flex-1 flex-col gap-1.5 p-5">
+                      {l.brand && (
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-blue">
+                          {l.brand}
+                        </p>
+                      )}
+                      <h3 className="line-clamp-2 text-sm font-bold leading-snug text-foreground">
+                        {l.productName}
+                      </h3>
+                      <p className="mt-auto text-2xl font-extrabold tracking-tight text-navy">
+                        {formatUsdFromCents(l.priceCentsUsd)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {l.quantity}{" "}
+                        {l.quantity === 1
+                          ? "unidad disponible"
+                          : "unidades disponibles"}
+                      </p>
+                      {l.sellerName && (
+                        <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-xs text-muted-foreground">
+                          <span className="max-w-[55%] truncate">
+                            {l.sellerName}
+                          </span>
+                          {l.sellerRating > 0 ? (
+                            <span className="flex shrink-0 items-center gap-0.5 font-medium">
+                              <Star
+                                className="size-3 fill-yellow text-yellow"
+                                aria-hidden
+                              />
+                              {l.sellerRating.toFixed(1)}
+                            </span>
+                          ) : (
+                            <span className="italic">Sin reseñas</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                </StaggerItem>
+              ))}
+            </Stagger>
+
+            {/* CTA grande "Ir a Mercado Nuestro" */}
+            <Reveal delay={0.2} className="mt-16 flex justify-center">
+              <Link
+                href="/app/marketplace"
+                className="group inline-flex items-center gap-3 rounded-full bg-blue px-8 py-4 text-base font-bold uppercase tracking-wider text-blue-foreground transition-transform hover:-translate-y-0.5"
+              >
+                Ir a Mercado Nuestro
+                <ArrowUpRight
+                  className="size-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                  aria-hidden
+                />
+              </Link>
+            </Reveal>
+          </Container>
+        </section>
+      )}
 
       {/* ====================== TESTIMONIOS ======================
           Fondo navy oscuro estilo "O FEEDBACK NO TRIPADVISOR".
@@ -723,7 +1005,7 @@ export default async function HomePage() {
                 <figure className="flex h-full flex-col gap-5 rounded-3xl border border-dashed border-cream/25 bg-navy/40 p-7 backdrop-blur-sm">
                   <StarRating value={t.rating} size="size-4" />
                   <blockquote className="text-base leading-relaxed text-cream">
-                    “{t.body}”
+                    "{t.body}"
                   </blockquote>
                   <figcaption className="mt-auto flex items-center gap-3 border-t border-cream/15 pt-4">
                     <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-yellow text-yellow-foreground text-sm font-extrabold">
@@ -795,103 +1077,6 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* ====================== PARA GRUPOS ======================
-          2 cards foto grandes (Empresas + Instituciones) estilo
-          "PARA CELEBRAR JUNTOS" + bloque chiquito de Importadores avanzados
-          como CTA separado. */}
-      <section id="grupos" className="bg-background py-24 sm:py-32">
-        <Container>
-          <Reveal className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em]">
-              <span className="rounded-full bg-primary px-3 py-1 text-primary-foreground">
-                Compras en grupo
-              </span>
-            </p>
-            <h2 className="mt-6 font-extrabold uppercase leading-[0.95] tracking-tight text-[clamp(2rem,5vw,4.5rem)]">
-              Para empresas e <span className="text-highlight">instituciones</span>
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Comprás un volumen mayor o representás a un grupo. Tenemos
-              modalidades a medida.
-            </p>
-          </Reveal>
-
-          {/* 2 cards foto lado a lado */}
-          <Stagger className="mt-16 grid gap-6 lg:grid-cols-2">
-            {groupHighlights.map((g) => (
-              <StaggerItem key={g.title}>
-                <Link
-                  href={g.href}
-                  className="group relative block aspect-[5/4] overflow-hidden rounded-[2rem]"
-                >
-                  <Image
-                    src={g.image}
-                    alt={g.title}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
-                  />
-                  {/* Overlay para legibilidad */}
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-gradient-to-t from-navy/85 via-navy/40 to-transparent"
-                  />
-                  {/* Texto abajo-izquierda */}
-                  <div className="absolute inset-x-0 bottom-0 p-8 sm:p-10">
-                    <h3 className="text-3xl font-extrabold uppercase tracking-tight text-cream sm:text-4xl">
-                      {g.title}
-                    </h3>
-                    <p className="mt-3 max-w-md text-sm leading-relaxed text-cream/85 sm:text-base">
-                      {g.description}
-                    </p>
-                    <p className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-cream">
-                      Hablemos
-                      <ArrowRight
-                        className="size-4 transition-transform group-hover:translate-x-1"
-                        aria-hidden
-                      />
-                    </p>
-                  </div>
-                </Link>
-              </StaggerItem>
-            ))}
-          </Stagger>
-
-          {/* Bloque chico: Importadores avanzados */}
-          <Reveal delay={0.25} className="mt-8">
-            <Link
-              href="/ser-importador"
-              className="hover-lift group block overflow-hidden rounded-3xl border border-border bg-cream p-8 transition-colors hover:border-primary/50 sm:p-10"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-navy">
-                    <IconMN name="vendedor" variant="blanco" size={32} alt="" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Para profesionales
-                    </p>
-                    <h3 className="mt-1 text-2xl font-extrabold uppercase tracking-tight sm:text-3xl">
-                      Importadores avanzados
-                    </h3>
-                  </div>
-                </div>
-                <p className="max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
-                  ¿Ya importás y querés abrir tus propias campañas en la
-                  plataforma? Postulate al programa y liderá tu propia
-                  importación.
-                </p>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-navy px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-navy-foreground transition-transform group-hover:-translate-y-0.5">
-                  Postularme
-                  <ArrowRight className="size-4" aria-hidden />
-                </span>
-              </div>
-            </Link>
-          </Reveal>
-        </Container>
-      </section>
-
       {/* ====================== CTA RESERVAR ======================
           Bloque navy full-bleed con headline gigante a la izquierda +
           form sobre cream a la derecha. Es el cierre del home. */}
@@ -918,7 +1103,7 @@ export default async function HomePage() {
                 </span>
               </p>
               <h2 className="mt-6 font-extrabold uppercase leading-[0.95] tracking-tight text-white text-[clamp(2rem,5.5vw,5rem)]">
-                Sumate a la <span className="text-yellow">primera campaña</span>
+                Sumate a <span className="text-yellow">Mercado Nuestro</span>
               </h2>
               <p className="mt-5 text-base text-cream/80 sm:text-lg">
                 Crear cuenta es gratis, lleva menos de un minuto y no te
@@ -933,11 +1118,11 @@ export default async function HomePage() {
                   { icon: "seguridad", label: "Pago seguro vía Mercado Pago" },
                 ].map((line) => (
                   <div key={line.label} className="flex items-center gap-3">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-white/10">
+                    <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/10">
                       <IconMN
                         name={line.icon as "ubicacion" | "tienda" | "soporte" | "seguridad"}
                         variant="blanco"
-                        size={22}
+                        size={28}
                         alt=""
                       />
                     </div>

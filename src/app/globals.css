@@ -59,6 +59,27 @@
   --color-gold-foreground: var(--yellow-foreground);
   --color-cream: var(--cream);
   --color-cream-foreground: var(--cream-foreground);
+
+  /* ─── Alias semánticos según COLORES.md ──────────────────────────────────
+     Estos son los nombres oficiales del spec para que las clases Tailwind
+     coincidan con la documentación: bg-brand-blue, text-brand-yellow,
+     border-neutral-gray-300, etc. Apuntan a los mismos HEX que los tokens
+     internos (--blue, --navy, --yellow, etc.) por lo que la Web Home y la
+     Web App comparten paleta — la diferencia está en cómo se nombran las
+     clases en cada lado. */
+  --color-brand-blue: var(--blue);
+  --color-brand-blue-foreground: var(--blue-foreground);
+  --color-brand-blue-dark: var(--navy);
+  --color-brand-blue-dark-foreground: var(--navy-foreground);
+  --color-brand-blue-light: var(--blue-light);
+  --color-brand-blue-light-foreground: var(--blue-light-foreground);
+  --color-brand-yellow: var(--yellow);
+  --color-brand-yellow-foreground: var(--yellow-foreground);
+  --color-neutral-white: #ffffff;
+  --color-neutral-gray-50: #f5f7fa;
+  --color-neutral-gray-300: #d1d5db;
+  --color-neutral-gray-700: #374151;
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -213,6 +234,26 @@
     border-radius: 0.15em;
     /* Box-decoration-break: clone hace que cada línea (cuando el texto
        wrappea en 2 líneas) reciba su propio subrayado. */
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .text-highlight-hero {
+    color: var(--blue);
+    background-image: linear-gradient(
+      to top,
+      transparent 0,
+      transparent 0.1em,
+      rgb(255 193 7 / 0.85) 0.1em,
+      rgb(255 193 7 / 0.85) 0.5em,
+      transparent 0.5em
+    );
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 100%;
+    padding-inline: 0.05em;
+    padding-bottom: 0.15em;
+    border-radius: 0.15em;
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
   }

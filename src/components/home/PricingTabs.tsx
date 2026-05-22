@@ -43,7 +43,7 @@ const CATEGORIES: Category[] = [
       "Manual + accesorios incluidos",
     ],
     ctaLabel: "Ver campañas electrónica",
-    ctaHref: "/campanas",
+    ctaHref: "/app/campanas",
   },
   {
     id: "hogar",
@@ -62,7 +62,7 @@ const CATEGORIES: Category[] = [
       "Devolución hasta 7 días",
     ],
     ctaLabel: "Ver campañas hogar",
-    ctaHref: "/campanas",
+    ctaHref: "/app/campanas",
   },
   {
     id: "indumentaria",
@@ -81,7 +81,7 @@ const CATEGORIES: Category[] = [
       "Bonus revendedor desde 5 uds",
     ],
     ctaLabel: "Ver campañas indumentaria",
-    ctaHref: "/campanas",
+    ctaHref: "/app/campanas",
   },
   {
     id: "empresas",
@@ -100,7 +100,7 @@ const CATEGORIES: Category[] = [
       "Asesoría de importador avanzado",
     ],
     ctaLabel: "Postularme como importador",
-    ctaHref: "/ser-importador",
+    ctaHref: "/app/ser-importador",
   },
 ];
 

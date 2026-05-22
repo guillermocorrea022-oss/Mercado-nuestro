@@ -2,13 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SignInForm } from "@/components/auth/SignInForm";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión",
@@ -25,25 +18,32 @@ export default async function LoginPage({
     next && next.startsWith("/") && !next.startsWith("//") ? next : undefined;
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
-        <CardDescription>
-          Entrá con tu email y contraseña para reservar y ver tus pedidos.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div>
+      {/* Eyebrow */}
+      <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-blue">
+        Bienvenido de nuevo
+      </p>
+
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-neutral-gray-700 sm:text-4xl">
+        Iniciar sesión
+      </h1>
+      <p className="mt-2 text-sm text-neutral-gray-700/70 sm:text-base">
+        Entrá con tu email y contraseña para reservar y ver tus pedidos.
+      </p>
+
+      <div className="mt-8">
         <SignInForm next={safeNext} />
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          ¿Todavía no tenés cuenta?{" "}
-          <Link
-            href="/registro"
-            className="font-medium text-primary hover:underline"
-          >
-            Creá una en un minuto
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+      </div>
+
+      <p className="mt-8 text-sm text-neutral-gray-700/70">
+        ¿Todavía no tenés cuenta?{" "}
+        <Link
+          href="/registro"
+          className="font-bold text-brand-blue underline-offset-4 hover:underline"
+        >
+          Creá una en un minuto
+        </Link>
+      </p>
+    </div>
   );
 }

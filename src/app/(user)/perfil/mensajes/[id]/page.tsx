@@ -87,7 +87,7 @@ export default async function ConversationPage({
           </p>
           {product ? (
             <Link
-              href={`/marketplace/${listing.id}`}
+              href={`/app/marketplace/${listing.id}`}
               className="mt-1 text-lg font-semibold tracking-tight hover:text-primary"
             >
               {product.name}

@@ -4,8 +4,8 @@ import { Minus, Plus } from "lucide-react";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
-import { createReservationAction } from "@/app/(public)/campanas/actions";
-import { initialReserveState } from "@/app/(public)/campanas/reserve-state";
+import { createReservationAction } from "@/app/app/campanas/actions";
+import { initialReserveState } from "@/app/app/campanas/reserve-state";
 import { buttonVariants } from "@/components/ui/button";
 import {
   findCurrentTier,
