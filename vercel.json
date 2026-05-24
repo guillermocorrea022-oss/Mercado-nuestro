@@ -1,12 +1,13 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
       "path": "/api/cron/close-expired-campaigns",
-      "schedule": "0 * * * *"
+      "schedule": "0 3 * * *"
     },
     {
       "path": "/api/cron/release-escrow",
-      "schedule": "15 * * * *"
+      "schedule": "30 3 * * *"
     },
     {
       "path": "/api/cron/process-payouts",
