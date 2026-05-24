@@ -640,7 +640,7 @@ export default async function MarketplacePage({ searchParams }: PageProps) {
                       <option>Mejor reputación</option>
                     </select>
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
                     {filtered.map((l) => (
                       <ListingCard key={l.id} listing={toCardData(l)} />
                     ))}
@@ -702,7 +702,7 @@ export default async function MarketplacePage({ searchParams }: PageProps) {
                       Ver todos
                     </Link>
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                     {featured.map((l) => (
                       <ListingCard key={l.id} listing={toCardData(l)} compact />
                     ))}
@@ -729,7 +729,7 @@ export default async function MarketplacePage({ searchParams }: PageProps) {
                       Ver todos
                     </Link>
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                     {bestSellers.map((l) => (
                       <ListingCard key={l.id} listing={toCardData(l)} compact />
                     ))}
