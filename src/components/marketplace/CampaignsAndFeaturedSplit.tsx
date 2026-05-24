@@ -87,7 +87,9 @@ export function CampaignsAndFeaturedSplit({
                 </Link>
               </header>
 
-              <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3">
+              {/* Mobile: flex carousel con scroll horizontal + snap.
+                  Desktop (sm+): grid 3 columnas. */}
+              <div className="-mx-5 flex flex-1 snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
                 {campaigns.slice(0, 3).map((c) => (
                   <CampaignMiniCard key={c.id} campaign={c} />
                 ))}
@@ -116,7 +118,9 @@ export function CampaignsAndFeaturedSplit({
                 </Link>
               </header>
 
-              <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3">
+              {/* Mobile: flex carousel con scroll horizontal + snap.
+                  Desktop (sm+): grid 3 columnas. */}
+              <div className="-mx-5 flex flex-1 snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
                 {featured.slice(0, 3).map((f) => (
                   <FeaturedMiniCard key={f.id} item={f} />
                 ))}
@@ -134,7 +138,8 @@ export function CampaignsAndFeaturedSplit({
 
 function CampaignMiniCard({ campaign }: { campaign: SplitCampaignCard }) {
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-white transition-all hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-md">
+    // Mobile: ancho fijo + snap-start para carousel; sm+: w-auto en el grid.
+    <article className="group flex h-full w-[180px] shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-border bg-white transition-all hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-md sm:w-auto sm:shrink">
       <Link
         href={`/app/campanas/${campaign.slug}`}
         className="relative block aspect-square overflow-hidden bg-neutral-gray-50"
@@ -212,7 +217,8 @@ function FeaturedMiniCard({ item }: { item: SplitFeaturedCard }) {
 
   return (
     <>
-      <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-white transition-all hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-md">
+      {/* Mobile: ancho fijo + snap-start para carousel; sm+: w-auto en el grid. */}
+      <article className="group flex h-full w-[180px] shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-border bg-white transition-all hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-md sm:w-auto sm:shrink">
         <Link
           href={`/app/marketplace/${item.slug}`}
           className="relative block aspect-square overflow-hidden bg-neutral-gray-50"
