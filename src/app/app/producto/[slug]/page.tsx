@@ -13,6 +13,7 @@ import { AppContainer } from "@/components/layout/AppContainer";
 import { Reveal } from "@/components/motion/Reveal";
 import { buttonVariants } from "@/components/ui/button";
 import { formatUsdFromCents } from "@/lib/campaigns";
+import { fixMojibake } from "@/lib/encoding";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/types/database";
@@ -79,8 +80,20 @@ async function getProduct(slug: string) {
 
   return {
     ...product,
+    // Fix mojibake en strings de DB (Cámara, brand, descripciones)
+    name: fixMojibake(product.name),
+    brand: product.brand ? fixMojibake(product.brand) : null,
+    short_description: product.short_description
+      ? fixMojibake(product.short_description)
+      : null,
+    long_description: product.long_description
+      ? fixMojibake(product.long_description)
+      : null,
     inventory: inventory?.[0] ?? null,
-    activeCampaigns: campaigns ?? [],
+    activeCampaigns: (campaigns ?? []).map((c) => ({
+      ...c,
+      title: fixMojibake(c.title),
+    })),
   };
 }
 

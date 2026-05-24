@@ -118,7 +118,9 @@ async function getActiveCampaigns(): Promise<CampaignRowCardData[]> {
     return {
       id: c.id,
       slug: c.slug,
-      title: c.title,
+      // Aplicar fixMojibake a TODOS los strings que vienen de DB con acentos,
+      // no solo a category. El título "Cámara IP WiFi" venía como "CÃ¡mara IP".
+      title: fixMojibake(c.title),
       category: category?.name ? fixMojibake(category.name) : null,
       imageUrl: c.hero_image_url ?? product?.main_image_url ?? null,
       pricingTiers: c.pricing_tiers ?? [],

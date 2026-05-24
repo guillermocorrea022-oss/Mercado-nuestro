@@ -22,9 +22,12 @@ const MOJIBAKE_PAIRS: Array<[string, string]> = [
   ["Ãº", "ú"],
   ["Ã±", "ñ"],
   ["Ã¼", "ü"],
+  ["Â·", "·"], // middle dot, muy usado como separador en títulos
   ["Â¿", "¿"],
   ["Â¡", "¡"],
   ["Â°", "°"],
+  ["Â®", "®"],
+  ["Â©", "©"],
 ];
 
 /**

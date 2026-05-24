@@ -16,6 +16,7 @@ import { AppContainer } from "@/components/layout/AppContainer";
 import { IconMN } from "@/components/ui/IconMN";
 import { StarRating } from "@/components/ui/star-rating";
 import { formatUsdFromCents } from "@/lib/campaigns";
+import { fixMojibake } from "@/lib/encoding";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -85,7 +86,33 @@ async function getListing(id: string): Promise<ListingDetail | null> {
     .maybeSingle()
     .returns<SellerDetail | null>();
 
-  return { ...raw, seller: seller ?? null };
+  // Fix mojibake en todos los strings que vienen de DB (mismo issue que en
+  // campanas: acentos rotos por encoding al insertar el seed).
+  const product = Array.isArray(raw.product) ? raw.product[0] : raw.product;
+  return {
+    ...raw,
+    description: raw.description ? fixMojibake(raw.description) : null,
+    product: product
+      ? {
+          ...product,
+          name: fixMojibake(product.name),
+          brand: product.brand ? fixMojibake(product.brand) : null,
+          short_description: product.short_description
+            ? fixMojibake(product.short_description)
+            : null,
+          long_description: product.long_description
+            ? fixMojibake(product.long_description)
+            : null,
+        }
+      : null,
+    seller: seller
+      ? {
+          ...seller,
+          display_name: fixMojibake(seller.display_name),
+          bio: seller.bio ? fixMojibake(seller.bio) : null,
+        }
+      : null,
+  };
 }
 
 export async function generateMetadata({

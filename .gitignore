@@ -51,3 +51,5 @@ next-env.d.ts
 /img/
 /iconos_mercado_nuestro/
 /logo/
+
+.vercel

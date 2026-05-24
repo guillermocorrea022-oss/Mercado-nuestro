@@ -8,6 +8,7 @@ import { CampaignReserveForm } from "@/components/campanas/CampaignReserveForm";
 import { ShareButton } from "@/components/campanas/ShareButton";
 import { AppContainer } from "@/components/layout/AppContainer";
 import { Reveal } from "@/components/motion/Reveal";
+import { fixMojibake } from "@/lib/encoding";
 import { createClient } from "@/lib/supabase/server";
 import {
   formatTimeRemaining,
@@ -105,11 +106,30 @@ async function getCampaignBySlug(slug: string) {
       Database["public"]["Tables"]["campaign_status_updates"]["Row"][]
     >();
 
+  const product = Array.isArray(campaign.product)
+    ? campaign.product[0] ?? null
+    : campaign.product;
+
+  // Aplicamos fixMojibake a TODOS los strings que vienen de DB y se muestran.
+  // Solución de raíz: arreglar los datos en DB con UPDATE SQL — pero mientras
+  // tanto este patch hace que se vea bien.
   return {
     ...campaign,
-    product: Array.isArray(campaign.product)
-      ? campaign.product[0] ?? null
-      : campaign.product,
+    title: fixMojibake(campaign.title),
+    description: campaign.description ? fixMojibake(campaign.description) : null,
+    product: product
+      ? {
+          ...product,
+          name: fixMojibake(product.name),
+          short_description: product.short_description
+            ? fixMojibake(product.short_description)
+            : null,
+          long_description: product.long_description
+            ? fixMojibake(product.long_description)
+            : null,
+          brand: product.brand ? fixMojibake(product.brand) : null,
+        }
+      : null,
     pricing_tiers: campaign.pricing_tiers ?? [],
     progress,
     updates: updates ?? [],

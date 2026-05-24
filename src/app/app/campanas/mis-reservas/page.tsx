@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRight, PackageOpen, ShieldCheck } from "lucide-react";
 
+import { fixMojibake } from "@/lib/encoding";
 import { CancelReservationButton } from "@/components/campanas/CancelReservationButton";
 import { CampaignsTabsNav } from "@/components/campanas/CampaignsTabsNav";
 import { PayBalanceButton } from "@/components/campanas/PayBalanceButton";
@@ -198,7 +199,7 @@ export default async function MisReservasPage() {
                           ) : null}
                         </div>
                         <h2 className="mt-2 line-clamp-1 text-base font-bold tracking-tight text-neutral-gray-700">
-                          {campaign.title}
+                          {fixMojibake(campaign.title)}
                         </h2>
                         <p className="mt-1 text-sm text-neutral-gray-700/70">
                           {r.quantity} unidad(es) ·{" "}
