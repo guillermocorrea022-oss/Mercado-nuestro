@@ -87,7 +87,7 @@ export function CampaignsAndFeaturedSplit({
                 </Link>
               </header>
 
-              <div className="grid flex-1 gap-3 sm:grid-cols-3">
+              <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3">
                 {campaigns.slice(0, 3).map((c) => (
                   <CampaignMiniCard key={c.id} campaign={c} />
                 ))}
@@ -116,7 +116,7 @@ export function CampaignsAndFeaturedSplit({
                 </Link>
               </header>
 
-              <div className="grid flex-1 gap-3 sm:grid-cols-3">
+              <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3">
                 {featured.slice(0, 3).map((f) => (
                   <FeaturedMiniCard key={f.id} item={f} />
                 ))}
