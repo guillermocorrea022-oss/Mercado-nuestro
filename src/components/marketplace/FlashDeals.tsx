@@ -92,8 +92,9 @@ export function FlashDeals({ items }: FlashDealsProps) {
           </div>
         </div>
 
-        {/* Carrusel horizontal de cards */}
-        <div className="flex gap-4 overflow-x-auto pb-2 lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible lg:pb-0">
+        {/* Grid 2 cols mobile, 4 cols desktop. Sin scroll horizontal para
+            no romper layout en celular. */}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
           {items.slice(0, 4).map((item) => (
             <FlashDealCard key={item.id} item={item} />
           ))}
@@ -113,7 +114,7 @@ function FlashDealCard({ item }: { item: FlashDealItem }) {
 
   return (
     <>
-      <article className="group flex w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl bg-white text-neutral-gray-700 shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl lg:w-auto">
+      <article className="group flex flex-col overflow-hidden rounded-2xl bg-white text-neutral-gray-700 shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl">
         {/* La imagen + título son clickeables → llevan al detalle del producto.
             El botón "Agregar al carrito" es SEPARADO (abre el modal). */}
         <Link
